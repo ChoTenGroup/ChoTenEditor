@@ -45,6 +45,15 @@ let editorFontFamily;
 let prewarmFiles;
 let prewarmFilesMax;
 let prewarmKether;
+let ceElementPickerEl;
+let cePreviewEl;
+let ceDiagnosticsEl;
+let mcAssetsPathEl;
+let hidePremiumHintsEl;
+let hideVersionHintsEl;
+let mcAssetsBrowseBtn;
+let mcAssetsDetectBtn;
+let mcAssetsStatusEl;
 
 // 积木块显示
 let blockFontSize;
@@ -154,6 +163,13 @@ const defaultConfig = {
     filesMaxMb: 50,
     kether: true,
   },
+  // ---- CraftEngine 工具 ----
+  ceElementPicker: true,       // 预载扫描 CE 元素 (补全按钮)
+  cePreview: true,             // MC 场景预览
+  ceDiagnostics: true,         // 配置错误检查 (ERROR/WARN/WEAK_WARN/INFO)
+  mcAssetsPath: '',            // 原版 Minecraft assets 目录
+  hidePremiumHints: false,     // 隐藏付费版提示
+  hideVersionHints: false,     // 隐藏版本限制提示
   ai: {
     endpoint: 'https://api.openai.com/v1/chat/completions',
     model: 'gpt-4o',
@@ -401,6 +417,18 @@ function initializeDOMElements() {
   prewarmFiles = document.getElementById('prewarm-files');
   prewarmFilesMax = document.getElementById('prewarm-files-max');
   prewarmKether = document.getElementById('prewarm-kether');
+
+  // CraftEngine 工具
+  ceElementPickerEl = document.getElementById('ce-element-picker');
+  cePreviewEl = document.getElementById('ce-preview');
+  ceDiagnosticsEl = document.getElementById('ce-diagnostics');
+  mcAssetsPathEl = document.getElementById('mc-assets-path');
+  hidePremiumHintsEl = document.getElementById('hide-premium-hints');
+  hideVersionHintsEl = document.getElementById('hide-version-hints');
+  mcAssetsBrowseBtn = document.getElementById('mc-assets-browse');
+  mcAssetsDetectBtn = document.getElementById('mc-assets-detect');
+  mcAssetsStatusEl = document.getElementById('mc-assets-status');
+  bindCEToolEvents();
 
   console.log('  - themeSelect:', !!themeSelect);
   console.log('  - backBtn:', !!backBtn);
@@ -689,14 +717,29 @@ function setupEventListeners() {
     });
   }
 
-  // 语言切换
+  // 语言切换：只保存选择，重启后生效
+  // （热切换会造成设置页以外的界面残留旧语言、缓存失效，且刷新 iframe 会丢弃未保存的其他设置）
   var langSelect = document.getElementById('language');
   if (langSelect) {
-    langSelect.value = I18N.lang;
+    var savedLang = getFullConfig().language;
+    langSelect.value = (savedLang === 'en_us' || savedLang === 'zh_cn') ? savedLang : I18N.lang;
+    updateLanguageRestartHint();
     langSelect.addEventListener('change', function() {
       playSound('click');
-      I18N.setLang(this.value);
-      location.reload();
+      var next = this.value;
+      I18N.saveLang(next);
+      updateLanguageRestartHint();
+      if (next === I18N.lang) {
+        // 选回了当前界面语言，等于取消之前的更改
+        showNotification(I18N.t('settings.languageReverted'), 'info');
+        return;
+      }
+      var msg = I18N.t('settings.languageRestartMessage');
+      if (window.UI && typeof UI.alert === 'function') {
+        UI.alert({ title: I18N.t('settings.languageRestartTitle'), message: msg });
+      } else {
+        showNotification(msg, 'info');
+      }
     });
   }
 
@@ -714,6 +757,18 @@ function setupEventListeners() {
   });
 
   console.log('[SETTINGS] 事件监听器设置完成?');
+}
+
+// 语言设置已保存但当前界面仍是旧语言（即等待重启）时，提示用户需要重启
+function updateLanguageRestartHint() {
+  var hint = document.getElementById('language-restart-hint');
+  if (!hint) return;
+  var saved = getFullConfig().language;
+  var pending = (saved === 'en_us' || saved === 'zh_cn') && saved !== I18N.lang;
+  var key = pending ? 'settings.languageRestartPending' : 'settings.languageRestartHint';
+  hint.setAttribute('data-i18n', key);
+  hint.textContent = I18N.t(key);
+  hint.classList.toggle('pending', pending);
 }
 
 // ============================================
@@ -1037,6 +1092,12 @@ async function saveSettings() {
     autoSync: editorAutoSync ? editorAutoSync.value === 'true' : defaultConfig.autoSync,
     devTools: editorDevtools ? editorDevtools.checked : defaultConfig.devTools,
     itemKeyStyle: itemKeyStyle ? itemKeyStyle.value : defaultConfig.itemKeyStyle,
+    ceElementPicker: ceElementPickerEl ? ceElementPickerEl.checked : defaultConfig.ceElementPicker,
+    cePreview: cePreviewEl ? cePreviewEl.checked : defaultConfig.cePreview,
+    ceDiagnostics: ceDiagnosticsEl ? ceDiagnosticsEl.checked : defaultConfig.ceDiagnostics,
+    mcAssetsPath: mcAssetsPathEl ? mcAssetsPathEl.value.trim() : defaultConfig.mcAssetsPath,
+    hidePremiumHints: hidePremiumHintsEl ? hidePremiumHintsEl.checked : defaultConfig.hidePremiumHints,
+    hideVersionHints: hideVersionHintsEl ? hideVersionHintsEl.checked : defaultConfig.hideVersionHints,
     prewarm: {
       files: prewarmFiles ? prewarmFiles.checked : defaultConfig.prewarm.files,
       filesMaxMb: prewarmFilesMax ? (function(){ var v = parseInt(prewarmFilesMax.value); return isNaN(v) ? defaultConfig.prewarm.filesMaxMb : v; })() : defaultConfig.prewarm.filesMaxMb,
@@ -1323,6 +1384,15 @@ function loadSettings() {
   if (prewarmFilesMax) prewarmFilesMax.value = (pw.filesMaxMb !== undefined && pw.filesMaxMb !== null) ? pw.filesMaxMb : 50;
   if (prewarmKether) prewarmKether.checked = pw.kether !== false;
 
+  // CraftEngine 工具设置
+  if (ceElementPickerEl) ceElementPickerEl.checked = config.ceElementPicker !== false;
+  if (cePreviewEl) cePreviewEl.checked = config.cePreview !== false;
+  if (ceDiagnosticsEl) ceDiagnosticsEl.checked = config.ceDiagnostics !== false;
+  if (mcAssetsPathEl) mcAssetsPathEl.value = config.mcAssetsPath || '';
+  if (hidePremiumHintsEl) hidePremiumHintsEl.checked = config.hidePremiumHints === true;
+  if (hideVersionHintsEl) hideVersionHintsEl.checked = config.hideVersionHints === true;
+  detectMinecraftAssets(true);
+
   // AI 设置
   var aiCfg = config.ai || defaultConfig.ai;
   if (aiEndpoint) aiEndpoint.value = aiCfg.endpoint || defaultConfig.ai.endpoint;
@@ -1601,3 +1671,107 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 console.log('[SETTINGS] settings.js 已加载');
+
+// ============================================
+// CraftEngine 工具设置 (资源目录 / 预览 / 配置检查)
+// ============================================
+function bindCEToolEvents() {
+  if (mcAssetsBrowseBtn) {
+    mcAssetsBrowseBtn.addEventListener('click', async function () {
+      if (!window.electronAPI || !window.electronAPI.openDirectory) return;
+      try {
+        const res = await window.electronAPI.openDirectory();
+        const dir = Array.isArray(res) ? res[0] : res;
+        if (!dir) return;
+        let p = String(dir).replace(/\\/g, '/').replace(/\/+$/, '');
+        if (!/\/assets$/.test(p)) {
+          const sub = await findAssetsDir(p);
+          if (sub) p = sub;
+        }
+        if (mcAssetsPathEl) mcAssetsPathEl.value = p;
+        detectMinecraftAssets(true);
+        showNotification(I18N.t('settings.mcAssetsSet'), 'info');
+      } catch (e) {
+        showNotification(I18N.t('settings.mcAssetsBrowseFailed') + ': ' + e.message, 'error');
+      }
+    });
+  }
+  if (mcAssetsDetectBtn) {
+    mcAssetsDetectBtn.addEventListener('click', function () { detectMinecraftAssets(false); });
+  }
+  if (mcAssetsPathEl) {
+    mcAssetsPathEl.addEventListener('change', function () { detectMinecraftAssets(true); });
+  }
+}
+
+// 在给定目录下寻找 assets 目录 (最多下探 3 层, 兼容 versions/<v>/<v>/assets)
+async function findAssetsDir(base) {
+  const api = window.electronAPI;
+  if (!api || !api.readdir) return null;
+  const norm = String(base).replace(/\\/g, '/').replace(/\/+$/, '');
+  if (/\/assets$/.test(norm)) return norm;
+  async function probe(dir, depth) {
+    if (depth > 3) return null;
+    const res = await api.readdir(dir);
+    if (!res || !res.success) return null;
+    const hit = res.files.find(f => f.name === 'assets' && f.isDirectory);
+    if (hit) return String(hit.path).replace(/\\/g, '/');
+    const dirs = res.files.filter(f => f.isDirectory && f.name.charAt(0) !== '.');
+    for (const d of dirs) {
+      const found = await probe(d.path, depth + 1);
+      if (found) return found;
+    }
+    return null;
+  }
+  return probe(norm, 0);
+}
+
+// 检测资源目录并显示索引状态
+async function detectMinecraftAssets(silentMissing) {
+  if (!mcAssetsStatusEl) return;
+  const api = window.electronAPI;
+  if (!api || !api.mc) {
+    mcAssetsStatusEl.textContent = I18N.t('settings.mcAssetsUnavailable');
+    return;
+  }
+  let root = mcAssetsPathEl ? mcAssetsPathEl.value.trim() : '';
+  if (!root) {
+    try {
+      const det = await api.mc.detectRoots();
+      if (det && det.ok && det.roots && det.roots.length) {
+        root = det.roots[0];
+        if (!silentMissing && mcAssetsPathEl) mcAssetsPathEl.value = root;
+      }
+    } catch (e) { /* ignore */ }
+  }
+  if (!root) {
+    mcAssetsStatusEl.textContent = silentMissing ? '' : I18N.t('settings.mcAssetsNotFound');
+    mcAssetsStatusEl.style.color = 'var(--color-warning)';
+    return;
+  }
+  mcAssetsStatusEl.style.color = 'var(--color-text-tertiary)';
+  mcAssetsStatusEl.textContent = I18N.t('settings.mcAssetsScanning');
+  try {
+    const res = await api.mc.scanAssets(root);
+    if (!res || !res.ok) {
+      mcAssetsStatusEl.textContent = I18N.t('settings.mcAssetsInvalid', { err: (res && res.error) || '' });
+      mcAssetsStatusEl.style.color = 'var(--color-error)';
+      return;
+    }
+    const ns = Object.keys(res.namespaces || {});
+    let items = 0, tex = 0, models = 0;
+    ns.forEach(k => {
+      const r = res.namespaces[k];
+      items += (r.itemIds || []).length;
+      tex += (r.textureIds || []).length;
+      models += (r.modelIds || []).length;
+    });
+    mcAssetsStatusEl.textContent = I18N.t('settings.mcAssetsStatus', {
+      ns: ns.join(', '), items: items, tex: tex, models: models,
+    });
+    mcAssetsStatusEl.style.color = 'var(--color-success)';
+  } catch (e) {
+    mcAssetsStatusEl.textContent = I18N.t('settings.mcAssetsInvalid', { err: e.message });
+    mcAssetsStatusEl.style.color = 'var(--color-error)';
+  }
+}

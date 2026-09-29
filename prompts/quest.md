@@ -30,14 +30,6 @@ QuestID:                      # 全局唯一的任务 ID
   addon:                      # 任务级附加功能
     track:
       scoreboard: false       #   是否显示计分板追踪
-    chotenui:                 #   ChoTenUI 面板显示
-      icon: MATERIAL          #     图标材质
-      index: |-               #     简短索引文本
-        任务简介
-      description: |-         #     详细描述
-        任务详细说明
-      reward: |-              #     奖励描述
-        奖励列表
     restart: player dead      #   重启条件（死亡重置）
   agent:                      # 任务级代理脚本
     accepted @ all: |-        #   接受任务时执行

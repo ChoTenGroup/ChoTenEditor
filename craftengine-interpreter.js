@@ -13,6 +13,21 @@
   function _t(key, params) {
     return (typeof I18N !== 'undefined' && I18N.t) ? I18N.t(key, params) : key;
   }
+  // 带兜底文案的 i18n (字典尚未加载/缺键时使用 fallback, 并自行做 {x} 插值)
+  function _tf(key, fallback, params) {
+    var v = null;
+    try {
+      if (typeof I18N !== 'undefined' && I18N.t) {
+        v = I18N.t(key);
+        if (v === key) v = null;
+      }
+    } catch (e) { v = null; }
+    if (v == null) v = fallback != null ? fallback : key;
+    if (params) {
+      v = String(v).replace(/\{(\w+)\}/g, function (m, n) { return params[n] != null ? params[n] : m; });
+    }
+    return v;
+  }
   function _sound(name) {
     try { if (typeof playSound === 'function') playSound(name); } catch (e) {}
   }
@@ -788,18 +803,74 @@
     if (_sfSchemas && _sfSchemas.constants) {
       var cs = _sfSchemas.constants;
       Object.keys(cs).forEach(function (k) {
-        if (Array.isArray(cs[k])) _sfDatalistMap[k] = cs[k];
+        if (Array.isArray(cs[k])) _sfDatalistMap[k] = cs[k].slice();
       });
       var vi = cs.vanillaItems || [];
-      _sfDatalistMap.items = vi;
-      _sfDatalistMap.blocks = vi;
+      _sfDatalistMap.items = vi.slice();
+      _sfDatalistMap.blocks = vi.slice();
     }
+  }
+
+  // ---- Minecraft 资源注册表 (ce-mcassets.js) 接入 ----
+  // 原版 resources 索引就绪/重扫后, 把资源列表合并进 datalist;
+  // 未配置资源目录时保持原样 (只有内置的原版常量列表)。
+  var _ceAssetsBound = false;
+  var _ceAssetsKindBound = {};
+  function _sfMergeList(name, arr) {
+    _sfInit();
+    if (!_sfDatalistMap) return false;
+    if (!arr || !arr.length) return false;
+    var base = _sfDatalistMap[name] || [];
+    var seen = Object.create(null);
+    var out = [];
+    for (var i = 0; i < base.length; i++) { var a = base[i]; if (!seen[a]) { seen[a] = 1; out.push(a); } }
+    for (var j = 0; j < arr.length; j++) { var b = arr[j]; if (!seen[b]) { seen[b] = 1; out.push(b); } }
+    out.sort();
+    _sfDatalistMap[name] = out;
+    return true;
+  }
+  function _ceAssetsBind() {
+    var A = (typeof CEMCAssets !== 'undefined') ? CEMCAssets : null;
+    if (!A || !A.status || A.status().state !== 'ready') return;
+    _sfInit();
+    var kinds = ['items', 'blocks', 'textures', 'blockTextures', 'itemTextures', 'guiTextures',
+      'models', 'blockModels', 'itemModels', 'particles', 'fonts', 'equipments', 'atlases',
+      'soundFiles', 'soundEvents', 'enchantments', 'potionEffects', 'entities', 'biomes',
+      'attributes', 'paintings', 'jukeboxSongs'];
+    var changed = false;
+    for (var i = 0; i < kinds.length; i++) {
+      var k = kinds[i];
+      var list = A.listFor(k);
+      if (list && list.length) {
+        if (_sfMergeList(k, list)) { changed = true; _ceAssetsKindBound[k] = 1; }
+        _ceElemRefreshDatalist(k);
+        _ceElemRefreshDatalist(k + 's');
+      }
+    }
+    _ceAssetsBound = true;
+    // 资源就绪后补挂 picker 按钮 / 刷新 datalist: 重新渲染当前表单
+    if (changed && _sfActiveContainer && _sfActiveContainer._ceRenderFn) {
+      try { _sfActiveContainer._ceRenderFn(); } catch (e) { /* 忽略渲染异常 */ }
+    }
+  }
+  function _ceAssetsEnsureBind() {
+    if (_ceAssetsBound) return;
+    if (typeof CEMCAssets === 'undefined' || !CEMCAssets) return;
+    CEMCAssets.onReady(function () { _ceAssetsBind(); });
+    if (CEMCAssets.status && CEMCAssets.status().state === 'ready') _ceAssetsBind();
   }
 
   // ---- CE 元素预载扫描 (picker 数据源) ----
   // 扫描工程 configuration/<section> 目录收集条目键 (items/blocks/furniture/categories/templates),
   // 合并进 _sfDatalistMap (items/blocks 与 vanilla 去重合并, 其余直接存储); 结果按 configuration 目录缓存
-  var _CE_ELEM_SECTIONS = { items: 1, blocks: 1, furniture: 1, categories: 1, templates: 1 };
+  var _CE_ELEM_SECTIONS = {
+    items: 1, blocks: 1, furniture: 1, categories: 1, templates: 1,
+    equipments: 1, recipes: 1, loot_sources: 1, images: 1, emoji: 1,
+    sounds: 1, jukebox_songs: 1, paintings: 1, global_variables: 1,
+    placed_features: 1, translations: 1, lang: 1,
+  };
+  // 工程内可被 <image:ns:id> / <global:id> / <i18n:id> 引用的段 (供预览与诊断使用)
+  var _CE_EXTRA_SECTIONS = { images: 1, global_variables: 1, emoji: 1, translations: 1, lang: 1 };
   var _ceElemCache = Object.create(null); // configDir -> { state: 'loading'|'done', data: {sec:[keys]} }
   var _ceElemListeners = [];
   // 同步: 文件路径中显式含 configuration(s) 段 (标准布局)
@@ -945,6 +1016,15 @@
       }
       _ceElemRefreshDatalist(sec);
     });
+    // 工程扫描会重建 items/blocks 等列表, 需要把原版资源索引再合并回来
+    if (_ceAssetsBound) {
+      Object.keys(_ceAssetsKindBound).forEach(function (k) {
+        var A = (typeof CEMCAssets !== 'undefined') ? CEMCAssets : null;
+        if (!A) return;
+        var list = A.listFor(k);
+        if (list && list.length) { _sfMergeList(k, list); _ceElemRefreshDatalist(k); }
+      });
+    }
   }
   function _ceElemRefreshDatalist(sec) {
     if (!ROOT.document) return;
@@ -1241,9 +1321,10 @@
 
   // ---- 控件 (无标签) ----
   function _sfInput(def, path, value, type) {
+    var pick = _sfEffPicker(def, path);
     return '<input class="ce-input" data-sf-kind="field" data-sf-path="' + _escHtml(path) + '" data-sf-type="' + (type || 'text') + '"' +
       (def.placeholder ? ' placeholder="' + _escHtml(_labelOf(def.placeholder)) + '"' : '') +
-      (def.datalist ? ' list="ce-dl-' + _escHtml(def.datalist) + '"' : '') +
+      (pick && _sfHasList(pick) ? ' list="ce-dl-' + _escHtml(pick) + '"' : '') +
       ' value="' + _escHtml(_sfScalarText(value)) + '" spellcheck="false">';
   }
   function _sfCheckbox(def, path, value) {
@@ -1351,8 +1432,9 @@
   }
   // CE 元素 picker: 带 datalist/picker 标记的文本类输入框右侧加 ▾ 按钮 (设置关闭时不渲染)
   function _sfPickWrap(def, path, html) {
-    var name = def.picker || def.datalist;
+    var name = _sfEffPicker(def, path);
     if (!name || typeof document === 'undefined') return html;
+    if (!_sfHasList(name)) return html;
     if (document.body && document.body.classList && !document.body.classList.contains('ce-element-picker')) return html;
     return '<span class="ce-sf-pick-wrap">' + html +
       '<button type="button" class="ce-sf-pick-btn" data-sf-action="picker-open" data-sf-picker="' + _escHtml(name) + '" data-sf-path="' + _escHtml(path) + '" data-tip="' + _escHtml(_t('craftengine.pickerBtn')) + '" title="' + _escHtml(_t('craftengine.pickerBtn')) + '">▾</button>' +
@@ -1366,6 +1448,7 @@
   }
   function _sfDatalistHtml() {
     _sfInit();
+    _ceAssetsEnsureBind();
     if (!_sfDatalistMap) return '';
     var html = '';
     Object.keys(_sfDatalistMap).forEach(function (name) {
@@ -1581,7 +1664,96 @@
     return _sfWrap(def, inner, path, value);
   }
 
-  // ---- 字段提示 (ℹ 图标 + RichTooltip) ----
+  // ---- 字段路径 → 补全数据源 自动映射 ----
+  // 未显式声明 datalist/picker 的字段按「路径末段」自动挂上资源补全 (原版资源 + 工程资源)。
+  // 数据源由 ce-mcassets.js 提供, 未配置/未扫描时退化为原版常量列表。
+  var _SF_AUTO_PICK = [
+    // 精确路径优先 (整条 path 匹配, 用正则 ^...$)
+    { re: /^result\.id$/, list: 'items' },
+    { re: /^use_remainder\.id$/, list: 'items' },
+    { re: /\.result\.id$/, list: 'items' },
+    { re: /\.ingredient$/, list: 'items' },
+    { re: /\.using_converts_to$/, list: 'items' },
+    { re: /^overrides\.[^.]+$/, list: 'items' },
+    // 末段匹配
+    { re: /(^|\.)textures$/, list: 'textures', listItem: true },
+    { re: /(^|\.)texture$/, list: 'textures' },
+    { re: /(^|\.)models$/, list: 'models', listItem: true },
+    { re: /(^|\.)(item_model|model_path|custom_model|model)$/, list: 'models' },
+    { re: /(^|\.)material$/, list: 'items' },
+    { re: /(^|\.)(item|icon)$/, list: 'items' },
+    { re: /(^|\.)font$/, list: 'fonts' },
+    { re: /(^|\.)particle$/, list: 'particles' },
+    { re: /(^|\.)(sound|equip_sound|break_sound|place_sound|hit_sound|step_sound|fall_sound|land_sound|open_sound|close_sound|insert_sound|remove_sound|sound_event)$/, list: 'soundEvents' },
+    { re: /(^|\.)(enchantment)$/, list: 'enchantments' },
+    { re: /(^|\.)(potion_effect|effect)$/, list: 'potionEffects' },
+    { re: /(^|\.)biome$/, list: 'biomes' },
+    { re: /(^|\.)(entity|entity_type|mob)$/, list: 'entities' },
+    { re: /(^|\.)attribute$/, list: 'attributes' },
+    { re: /(^|\.)(recipe|loot_table|loot_source)$/, list: 'recipes' },
+    { re: /(^|\.)(ref|image)$/, list: 'images' },
+    { re: /(^|\.)category$/, list: 'categories' },
+    { re: /(^|\.)template$/, list: 'templates' },
+    { re: /(^|\.)painting_variant$/, list: 'paintings' },
+  ];
+  // 哪些 auto-pick 允许把「路径末段本身」当作数据源键 (listOf 的父字段)
+  function _sfAutoPickList(path) {
+    var p = String(path || '');
+    for (var i = 0; i < _SF_AUTO_PICK.length; i++) {
+      var r = _SF_AUTO_PICK[i];
+      if (r.re.test(p)) return r.list;
+    }
+    return null;
+  }
+  // 单个字段的有效补全数据源: 显式 picker > 显式 datalist > 路径自动推断
+  function _sfEffPicker(def, path) {
+    if (!def) return null;
+    if (def.picker) return def.picker;
+    if (def.datalist) return def.datalist;
+    return _sfAutoPickList(path);
+  }
+  function _sfHasList(name) {
+    if (!name) return false;
+    _sfInit();
+    return !!(_sfDatalistMap && _sfDatalistMap[name]);
+  }
+  // listOf: 值自身是数组, 末段即数据源名 (textures/models), 把 datalist 注入 itemType
+  function _sfListItemDef(def, path) {
+    var itemDef = def.itemType;
+    if (!itemDef || itemDef.datalist || itemDef.picker) return itemDef;
+    if (itemDef.type && itemDef.type !== 'text' && itemDef.type !== 'scalar' && itemDef.type !== 'string-scalar') return itemDef;
+    var name = _sfAutoPickList(path) || _sfAutoPickList(path + '.x');
+    if (!name || !_sfHasList(name)) return itemDef;
+    var copy = {};
+    for (var k in itemDef) if (Object.prototype.hasOwnProperty.call(itemDef, k)) copy[k] = itemDef[k];
+    copy.datalist = name;
+    return copy;
+  }
+
+  // ---- CE 别名键 ----------------------------------------------------------
+  // CraftEngine 通过 ConfigKeys.of("a|b|c") 接受多个键名 (behavior/behaviors、texture/textures…)。
+  // ce-cekeys.js 由 CE 源码生成, 这里据此把 schema 的规范键映射到文件里实际写的那个键。
+  function _ceAliasKeyIn(data, key, canonicalSet) {
+    if (!data || typeof data !== 'object') return null;
+    var db = (typeof CECeKeys !== 'undefined') ? CECeKeys : null;
+    if (!db || !db.aliasOf) return null;
+    var norm = String(key).toLowerCase().replace(/-/g, '_');
+    var alts = db.aliasOf[norm];
+    if (!alts || !alts.length) return null;
+    for (var i = 0; i < alts.length; i++) {
+      var cand = alts[i];
+      if (cand === norm) continue;
+      // 别名本身若是本 schema 的另一个规范键 (如 model 既是 item_model 的别名又是独立字段),
+      // 不能拿来绑定, 否则同一 YAML 键会被两个字段重复渲染
+      if (canonicalSet && canonicalSet[cand]) continue;
+      if (data[cand] !== undefined) return cand;
+      var dashed = cand.replace(/_/g, '-');
+      if (canonicalSet && canonicalSet[dashed]) continue;
+      if (data[dashed] !== undefined) return dashed;
+    }
+    return null;
+  }
+
   // CEHints (craftengine-hints.js): 文档原文提示数据库, key = 字段完整路径
   // 注意: interpreter 先于 hints 加载 (index.html), 必须按需读取, 不能加载时捕获
   function _sfCeHints() {
@@ -1620,7 +1792,20 @@
     return _sfTipOf(h);
   }
   // 高级版专属字段 (wiki 标记 Premium Exclusive), tooltip 末尾追加红色提示
+  // 键名比对统一把下划线/连字符/大小写归一, 避免 client_bound_data 与 client-bound-data 漏判
   var _sfPremiumKeys = ['client_bound_data', 'client_bound_material', 'data.conditional', 'visual_result', 'functions', 'variants.entity_culling', 'config.item.client-bound-model'];
+  var _sfPremiumSet = (function () {
+    var s = {};
+    for (var i = 0; i < _sfPremiumKeys.length; i++) s[_sfNormKey(_sfPremiumKeys[i])] = 1;
+    return s;
+  })();
+  function _sfNormKey(k) {
+    return String(k == null ? '' : k).replace(/[-_]/g, '').toLowerCase();
+  }
+  function _sfIsPremiumKey(k) {
+    if (!k) return false;
+    return _sfPremiumSet[_sfNormKey(k)] === 1;
+  }
   function _sfPremiumHidden() {
     return typeof document !== 'undefined' && !!(document.body && document.body.classList && document.body.classList.contains('ce-hide-premium-hints'));
   }
@@ -1645,7 +1830,7 @@
     if (!tip) return '';
     var k = _sfHintKey(path);
     if (k && def) _sfHintDefs[k] = def;
-    var isPremium = (_sfPremiumKeys.indexOf(k) !== -1) || (def && def.key && _sfPremiumKeys.indexOf(def.key) !== -1);
+    var isPremium = _sfIsPremiumKey(k) || (def && _sfIsPremiumKey(def.key));
     if (isPremium && !_sfPremiumHidden()) {
       tip += '\n\n§c' + _t('craftengine.premiumHint');
     }
@@ -2213,7 +2398,7 @@
   function _sfListHtml(def, path, value, opts) {
     var uid = (opts && opts.uid) || _sfUidAlloc(path, 'list', def, opts);
     var arr = Array.isArray(value) ? value : [];
-    var itemDef = def.itemType;
+    var itemDef = _sfListItemDef(def, path);
     var isUnionItem = itemDef && itemDef.type === 'union';
     var html = '<div class="ce-sf-list" data-sf-kind="list" data-sf-path="' + _escHtml(path) + '" data-sf-uid="' + uid + '">';
     for (var i = 0; i < arr.length; i++) {
@@ -2284,9 +2469,13 @@
       if (_sfVersionKeyRe.test(keys[vk])) { hasVer = true; break; }
     }
     var html = '<div class="ce-sf-map' + (hasVer ? ' has-verkey' : '') + '" data-sf-kind="map" data-sf-path="' + _escHtml(path) + '" data-sf-uid="' + uid + '">';
+    // 键本身是资源 ID 的 map (如 enchantment.enchantments / ingredients.map): 给键输入框挂 datalist
+    var keyList = _sfAutoPickList(path + '.x');
+    var keyListAttr = (keyList && _sfHasList(keyList)) ? ' list="ce-dl-' + _escHtml(keyList) + '"' : '';
+    if (keyList === 'items' && _sfHasList('items')) keyListAttr = ' list="ce-dl-items"';
     for (var i = 0; i < keys.length; i++) {
       var k = keys[i];
-      var keyCtrl = '<input class="ce-input ce-sf-map-key" data-sf-kind="map-key" data-sf-path="' + _escHtml(path) + '" data-sf-okey="' + _escHtml(k) + '" value="' + _escHtml(k) + '" spellcheck="false">';
+      var keyCtrl = '<input class="ce-input ce-sf-map-key" data-sf-kind="map-key" data-sf-path="' + _escHtml(path) + '" data-sf-okey="' + _escHtml(k) + '"' + keyListAttr + ' value="' + _escHtml(k) + '" spellcheck="false">';
       if (_sfVersionKeyRe.test(k)) {
         keyCtrl = '<div class="ce-sf-map-keybox">' + _sfVersionKeyBadge(k) + keyCtrl + '</div>';
       }
@@ -2416,8 +2605,9 @@
       var k = keys[i];
       var lb = _labelOf(types[k]) || k;
       var otip = '';
-      if (hintPrefix && _sfCeHints) {
-        var oh = _sfCeHints[hintPrefix + '.' + k];
+      var _chU = _sfCeHints();
+      if (hintPrefix && _chU) {
+        var oh = _chU[hintPrefix + '.' + k];
         if (oh) otip = ' data-tip="' + _escHtml(_sfPlain(_sfTipOf(oh))) + '"';
       }
       optHtml += '<option value="' + _escHtml(k) + '"' + otip + (cur.key === k && !cur.neg ? ' selected' : '') + '>' + _escHtml(lb) + '</option>';
@@ -3514,8 +3704,22 @@
       for (var t = 0; t < schema.tabs.length; t++) tabs[schema.tabs[t].key] = '';
     }
     var keyStyle = _sfItemKeyStyle(entry.data);
+    // 本 schema 的规范键集合 (别名解析时避免与其它字段撞车)
+    var canonicalKeys = Object.create(null);
+    (schema.fields || []).forEach(function (f0) {
+      if (!f0 || !f0.key) return;
+      canonicalKeys[f0.key] = 1;
+      canonicalKeys[f0.key.replace(/_/g, '-')] = 1;
+    });
     (schema.fields || []).forEach(function (fld) {
       var fk = _sfFldKey(fld, keyStyle);
+      // CE 别名键 (behaviors ↔ behavior / textures ↔ texture 等): 文件里写的是别名时,
+      // 用实际存在的那个键作为字段路径, 这样表单能正确回显与写回, 而不是落到「其他字段」
+      if (entry.data && typeof entry.data === 'object' && !Array.isArray(entry.data) &&
+          entry.data[fk] === undefined) {
+        var aliasKey = _ceAliasKeyIn(entry.data, fk, canonicalKeys);
+        if (aliasKey) fk = aliasKey;
+      }
       modeled[fk] = 1;
       var fhtml;
       if (fld.custom === 'events') fhtml = _eventsPanel(entry, evKey);
@@ -3702,7 +3906,7 @@
     var icon = '';
     var tip = hint || '';
     var k = _sfHintKey(key);
-    if (_sfCeHints && k && _sfCeHints[k]) tip = _sfTipOf(_sfCeHints[k]);
+    var _ch2 = _sfCeHints(); if (_ch2 && k && _ch2[k]) tip = _sfTipOf(_ch2[k]);
     if (tip) icon = '<span class="ce-sf-hint-icon" data-sf-hint="' + _escHtml(tip) + '">ℹ</span>';
     return '<div class="ce-field">' +
       '<label class="ce-field-label">' + _escHtml(label) + icon + '</label>' +
@@ -3726,8 +3930,9 @@
     for (var i = 0; i < options.length; i++) {
       var o = options[i];
       var otip = '';
-      if (titlePrefix && _sfCeHints) {
-        var oh = _sfCeHints[titlePrefix + '.' + o];
+      var _chL = _sfCeHints();
+      if (titlePrefix && _chL) {
+        var oh = _chL[titlePrefix + '.' + o];
         if (oh) otip = ' data-tip="' + _escHtml(_sfPlain(_sfTipOf(oh))) + '"';
       }
       html += '<option value="' + _escHtml(o) + '"' + otip + (String(value) === o ? ' selected' : '') + '>' + _escHtml(o) + '</option>';
@@ -4240,6 +4445,7 @@
         '<div class="ce-form-header">' +
         '<div class="ce-form-title">' + _escHtml(typeName) + '</div>' +
         '<div class="ce-form-actions">' +
+        _cePreviewButtons(section) +
         (parsed._isConfig ? '' :
           '<button class="cv-btn cv-btn-danger ce-rm-btn" data-action="ce-delete-entry">' + _escHtml(_t('craftengine.deleteEntry')) + '</button>') +
         '</div></div>' +
@@ -4256,6 +4462,7 @@
       '<div class="ce-badge" id="ce-owner-badge">' + _escHtml(_t('craftengine.ownerLoading')) + '</div>' +
       '<div class="ce-toolbar">' +
       '<button class="cv-btn cv-btn-secondary" data-action="ce-sync">' + _escHtml(_t('craftengine.syncToSource')) + '</button>' +
+      '<button class="cv-btn cv-btn-secondary ce-diag-btn" data-action="ce-diag-open" data-tip="' + _escHtml(_tf('diagnostics.openPanel', '配置检查')) + '"><span id="ce-diag-badge" class="ce-diag-badge ce-diag-badge-none">✓</span> ' + _escHtml(_tf('diagnostics.title', '配置检查')) + '</button>' +
       '<label class="ce-autosync"><input type="checkbox" id="ce-autosync"' + (ROOT.__keAutoSync ? ' checked' : '') + '> ' + _escHtml(_t('craftengine.autoSync')) + '</label>' +
       '</div></div>' +
       '<div class="ce-layout">' +
@@ -4285,6 +4492,168 @@
       });
     }
     _sfLastParsed = containerEl._ceParsed;
+    _ceDiagApply(containerEl);
+  }
+
+  // ============ 配置诊断 (IDEA 风格 ERROR/WARN/WEAK_WARN/INFO) ============
+  var _CE_DIAG_CLASS = { ERROR: 'ce-diag-error', WARN: 'ce-diag-warn', WEAK_WARN: 'ce-diag-weak', INFO: 'ce-diag-info' };
+  var _CE_DIAG_MARK = { ERROR: '✖', WARN: '⚠', WEAK_WARN: '△', INFO: 'ⓘ' };
+  function _ceDiagApply(containerEl) {
+    var parsed = containerEl._ceParsed;
+    if (!parsed) return;
+    // 诊断开关 (设置里关闭时不显示任何标记)
+    var diagOff = (typeof document !== 'undefined' && document.body && document.body.classList &&
+      document.body.classList.contains('ce-no-diagnostics'));
+    var issues = [];
+    if (!diagOff && typeof CEDiagnostics !== 'undefined') {
+      try { issues = CEDiagnostics.analyze(parsed, { file: containerEl._ceFilePath }) || []; }
+      catch (e) { issues = []; }
+    }
+    containerEl._ceIssues = issues;
+    var c = (typeof CEDiagnostics !== 'undefined')
+      ? CEDiagnostics.counts(issues)
+      : { ERROR: 0, WARN: 0, WEAK_WARN: 0, INFO: 0, total: issues.length };
+    // 工具条徽章
+    var badge = containerEl.querySelector('#ce-diag-badge');
+    if (badge) {
+      badge.className = 'ce-diag-badge ' + (c.ERROR ? 'ce-diag-badge-error'
+        : c.WARN ? 'ce-diag-badge-warn'
+          : c.WEAK_WARN ? 'ce-diag-badge-weak' : c.INFO ? 'ce-diag-badge-info' : 'ce-diag-badge-none');
+      badge.textContent = c.ERROR ? String(c.ERROR) : c.WARN ? String(c.WARN)
+        : c.WEAK_WARN ? String(c.WEAK_WARN) : c.INFO ? String(c.INFO) : '✓';
+      badge.title = _tf('diagnostics.summary', 'ERROR {e} · WARN {w} · WEAK {k} · INFO {i}',
+        { e: c.ERROR, w: c.WARN, k: c.WEAK_WARN, i: c.INFO });
+    }
+    _ceDiagMark(containerEl, issues);
+    try {
+      ROOT.document.dispatchEvent(new CustomEvent('ce-diagnostics', {
+        detail: { file: containerEl._ceFilePath, issues: issues, counts: c },
+      }));
+    } catch (e) { /* 宿主未监听时忽略 */ }
+  }
+  // 把诊断结果落到当前条目的字段控件上 (只标注当前编辑条目, 避免跨条目路径冲突)
+  function _ceDiagMark(containerEl, issues) {
+    var parsed = containerEl._ceParsed;
+    var ui = containerEl._ceUi;
+    if (!parsed || !ui) return;
+    var section = parsed.sections[ui.section];
+    var entry = section && section.entries[ui.entry];
+    var body = containerEl.querySelector('.ce-form-body');
+    if (!body) return;
+    // 清掉上一次的标注
+    var old = body.querySelectorAll('.ce-diag-mark');
+    for (var i = 0; i < old.length; i++) old[i].remove();
+    var marked = body.querySelectorAll('[class*="ce-diag-field-"]');
+    for (var m = 0; m < marked.length; m++) {
+      marked[m].className = marked[m].className.replace(/\s*ce-diag-field-\w+/g, '');
+      marked[m].removeAttribute('title');
+    }
+    if (!issues.length || !entry) return;
+    var byPath = {};
+    var entryLevel = [];
+    for (var j = 0; j < issues.length; j++) {
+      var it = issues[j];
+      if (it.entry && it.entry !== entry.key) continue;
+      if (it.section && section && it.section !== section.key) continue;
+      if (it.path) {
+        (byPath[it.path] = byPath[it.path] || []).push(it);
+      } else {
+        entryLevel.push(it);
+      }
+    }
+    var sevCls = { ERROR: 'ce-diag-field-error', WARN: 'ce-diag-field-warn', WEAK_WARN: 'ce-diag-field-weak', INFO: 'ce-diag-field-info' };
+    var n = 0;
+    Object.keys(byPath).forEach(function (p) {
+      if (n++ > 400) return;
+      var ctrl = null;
+      try { ctrl = body.querySelector('[data-sf-path="' + _cssEsc(p) + '"]'); } catch (e) { ctrl = null; }
+      if (!ctrl) ctrl = body.querySelector('[data-ce-field="' + _cssEsc(p) + '"]');
+      if (!ctrl) return;
+      var list = byPath[p].slice().sort(function (a, b) {
+        return (CEDiagnostics ? CEDiagnostics.SEV_ORDER[a.severity] : 0) - (CEDiagnostics ? CEDiagnostics.SEV_ORDER[b.severity] : 0);
+      });
+      var worst = list[0];
+      ctrl.classList.add(sevCls[worst.severity] || 'ce-diag-field-warn');
+      ctrl.title = list.map(function (x) { return _CE_DIAG_MARK[x.severity] + ' ' + x.message; }).join('\n');
+      var row = ctrl.closest ? (ctrl.closest('.ce-row') || ctrl.closest('.ce-stack')) : null;
+      if (row) {
+        var lbl = row.querySelector('.ce-field-label');
+        if (lbl && !lbl.querySelector('.ce-diag-mark')) {
+          var span = document.createElement('span');
+          span.className = 'ce-diag-mark ce-diag-mark-' + worst.severity.toLowerCase();
+          span.textContent = _CE_DIAG_MARK[worst.severity] || '!';
+          span.title = ctrl.title;
+          span.addEventListener('click', function (ev) {
+            ev.preventDefault(); ev.stopPropagation();
+            try {
+              ROOT.document.dispatchEvent(new CustomEvent('ce-diagnostics-open', {
+                detail: { file: containerEl._ceFilePath, issues: containerEl._ceIssues || [], focusPath: p },
+              }));
+            } catch (e2) { /* ignore */ }
+          });
+          lbl.appendChild(span);
+        }
+      }
+    });
+    // 条目级 (无 path) 的提示放在表单头部
+    if (entryLevel.length) {
+      var hdr = body.parentNode ? body.parentNode.querySelector('.ce-form-actions') : null;
+      if (hdr) {
+        var worstEntry = entryLevel.slice().sort(function (a, b) {
+          return (CEDiagnostics ? CEDiagnostics.SEV_ORDER[a.severity] : 0) - (CEDiagnostics ? CEDiagnostics.SEV_ORDER[b.severity] : 0);
+        })[0];
+        var b2 = document.createElement('span');
+        b2.className = 'ce-diag-entrymark ' + (SEV_CLS_ENTRY[worstEntry.severity] || '');
+        b2.textContent = _CE_DIAG_MARK[worstEntry.severity] + ' ' + entryLevel.length;
+        b2.title = entryLevel.map(function (x) { return _CE_DIAG_MARK[x.severity] + ' ' + x.message; }).join('\n');
+        b2.addEventListener('click', function () {
+          try {
+            ROOT.document.dispatchEvent(new CustomEvent('ce-diagnostics-open', {
+              detail: { file: containerEl._ceFilePath, issues: containerEl._ceIssues || [] },
+            }));
+          } catch (e2) { /* ignore */ }
+        });
+        hdr.insertBefore(b2, hdr.firstChild);
+      }
+    }
+  }
+  var SEV_CLS_ENTRY = { ERROR: 'ce-diag-mark-error', WARN: 'ce-diag-mark-warn', WEAK_WARN: 'ce-diag-mark-weak_warn', INFO: 'ce-diag-mark-info' };
+  function _cssEsc(s) {
+    return String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  }
+
+  // ============ 条目预览按钮 (物品/模型/字体图像 场景预览) ============
+  // 只有能产生视觉结果的 section 才显示预览按钮
+  var _CE_PREVIEW_SECTIONS = { items: 1, blocks: 1, furniture: 1, equipments: 1, images: 1, emoji: 1, categories: 1, paintings: 1 };
+  function _cePreviewButtons(section) {
+    if (!section || !_CE_PREVIEW_SECTIONS[section.base]) return '';
+    if (typeof document !== 'undefined' && document.body && document.body.classList &&
+        document.body.classList.contains('ce-no-preview')) return '';
+    var tip = _escHtml(_tf('preview.open', '在模拟游戏场景中预览'));
+    return '<button class="cv-btn cv-btn-secondary ce-preview-btn" data-action="ce-preview-entry" data-tip="' + tip + '" title="' + tip + '">👁 ' + _escHtml(_tf('preview.title', '预览')) + '</button>' +
+      '<button class="cv-btn cv-btn-secondary ce-preview-btn" data-action="ce-preview-scene" data-ce-scene="gui" data-tip="' + _escHtml(_tf('preview.sceneGui', 'GUI 场景预览')) + '" title="' + _escHtml(_tf('preview.sceneGui', 'GUI 场景预览')) + '">▦</button>';
+  }
+  // 取当前条目并交给预览面板; scene 为 'auto' 时按 section 自动选择场景
+  function _cePreviewCurrentEntry(containerEl, scene) {
+    var parsed = containerEl._ceParsed;
+    var ui = containerEl._ceUi;
+    if (!parsed || !ui) return;
+    var section = parsed.sections[ui.section];
+    var entry = section && section.entries[ui.entry];
+    if (!section || !entry) return;
+    var P = ROOT.CEPreviewPanel;
+    if (!P) {
+      if (typeof ROOT.updateStatus === 'function') ROOT.updateStatus(_tf('preview.unavailable', '预览模块未加载'));
+      return;
+    }
+    P.open({
+      file: containerEl._ceFilePath,
+      section: section.key,
+      sectionBase: section.base,
+      entryKey: entry.key,
+      data: entry.data,
+      scene: scene || 'auto',
+    });
   }
   function _applyValue(entry, path, value, parsed, section) {
     if (path === '__key__') return; // 由 ce-rename 处理
@@ -4383,6 +4752,19 @@
       } else if (action === 'ce-del-event') {
         _sound('click');
         _showEventDeleteConfirm(containerEl, el.getAttribute('data-ce-ev'));
+      } else if (action === 'ce-preview-entry') {
+        _sound('click');
+        _cePreviewCurrentEntry(containerEl);
+      } else if (action === 'ce-preview-scene') {
+        _sound('click');
+        _cePreviewCurrentEntry(containerEl, el.getAttribute('data-ce-scene') || 'auto');
+      } else if (action === 'ce-diag-open') {
+        _sound('click');
+        try {
+          document.dispatchEvent(new CustomEvent('ce-diagnostics-open', {
+            detail: { file: containerEl._ceFilePath, issues: containerEl._ceIssues || [] },
+          }));
+        } catch (err) { /* ignore */ }
       }
     };
     var changeHandler = function (e) {
@@ -4943,6 +5325,9 @@
       parsed._isConfig = true;
       _projectConfigSections(parsed);
     }
+    if (typeof CEMCAssets !== 'undefined' && CEMCAssets) {
+      try { CEMCAssets.setActiveFile(filePath); } catch (e) { /* 资源索引非核心功能 */ }
+    }
     parsed._visualDirty = false;
     _sfLastParsed = parsed;
     containerEl._ceParsed = parsed;
@@ -4967,6 +5352,31 @@
     render: render,
     generateYAML: generateYAML,
     syncToSource: syncToSource,
+    // 诊断: 对已解析模型跑检查 (宿主源码模式/问题面板使用)
+    validate: function (parsed, ctx) {
+      if (typeof CEDiagnostics === 'undefined') return [];
+      try { return CEDiagnostics.analyze(parsed, ctx || {}) || []; } catch (e) { return []; }
+    },
+    // 当前可视化编辑容器的上下文读取 (预览/诊断用)
+    currentEntry: function (containerEl) {
+      if (!containerEl || !containerEl._ceParsed || !containerEl._ceUi) return null;
+      var p = containerEl._ceParsed, u = containerEl._ceUi;
+      var sec = p.sections[u.section];
+      var en = sec && sec.entries[u.entry];
+      if (!sec || !en) return null;
+      return { file: containerEl._ceFilePath, section: sec.key, sectionBase: sec.base, entryKey: en.key, data: en.data };
+    },
+    // 取 datalist 数据源 (设置页/调试用)
+    datalistNames: function () {
+      _sfInit();
+      return Object.keys(_sfDatalistMap || {}).sort();
+    },
+    datalistSize: function (name) {
+      _sfInit();
+      return (_sfDatalistMap && _sfDatalistMap[name]) ? _sfDatalistMap[name].length : 0;
+    },
+    // 资源索引就绪后手动触发补全数据刷新
+    refreshAssetLists: function () { _ceAssetsBind(); },
   };
   ROOT._ceElem = {
     scan: _ceElemScan,

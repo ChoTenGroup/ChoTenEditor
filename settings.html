@@ -72,7 +72,7 @@
                                 </select>
                                 <span class="select-icon">▼</span>
                             </div>
-                            <div class="setting-hint" data-i18n="settings.languageRestartHint">您可能需要重新启动软件，或是刷新才能看到语言更改。</div>
+                            <div class="setting-hint" id="language-restart-hint" data-i18n="settings.languageRestartHint">更改语言后需要重启软件才能生效。</div>
                         </div>
                     </section>
 
@@ -622,15 +622,39 @@
                         </div>
                     </section>
 
-                    <!-- CE 元素预载 -->
+                    <!-- CraftEngine 工具 -->
                     <section class="settings-section">
-                        <h2 data-i18n="settings.elementPickerTitle">CE 元素预载</h2>
+                        <h2 data-i18n="settings.elementPickerTitle">CraftEngine 工具</h2>
                         <div class="setting-group">
                             <label class="checkbox-row">
                                 <input type="checkbox" id="ce-element-picker" checked>
                                 <span data-i18n="settings.elementPicker">预载检测 CE 元素</span>
                             </label>
                             <div class="setting-hint" data-i18n="settings.elementPickerHint">打开 CraftEngine 文件时自动扫描工程 configuration 目录中的物品/方块/家具/分类/模板，在对应输入框右侧显示按钮，可快速填入</div>
+                        </div>
+                        <div class="setting-group">
+                            <label class="checkbox-row">
+                                <input type="checkbox" id="ce-preview" checked>
+                                <span data-i18n="settings.cePreview">启用 MC 场景预览</span>
+                            </label>
+                            <div class="setting-hint" data-i18n="settings.cePreviewHint">在物品 / 方块 / 家具 / 字体图像条目的表单顶部显示 👁 预览按钮，可仿照游戏内场景（聊天、物品 Lore、9x1~9x6 GUI）渲染字体图像与文本标签</div>
+                        </div>
+                        <div class="setting-group">
+                            <label class="checkbox-row">
+                                <input type="checkbox" id="ce-diagnostics" checked>
+                                <span data-i18n="settings.ceDiagnostics">启用配置错误检查</span>
+                            </label>
+                            <div class="setting-hint" data-i18n="settings.ceDiagnosticsHint">像 IDE 一样检查 CraftEngine 配置，按 ERROR / WARN / WEAK_WARN / INFO 四级报告未知键、类型错误、非法枚举、越界引用等问题，并在编辑器与状态栏显示</div>
+                        </div>
+                        <div class="setting-group">
+                            <label for="mc-assets-path" data-i18n="settings.mcAssetsPath">Minecraft 资源目录</label>
+                            <div class="path-input-row">
+                                <input type="text" id="mc-assets-path" class="input-full" placeholder="E:\MC\Windose\.minecraft\versions\26.3\26.3\assets" data-i18n-placeholder="settings.mcAssetsPathPlaceholder">
+                                <button type="button" class="btn-secondary" id="mc-assets-browse" data-i18n="settings.browse">浏览…</button>
+                                <button type="button" class="btn-secondary" id="mc-assets-detect" data-i18n="settings.detect">自动检测</button>
+                            </div>
+                            <div class="setting-hint" data-i18n="settings.mcAssetsPathHint">原版资源目录（包含 minecraft 子目录的 assets 文件夹）。用于补全原版物品 / 方块 / 纹理 / 模型 / 音效 / 粒子 / 魔咒等 ID，并让预览使用真实的原版字体与 GUI 贴图。</div>
+                            <div class="setting-hint" id="mc-assets-status"></div>
                         </div>
                     </section>
 

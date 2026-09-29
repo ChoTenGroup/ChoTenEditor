@@ -1,0 +1,269 @@
+/* ChoTenEditor — 配置检查 (Checks → Debug) 独立窗口
+ * 依赖 styles.css 的设计令牌 (--color-*)，严重级别配色与编辑器底部问题面板一致。
+ */
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-ui, "Segoe UI", "Microsoft YaHei", system-ui, sans-serif);
+  font-size: 13px;
+  overflow: hidden;
+}
+
+/* ---------------- 顶栏 ---------------- */
+.chk-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-secondary, var(--color-bg-primary));
+  flex: 0 0 auto;
+}
+
+.chk-head-main { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.chk-icon { font-size: 20px; line-height: 1; }
+.chk-titles { min-width: 0; }
+.chk-titles h1 { margin: 0; font-size: 15px; font-weight: 600; }
+.chk-sub {
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chk-head-actions { display: flex; align-items: center; gap: 6px; flex: 0 0 auto; }
+
+.chk-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--color-text-primary);
+  background: var(--color-bg-tertiary, rgba(255, 255, 255, 0.06));
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.chk-btn:hover { background: var(--color-bg-hover); border-color: var(--color-border-light); }
+.chk-btn:disabled { opacity: .5; cursor: default; }
+.chk-btn-primary { border-color: var(--color-primary); color: var(--color-primary); }
+
+/* ---------------- 筛选栏 ---------------- */
+.chk-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--color-border);
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+}
+
+.chk-search {
+  flex: 1 1 240px;
+  min-width: 160px;
+  padding: 5px 9px;
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--color-text-primary);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  outline: none;
+}
+.chk-search:focus { border-color: var(--color-primary); }
+
+.chk-chips { display: flex; gap: 5px; flex-wrap: wrap; }
+
+.chk-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .3px;
+  font-family: inherit;
+  background: transparent;
+  border: 1px solid currentColor;
+  border-radius: 10px;
+  cursor: pointer;
+  opacity: .38;
+}
+.chk-chip.active { opacity: 1; }
+.chk-chip b { font-weight: 700; }
+.chk-chip-error { color: var(--color-error); }
+.chk-chip-warn { color: var(--color-warning); }
+.chk-chip-weak { color: var(--color-text-secondary); }
+.chk-chip-info { color: var(--color-info); }
+
+.chk-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+/* ---------------- 状态行 ---------------- */
+.chk-status {
+  padding: 5px 14px;
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
+  flex: 0 0 auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chk-status.has-error { color: var(--color-error); }
+
+/* ---------------- 列表 ---------------- */
+.chk-body { flex: 1 1 auto; min-height: 0; overflow: auto; }
+
+.chk-empty {
+  padding: 40px 18px;
+  text-align: center;
+  color: var(--color-text-tertiary);
+}
+.chk-empty-icon { font-size: 30px; display: block; margin-bottom: 8px; }
+
+.chk-group { border-bottom: 1px solid var(--color-border); }
+
+.chk-group-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  cursor: pointer;
+  background: var(--color-bg-secondary, rgba(255, 255, 255, 0.03));
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.chk-group-head:hover { background: var(--color-bg-hover); }
+.chk-caret { width: 12px; flex: 0 0 12px; color: var(--color-text-tertiary); font-size: 10px; }
+.chk-file { font-weight: 600; color: var(--color-text-primary); }
+.chk-file-dir {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chk-group-counts { margin-left: auto; display: flex; gap: 6px; flex: 0 0 auto; }
+.chk-mini {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 8px;
+  background: var(--color-bg-tertiary, rgba(255, 255, 255, 0.06));
+}
+.chk-mini-error { color: var(--color-error); }
+.chk-mini-warn { color: var(--color-warning); }
+.chk-mini-weak { color: var(--color-text-secondary); }
+.chk-mini-info { color: var(--color-info); }
+
+.chk-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 5px 14px 5px 34px;
+  cursor: pointer;
+  border-top: 1px solid transparent;
+}
+.chk-row:hover { background: var(--color-bg-hover); }
+
+.chk-sev {
+  flex: 0 0 62px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .3px;
+  padding-top: 1px;
+}
+.chk-row-error .chk-sev { color: var(--color-error); }
+.chk-row-warn .chk-sev { color: var(--color-warning); }
+.chk-row-weak .chk-sev { color: var(--color-text-secondary); }
+.chk-row-info .chk-sev { color: var(--color-info); }
+
+/* 保留诊断消息里的换行: YAML 语法错误自带代码帧, 折成一行会看不清 */
+.chk-msg { flex: 1 1 auto; word-break: break-word; white-space: pre-wrap; }
+.chk-row-info .chk-msg { color: var(--color-text-secondary); }
+.chk-row-weak .chk-msg { color: var(--color-text-secondary); }
+
+.chk-loc {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+.chk-line { color: var(--color-text-tertiary); }
+.chk-code {
+  font-size: 10px;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-tertiary, rgba(255, 255, 255, 0.06));
+  padding: 0 5px;
+  border-radius: 3px;
+}
+/* 行尾的「跳转」提示: 常驻显示, hover 高亮 (不占大块空间) */
+.chk-open {
+  font-size: 12px;
+  line-height: 1;
+  color: var(--color-text-secondary);
+  opacity: .85;
+}
+.chk-row:hover .chk-open { opacity: 1; color: var(--color-primary); }
+
+.chk-path {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  word-break: break-all;
+}
+
+/* 平铺模式 (不分组) 下的文件列 */
+.chk-row-flat .chk-flatfile {
+  flex: 0 0 220px;
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 扫描中动画 */
+.chk-spinner {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  margin-right: 6px;
+  border: 2px solid var(--color-border-light);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: chk-spin .7s linear infinite;
+  vertical-align: -2px;
+}
+@keyframes chk-spin { to { transform: rotate(360deg); } }
+
+/* 浅色主题下的微调 */
+body[data-theme="light"] .chk-group-head { background: rgba(0, 0, 0, 0.03); }
+body[data-theme="light"] .chk-chip-weak { color: var(--color-text-tertiary); }

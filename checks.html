@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checks - ChoTenEditor</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="checks.css">
+</head>
+<body data-theme="dark" data-title-key="checks.title">
+  <header class="chk-head">
+    <div class="chk-head-main">
+      <span class="chk-icon">🐞</span>
+      <div class="chk-titles">
+        <h1 data-i18n="checks.title">配置检查</h1>
+        <p class="chk-sub" data-i18n="checks.subtitle">Debug · 整个工程的全部配置问题</p>
+      </div>
+    </div>
+    <div class="chk-head-actions">
+      <button id="chk-rescan" class="chk-btn chk-btn-primary" title="重新扫描" data-i18n-title="checks.scan">
+        ⟳ <span data-i18n="checks.scan">重新扫描</span>
+      </button>
+      <button id="chk-copy" class="chk-btn" data-i18n-title="checks.copyAll">
+        📋 <span data-i18n="checks.copyAll">复制全部</span>
+      </button>
+      <button id="chk-close" class="chk-btn" data-i18n-title="checks.close">
+        ✕ <span data-i18n="checks.close">关闭</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="chk-bar">
+    <input id="chk-search" class="chk-search" type="search" autocomplete="off"
+           placeholder="搜索…" data-i18n-placeholder="checks.search">
+    <div class="chk-chips" id="chk-chips"></div>
+    <label class="chk-check">
+      <input type="checkbox" id="chk-group" checked>
+      <span data-i18n="checks.groupBy">按文件分组</span>
+    </label>
+  </div>
+
+  <div class="chk-status" id="chk-status"></div>
+
+  <main class="chk-body" id="chk-body"></main>
+
+  <script src="node_modules/js-yaml/dist/js-yaml.min.js"></script>
+  <script src="i18n.js"></script>
+  <script src="checks.js"></script>
+</body>
+</html>

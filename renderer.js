@@ -323,6 +323,11 @@ function init() {
   // 恢复上次的会话
   restoreAppState();
 
+  // CraftEngine 资源索引 / 预览 / 配置检查
+  try { initCETools(); } catch (e) { console.error('[CETools] init failed:', e); }
+  // Checks → Debug 窗口桥接 (重新扫描 / 打开并定位)
+  try { initChecksBridge(); } catch (e) { console.error('[Checks] init failed:', e); }
+
   // 根据设置决定是否打开 DevTools
   if (window.electronAPI && window.electronAPI.openDevTools) {
     try {
@@ -832,6 +837,7 @@ function initMenuBar() {
       case 'paste': cmExecCommand('paste'); break;
       case 'select-all': cmExecCommand('selectAll'); break;
       case 'settings': playSound('select'); openSettings(); break;
+      case 'checks-debug': playSound('select'); openChecksDebug(); break;
       case 'remote': playSound('select'); openRemoteMode(); break;
       case 'ai': playSound('select'); openAIPanel(); break;
       case 'about': showAbout(); break;
@@ -1466,6 +1472,14 @@ async function openFile(filePath, content) {
     // 记录导航历史 (历史导航自身触发时不记录)
     if (!_navSuppress) _pushNav('file', filePath);
 
+    // CraftEngine: 切换资源索引上下文 + 立即跑一次配置检查
+    try {
+      if (window.CEMCAssets && window.CEMCAssets.setActiveFile) {
+        window.CEMCAssets.setActiveFile(filePath);
+      }
+    } catch (e) {}
+    setTimeout(function () { try { runCECSourceDiagnostics(); } catch (e) {} }, 60);
+
     if (_openingFile === filePath) _openingFile = null;
   } catch (error) {
     console.error('[RENDERER] 打开文件错误:', error);
@@ -2063,6 +2077,8 @@ async function switchEditorMode(visual) {
     if (codeMirrorEditor) {
       setTimeout(function() { codeMirrorEditor.refresh(); }, 50);
     }
+    // 回到源码模式时刷新配置检查标记
+    setTimeout(function () { try { runCECSourceDiagnostics(); } catch (e) {} }, 80);
   }
 }
 
@@ -2237,7 +2253,9 @@ function openSettings() {
     return;
   }
   // 每次打开重新加载 iframe，确保展示最新配置
-  frame.src = 'settings.html';
+  // 带上当前生效语言：语言更改需重启才生效，设置页应继续用当前生效语言渲染
+  const activeLang = (window.I18N && I18N.lang) ? I18N.lang : '';
+  frame.src = 'settings.html' + (activeLang ? '?lang=' + encodeURIComponent(activeLang) : '');
   overlay.style.display = 'flex';
 }
 
@@ -2599,9 +2617,42 @@ function applyStoredConfig() {
     // 重新应用 tooltip 提示开关 (body class: ce-hide-premium-hints / ce-hide-version-hints)
     document.body.classList.toggle('ce-hide-premium-hints', config.hidePremiumHints === true);
     document.body.classList.toggle('ce-hide-version-hints', config.hideVersionHints === true);
+    // 诊断引擎同步同一开关 (付费版提示的 INFO 也必须随之隐藏)
+    try {
+      if (window.CEDiagnostics && window.CEDiagnostics.setOptions) {
+        window.CEDiagnostics.setOptions({ hidePremiumHints: config.hidePremiumHints === true });
+      }
+    } catch (e) {}
 
     // 重新应用 CE 元素预载开关 (body class: ce-element-picker, 默认开启)
     document.body.classList.toggle('ce-element-picker', config.ceElementPicker !== false);
+
+    // CraftEngine 资源索引 / 预览 / 配置检查开关
+    document.body.classList.toggle('ce-no-preview', config.cePreview === false);
+    document.body.classList.toggle('ce-no-diagnostics', config.ceDiagnostics === false);
+    try {
+      if (window.CEMCAssets) {
+        const wantRoot = (typeof config.mcAssetsPath === 'string' && config.mcAssetsPath.trim()) ? config.mcAssetsPath.trim() : null;
+        if (wantRoot && wantRoot !== window.CEMCAssets.mcRoot()) {
+          window.CEMCAssets.rescan({ mcRoot: wantRoot, filePath: currentFile || null }).then(function () {
+            // 资源目录变了: 刷新补全数据源与预览工程数据
+            try {
+              if (typeof CraftEngineInterpreter !== 'undefined') CraftEngineInterpreter.refreshAssetLists();
+              if (isVisualMode && visualEditor && visualEditor._ceRenderFn) visualEditor._ceRenderFn();
+            } catch (e) {}
+            try { if (window.CEPreview && window.CEPreview.init) window.CEPreview.init({ mcRoot: wantRoot }); } catch (e) {}
+            setTimeout(function () { try { runCECSourceDiagnostics(); } catch (e) {} }, 120);
+          }).catch(function () {});
+        }
+      }
+    } catch (e) {}
+    // 配置检查关闭时清空面板
+    if (config.ceDiagnostics === false) {
+      try { if (window.CEProblems) window.CEProblems.clear(); } catch (e) {}
+      try { if (window.codeMirrorEditor) applyCodeMirrorMarkers('', []); } catch (e) {}
+    } else if (currentFile) {
+      setTimeout(function () { try { runCECSourceDiagnostics(); } catch (e) {} }, 80);
+    }
 
     // 重新应用背景图片到 body
     const body = document.body;
@@ -3369,3 +3420,405 @@ function initRemoteEvents() {
   // 最多等待 10 秒
   setTimeout(function() { clearInterval(check); }, 10000);
 })();
+
+// ============================================
+// CraftEngine 资源索引 / 预览 / 配置检查 集成
+// ============================================
+
+function _ceCfg() {
+  try { return JSON.parse(localStorage.getItem('editorConfig') || '{}'); } catch (e) { return {}; }
+}
+
+// ============================================
+// Checks → Debug 窗口: 整个工程的配置问题清单
+// ============================================
+
+const CHECKS_MAX_FILES = 4000;          // 扫描文件数上限 (防止误开超大目录卡死)
+const CHECKS_READ_CONCURRENCY = 8;
+const CHECKS_SKIP_DIRS = {
+  node_modules: 1, '.git': 1, '.idea': 1, '.vscode': 1, '.gradle': 1, '.cache': 1,
+  dist: 1, build: 1, out: 1, target: 1, release: 1, bin: 1, obj: 1,
+};
+const CHECKS_YAML_RE = /\.(ya?ml)$/i;
+
+function checksDirOf(p) {
+  return String(p || '').replace(/[\\/][^\\/]*$/, '');
+}
+
+// 递归收集工程下的 YAML 文件 (跳过依赖 / 产物目录, 有上限)
+async function collectYamlFiles(root) {
+  const found = [];
+  const queue = [root];
+  let truncated = false;
+  while (queue.length) {
+    const dir = queue.shift();
+    let res = null;
+    try { res = await _electronAPI.readdir(dir); } catch (e) { res = null; }
+    if (!res || !res.success || !Array.isArray(res.files)) continue;
+    for (const f of res.files) {
+      const name = String(f.name || '');
+      if (f.isDirectory) {
+        if (!name || name.charAt(0) === '.' || CHECKS_SKIP_DIRS[name.toLowerCase()]) continue;
+        queue.push(f.path);
+      } else if (CHECKS_YAML_RE.test(name)) {
+        if (found.length >= CHECKS_MAX_FILES) { truncated = true; break; }
+        found.push(f.path);
+      }
+    }
+    if (truncated) break;
+  }
+  return { files: found, truncated };
+}
+
+// 扫描整个工程 → { root, files, issues[], assets, truncated }
+async function collectProjectIssues(onProgress) {
+  const result = {
+    root: null, files: 0, issues: [], truncated: false, assets: null,
+    at: Date.now(), hidePremiumHints: false,
+  };
+  const root = currentProjectPath || (currentFile ? checksDirOf(currentFile) : null);
+  if (!root || !_electronAPI || !window.CEDiagnostics) return result;
+  result.root = root;
+
+  // 诊断引擎取最新工程数据 + 设置开关
+  const cfg = _ceCfg();
+  result.hidePremiumHints = cfg.hidePremiumHints === true;
+  try { window.CEDiagnostics.setProjectData(_ceProjectDataForDiag()); } catch (e) {}
+  try {
+    if (window.CEDiagnostics.setOptions) {
+      window.CEDiagnostics.setOptions({ hidePremiumHints: result.hidePremiumHints });
+    }
+  } catch (e) {}
+
+  const walk = await collectYamlFiles(root);
+  result.truncated = walk.truncated;
+  result.files = walk.files.length;
+  if (onProgress) { try { onProgress({ done: 0, files: result.files }); } catch (e) {} }
+
+  const issues = [];
+  let done = 0;
+  const worker = async () => {
+    while (true) {
+      const idx = done++;
+      if (idx >= walk.files.length) return;
+      const file = walk.files[idx];
+      let content = '';
+      try {
+        const r = await _electronAPI.readFile(file);
+        content = (r && r.success) ? (r.content || '') : '';
+      } catch (e) { content = ''; }
+      if (typeof content !== 'string' || !content.trim()) {
+        if (onProgress) { try { onProgress({ done: idx + 1, files: walk.files.length }); } catch (e) {} }
+        continue;
+      }
+      let fileIssues = [];
+      try {
+        const isCE = typeof CraftEngineInterpreter !== 'undefined'
+          && CraftEngineInterpreter.detectFileType(content, file) === 'craftengine';
+        if (isCE) {
+          let parsed = null;
+          try { parsed = CraftEngineInterpreter.parse(content); } catch (e) { parsed = null; }
+          fileIssues = parsed ? (window.CEDiagnostics.analyze(parsed, { file }) || []) : [];
+        } else {
+          fileIssues = window.CEDiagnostics.analyzeYaml(content, file) || [];
+        }
+      } catch (e) { fileIssues = []; }
+      // 结构化检查只给 path/key, 这里补出文本行号供窗口显示
+      for (const it of fileIssues) {
+        if (!it.line) {
+          try { it.line = window.CEDiagnostics.lineOf(content, it.entry || it.key || '', it.path || ''); } catch (e) {}
+        }
+        issues.push(it);
+      }
+      if (onProgress) { try { onProgress({ done: idx + 1, files: walk.files.length }); } catch (e) {} }
+    }
+  };
+  const workers = [];
+  for (let i = 0; i < Math.min(CHECKS_READ_CONCURRENCY, walk.files.length); i++) workers.push(worker());
+  await Promise.all(workers);
+
+  result.issues = issues;
+  try {
+    const st = window.CEMCAssets && window.CEMCAssets.status ? window.CEMCAssets.status() : null;
+    result.assets = st ? { state: st.state, namespaces: (st.namespaces || []).length } : null;
+  } catch (e) {}
+  return result;
+}
+
+let _checksBusy = false;
+
+// 顶部栏「检查 → Debug」: 扫描整个工程并在独立窗口展示全部问题
+async function openChecksDebug() {
+  const api = _electronAPI && _electronAPI.checks;
+  if (!api) return;
+  if (_checksBusy) return;
+  _checksBusy = true;
+  const root = currentProjectPath || (currentFile ? checksDirOf(currentFile) : null);
+  // 先开窗 (带扫描中状态), 扫描完成后再推送结果
+  try { await api.open({ phase: 'scanning', root: root, at: Date.now() }); } catch (e) {}
+  try {
+    const data = await collectProjectIssues(function (p) {
+      try { api.update({ phase: 'scanning', root: root, progress: p, at: Date.now() }); } catch (e) {}
+    });
+    data.phase = 'ready';
+    try { await api.update(data); } catch (e) {}
+  } catch (e) {
+    console.warn('[Checks] scan failed:', e);
+    try { await api.update({ phase: 'error', root: root, error: String(e && e.message || e), at: Date.now() }); } catch (e2) {}
+  } finally {
+    _checksBusy = false;
+  }
+}
+
+// Debug 窗口 → 主窗口的桥接: 重新扫描 / 打开并定位某条问题
+function initChecksBridge() {
+  const api = _electronAPI && _electronAPI.checks;
+  if (!api) return;
+  if (api.onRescan) api.onRescan(function () { openChecksDebug(); });
+  if (api.onGoto) api.onGoto(function (issue) { gotoDiagnosticIssue(issue || {}); });
+}
+
+function initCETools() {
+  const cfg = _ceCfg();
+
+  // 0) 诊断引擎设置注入 (隐藏付费版提示等)
+  if (window.CEDiagnostics && window.CEDiagnostics.setOptions) {
+    try { window.CEDiagnostics.setOptions({ hidePremiumHints: cfg.hidePremiumHints === true }); } catch (e) {}
+  }
+
+  // 1) Minecraft 资源索引 (补全 + 预览数据源)
+  if (window.CEMCAssets) {
+    const mcRoot = (typeof cfg.mcAssetsPath === 'string' && cfg.mcAssetsPath.trim()) ? cfg.mcAssetsPath.trim() : null;
+    window.CEMCAssets.init({ mcRoot, filePath: currentFile || null })
+      .then(function (st) {
+        if (st && st.state === 'ready') {
+          console.log('[CEMCAssets] ready:', st.counts);
+          // 资源就绪后刷新可视化编辑器 (补全按钮/缩略图)
+          if (isVisualMode && visualEditor && visualEditor._ceRenderFn) {
+            try { visualEditor._ceRenderFn(); } catch (e) {}
+          }
+        } else if (st && st.error) {
+          console.warn('[CEMCAssets] not ready:', st.error);
+        }
+      })
+      .catch(function (e) { console.warn('[CEMCAssets] init error:', e); });
+  }
+
+  // 2) 预览渲染核心初始化
+  if (window.CEPreview && window.CEPreview.init) {
+    window.CEPreview.init({
+      mcRoot: (typeof cfg.mcAssetsPath === 'string' && cfg.mcAssetsPath.trim()) ? cfg.mcAssetsPath.trim() : null,
+      lang: I18N.lang,
+    }).catch(function (e) { console.warn('[CEPreview] init error:', e); });
+  }
+
+  // 3) 诊断事件桥接
+  document.addEventListener('ce-diagnostics', function (ev) {
+    if (!window.CEProblems) return;
+    const d = ev.detail || {};
+    window.CEProblems.set(d.file || currentFile, d.issues || []);
+    updateTabDiagBadge(d.file || currentFile, d.counts || null);
+  });
+  document.addEventListener('ce-diagnostics-open', function () {
+    if (window.CEProblems) window.CEProblems.open();
+  });
+  document.addEventListener('ce-goto-issue', function (ev) {
+    gotoDiagnosticIssue(ev.detail || {});
+  });
+
+  // 4) 状态栏徽章点击 → 打开/关闭面板
+  const diagStatus = document.getElementById('ce-diag-status');
+  if (diagStatus) {
+    diagStatus.addEventListener('click', function () {
+      if (!window.CEProblems) return;
+      playSound('click');
+      window.CEProblems.toggle();
+    });
+  }
+
+  // 5) 停靠面板关闭按钮已由 ce-problems.js 处理; 切换文件时刷新源码层检查
+  if (codeMirrorEditor) {
+    codeMirrorEditor.on('change', debounceCEDiagSource, true);
+  }
+}
+
+function debounceCEDiagSource() {
+  if (_ceDiagSrcTimer) clearTimeout(_ceDiagSrcTimer);
+  _ceDiagSrcTimer = setTimeout(runCECSourceDiagnostics, 500);
+}
+let _ceDiagSrcTimer = null;
+
+// 源码模式的诊断: YAML 语法 + (CE 文件时) 全量配置检查
+function runCECSourceDiagnostics() {
+  if (!window.CEDiagnostics || !codeMirrorEditor) return;
+  const cfg = _ceCfg();
+  if (cfg.ceDiagnostics === false) return;
+  const file = currentFile;
+  const content = codeMirrorEditor.getValue();
+  let issues = [];
+  let parsed = null;
+  const isCE = file && typeof CraftEngineInterpreter !== 'undefined'
+    && CraftEngineInterpreter.detectFileType(content, file) === 'craftengine';
+  if (isCE) {
+    try { parsed = CraftEngineInterpreter.parse(content); } catch (e) { parsed = null; }
+    if (parsed) {
+      try { issues = CraftEngineInterpreter.validate(parsed, { file }) || []; } catch (e) { issues = []; }
+      try { window.CEDiagnostics.setProjectData(_ceProjectDataForDiag()); } catch (e) {}
+    }
+  } else {
+    issues = window.CEDiagnostics.analyzeYaml(content, file) || [];
+  }
+  if (window.CEProblems) window.CEProblems.set(file, issues);
+  applyCodeMirrorMarkers(content, issues);
+  updateTabDiagBadge(file, window.CEDiagnostics.counts(issues));
+}
+
+// 供诊断使用的工程数据 (全局变量 / 图片 / 表情)
+function _ceProjectDataForDiag() {
+  if (window.CEPreview && window.CEPreview._lastProjectData) return window.CEPreview._lastProjectData;
+  return _ceProjectCache || { globals: {}, images: {}, emojis: {} };
+}
+
+let _ceProjectCache = { globals: {}, images: {}, emojis: {} };
+let _ceMarkers = [];
+
+// CodeMirror 行标记 (ERROR / WARN / WEAK / INFO 的 gutter 图标 + 行底色)
+function applyCodeMirrorMarkers(content, issues) {
+  if (!codeMirrorEditor) return;
+  const cm = codeMirrorEditor;
+  // gutter 只注册一次
+  if (!cm._ceGutterReady) {
+    try {
+      const gutters = (cm.getOption('gutters') || []).slice();
+      if (gutters.indexOf('ce-cm-gutter') === -1) {
+        gutters.push('ce-cm-gutter');
+        cm.setOption('gutters', gutters);
+      }
+      cm._ceGutterReady = true;
+    } catch (e) { return; }
+  }
+  // 清理旧标记
+  _ceMarkers.forEach(function (line) {
+    try { cm.setGutterMarker(line, 'ce-cm-gutter', null); } catch (e) {}
+    try { cm.removeLineClass(line, 'background', 'ce-cm-line-error'); } catch (e) {}
+    try { cm.removeLineClass(line, 'background', 'ce-cm-line-warn'); } catch (e) {}
+  });
+  _ceMarkers = [];
+  if (!issues.length || !content) return;
+
+  const worstByLine = {};
+  issues.forEach(function (i) {
+    let line = i.line;
+    if (!line) {
+      line = window.CEDiagnostics.lineOf(content, i.entry || i.key || '', i.path || '');
+    }
+    if (!line) return;
+    const idx = line - 1;
+    if (idx < 0 || idx >= cm.lineCount()) return;
+    const cur = worstByLine[idx];
+    const order = { ERROR: 0, WARN: 1, WEAK_WARN: 2, INFO: 3 };
+    const sev = i.severity;
+    if (cur === undefined || order[sev] < order[cur.severity]) {
+      worstByLine[idx] = { severity: sev, msg: i.message };
+    } else {
+      cur.msg += '\n' + i.message;
+    }
+  });
+  Object.keys(worstByLine).forEach(function (k) {
+    const line = parseInt(k, 10);
+    const info = worstByLine[k];
+    const cls = { ERROR: 'error', WARN: 'warn', WEAK_WARN: 'weak', INFO: 'info' }[info.severity] || 'warn';
+    const icon = { ERROR: '✖', WARN: '⚠', WEAK_WARN: '△', INFO: 'ⓘ' }[info.severity] || '⚠';
+    const el = document.createElement('div');
+    el.className = 'ce-cm-marker ce-cm-marker-' + cls;
+    el.textContent = icon;
+    el.title = info.msg;
+    try {
+      cm.setGutterMarker(line, 'ce-cm-gutter', el);
+      if (cls === 'error') cm.addLineClass(line, 'background', 'ce-cm-line-error');
+      else if (cls === 'warn') cm.addLineClass(line, 'background', 'ce-cm-line-warn');
+      _ceMarkers.push(line);
+    } catch (e) {}
+  });
+}
+
+// 标签页上的问题计数徽章
+function updateTabDiagBadge(file, counts) {
+  if (!file) return;
+  const tabEl = Array.prototype.find.call(
+    document.querySelectorAll('.editor-tab'),
+    function (t) { return t.dataset && t.dataset.path === file; }
+  );
+  if (!tabEl) return;
+  let badge = tabEl.querySelector('.ce-tab-diag');
+  const total = counts ? (counts.total || 0) : 0;
+  if (!total) {
+    if (badge) badge.remove();
+    return;
+  }
+  if (!badge) {
+    badge = document.createElement('span');
+    badge.className = 'ce-tab-diag';
+    const nameEl = tabEl.querySelector('.editor-tab-name') || tabEl.firstChild;
+    if (nameEl && nameEl.parentNode) nameEl.parentNode.insertBefore(badge, nameEl.nextSibling);
+    else tabEl.appendChild(badge);
+  }
+  const cls = counts.ERROR ? 'error' : counts.WARN ? 'warn' : counts.WEAK_WARN ? 'weak' : 'info';
+  badge.className = 'ce-tab-diag ce-tab-diag-' + cls;
+  badge.textContent = String(total);
+  badge.title = I18N.t('diagnostics.summary', {
+    e: counts.ERROR, w: counts.WARN, k: counts.WEAK_WARN, i: counts.INFO,
+  });
+}
+
+// 点击问题 → 跳转到文件 / 可视化条目 / 源码行
+async function gotoDiagnosticIssue(issue) {
+  if (!issue) return;
+  try {
+    if (issue.file && issue.file !== currentFile) {
+      await openFile(issue.file);
+    }
+    if (issue.line && codeMirrorEditor) {
+      if (isVisualMode) await switchEditorMode(false);
+      const line = Math.max(0, issue.line - 1);
+      codeMirrorEditor.setCursor({ line: line, ch: 0 });
+      codeMirrorEditor.scrollIntoView({ line: line, ch: 0 }, 120);
+      codeMirrorEditor.focus();
+      playSound('select');
+      return;
+    }
+    // 可视化模式: 定位到出问题的条目
+    if (!isVisualMode) await switchEditorMode(true);
+    if (issue.section && visualEditor && visualEditor._ceParsed) {
+      const parsed = visualEditor._ceParsed;
+      const ui = visualEditor._ceUi || (visualEditor._ceUi = { section: 0, entry: 0 });
+      for (let s = 0; s < parsed.sections.length; s++) {
+        const sec = parsed.sections[s];
+        if (sec.key !== issue.section) continue;
+        ui.section = s;
+        for (let e = 0; e < sec.entries.length; e++) {
+          if (sec.entries[e].key === issue.entry) { ui.entry = e; break; }
+        }
+        break;
+      }
+      if (visualEditor._ceRenderFn) visualEditor._ceRenderFn();
+      // 高亮目标字段
+      if (issue.path) {
+        setTimeout(function () {
+          try {
+            const ctrl = visualEditor.querySelector('[data-sf-path="' + issue.path.replace(/"/g, '\\"') + '"]');
+            if (ctrl) {
+              ctrl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+              ctrl.focus();
+              ctrl.classList.add('ce-diag-flash');
+              setTimeout(function () { ctrl.classList.remove('ce-diag-flash'); }, 1600);
+            }
+          } catch (e) {}
+        }, 80);
+      }
+      playSound('select');
+    }
+  } catch (e) {
+    console.warn('[CEDiag] goto failed:', e);
+  }
+}

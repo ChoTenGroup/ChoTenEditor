@@ -328,6 +328,11 @@ body.embedded .title-bar {
   line-height: 1.5;
 }
 
+.setting-hint.pending {
+  color: var(--color-warning);
+  font-weight: 500;
+}
+
 .btn-sm {
   padding: 4px 12px;
   font-size: 12px;
@@ -1019,3 +1024,12 @@ body[data-theme="light"] .preview-text p.secondary {
     box-shadow: none;
   }
 }
+
+/* ============================ 设置页: 路径输入行 ============================ */
+.path-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.path-input-row .input-full { flex: 1 1 auto; min-width: 0; }
+.path-input-row .btn { flex: 0 0 auto; white-space: nowrap; }

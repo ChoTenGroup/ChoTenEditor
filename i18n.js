@@ -74,6 +74,18 @@
       .catch(function(err) { console.warn('I18N load failed:', err); return {}; });
   }
 
+  // 语言更改"重启后生效"：会话内已生效的界面语言由主窗口决定。
+  // 主窗口打开设置页时带上 ?lang=<当前生效语言>，设置页据此继续用当前生效语言渲染，
+  // 而不是刚保存但尚未生效的语言（否则设置面板会和编辑器界面语言不一致）。
+  function getForcedLang() {
+    try {
+      var m = /[?&]lang=(en_us|zh_cn)(?:&|$)/.exec(window.location.search || '');
+      return m ? m[1] : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   function init(lang) {
     current = lang;
     var chain = Promise.resolve();
@@ -86,12 +98,19 @@
   }
 
   // 立即以已保存语言（或默认）开始加载；ready 永远指向最新的 init
-  initPromise = init(getLang());
+  initPromise = init(getForcedLang() || getLang());
 
   function setLang(lang) {
     saveLang(lang);
     initPromise = init(lang);
     return initPromise;
+  }
+
+  // 仅持久化语言选择，不切换当前界面语言。
+  // 语言热切换会让已生成的界面文本、提示/补全缓存与其它窗口状态不一致
+  // (混合语言、旧缓存失效)，因此设置页统一改为"保存 + 重启后生效"。
+  function persistLang(lang) {
+    saveLang(lang === 'en_us' ? 'en_us' : 'zh_cn');
   }
 
   // 启动加载提示列表（替代 loadingtips.txt）
@@ -122,6 +141,7 @@
     t: t,
     applyDOM: applyDOM,
     setLang: setLang,
+    saveLang: persistLang,
     tips: tips,
     desc: desc,
     localizeRemote: localizeRemote,

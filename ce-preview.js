@@ -1,0 +1,3541 @@
+/* ChoTenEditor Minecraft 风格预览渲染器
+ * 依赖(全部可选, 缺失时自动降级): window.CEMCAssets / window.electronAPI.mc / window.I18N / jsyaml
+ *
+ * 能力:
+ *   1) MC 位图字体引擎: 读取原版 font provider(reference/bitmap/space), 支持
+ *      MiniMessage、旧版 § 颜色码、CraftEngine 自定义标签
+ *      (image / shift / global / i18n / l10n / expr / random / arg / var / papi / bubble 等)
+ *   2) 物品/方块图标: 平面物品贴图 + 由原版模型 JSON 生成的等轴测 3D 方块
+ *   3) 场景合成: 聊天栏 / 物品悬浮提示(lore) / 原版容器 GUI (9x1~9x6) / 字体图像总览
+ *
+ * 对外 API: window.CEPreview
+ */
+(function () {
+  'use strict';
+  var root = (typeof window !== 'undefined') ? window
+    : (typeof globalThis !== 'undefined' ? globalThis : this);
+  if (root.CEPreview) return;
+
+  var VERSION = 1;
+  var LINE_HEIGHT = 9;            // MC 文本行高 (Font.lineHeight = 9)
+  var SHADOW_FACTOR = 0.25;       // MC 阴影 = 原色 * 0.25 (ARGB.scaleRGB(color, 0.25f))
+  var CACHE_CAP = 400;
+  var COS30 = Math.cos(Math.PI / 6);
+  var SIN30 = Math.sin(Math.PI / 6);
+
+  // ---------------- MiniMessage 具名颜色 (与原版 16 色一致) ----------------
+  var NAMED_COLORS = {
+    black: '#000000', dark_blue: '#0000AA', dark_green: '#00AA00', dark_aqua: '#00AAAA',
+    dark_red: '#AA0000', dark_purple: '#AA00AA', gold: '#FFAA00', gray: '#AAAAAA',
+    grey: '#AAAAAA', dark_gray: '#555555', dark_grey: '#555555', blue: '#5555FF',
+    green: '#55FF55', aqua: '#55FFFF', red: '#FF5555', light_purple: '#FF55FF',
+    yellow: '#FFFF55', white: '#FFFFFF'
+  };
+  // ---------------- 旧版 § 颜色码 ----------------
+  var LEGACY_COLORS = {
+    '0': '#000000', '1': '#0000AA', '2': '#00AA00', '3': '#00AAAA', '4': '#AA0000',
+    '5': '#AA00AA', '6': '#FFAA00', '7': '#AAAAAA', '8': '#555555', '9': '#5555FF',
+    'a': '#55FF55', 'b': '#55FFFF', 'c': '#FF5555', 'd': '#FF55FF', 'e': '#FFFF55',
+    'f': '#FFFFFF'
+  };
+  var LEGACY_FORMATS = { l: 'bold', o: 'italic', n: 'underlined', m: 'strikethrough', k: 'obfuscated' };
+
+  // ---------------- 标签命名空间 ----------------
+  // MiniMessage(Adventure) 和 CraftEngine 都用 <>, 必须分开识别与开关:
+  //   MM 标签只影响样式/交互 (颜色、装饰、点击悬浮...)
+  //   CE 标签会展开成实际内容 (图像、变量、计算、偏移...)
+  // 装饰标签的短名/长名都映射到同一个样式键 —— 之前直接把标签名当键写,
+  // 于是 <i>/<b>/<u>/<st>/<obf> 全部静默失效 (样式键其实叫 italic/bold/...)。
+  var DECOR_ALIASES = {
+    bold: 'bold', b: 'bold',
+    italic: 'italic', em: 'italic', i: 'italic',
+    underlined: 'underlined', u: 'underlined',
+    strikethrough: 'strikethrough', st: 'strikethrough',
+    obfuscated: 'obfuscated', obf: 'obfuscated'
+  };
+  // MiniMessage 里「有语义但不改变外观」的标签: 预览中直接吃掉 (点击/悬浮/插入)
+  var MM_OPAQUE = { click: 1, hover: 1, insertion: 1 };
+  // MiniMessage 里需要显示成灰色占位符的动态标签 (预览无法求值)
+  var MM_PLACEHOLDER = { key: 1, selector: 1, score: 1, nbt: 1 };
+  // MiniMessage 的翻译标签 (CE 用的是 i18n / l10n)
+  var MM_TRANSLATE = { lang: 1, translate: 1 };
+  // CraftEngine 扩展标签 (见 CE wiki: reference/text_format)
+  var CE_TAGS = {
+    shift: 1, image: 1, global: 1, i18n: 1, l10n: 1, expr: 1, random: 1,
+    arg: 1, viewer_arg: 1, var: 1, papi: 1, viewer_papi: 1, rel_papi: 1,
+    head_texture: 1, bubble: 1, nameplate: 1, background: 1
+  };
+
+  // ---------------- 选项 / 状态 ----------------
+  var options = {
+    mcRoot: null,
+    lang: 'zh_cn',
+    shadow: true,
+    resolveTags: true,          // 总开关
+    resolveMiniMessage: true,   // MiniMessage(Adventure) 标签
+    resolveCeTags: true,        // CraftEngine 扩展标签
+    resolveGlobals: true,
+    resolveImages: true
+  };
+  var _projectData = { images: {}, globals: {}, emojis: {}, langs: {}, furniture: {}, items: {} };
+  var _fonts = null;             // 已加载的 glyph ?(codepoint -> glyph)
+  var _fontPromise = null;
+  var _fontSettled = false;      // 是否已基于资源就绪完成一次真实加?
+  var _readyFired = false;
+  var _readyListeners = [];
+  var _activeFile = null;
+  var _projectCacheKey = null;
+  var _imgCache = new Map();
+  var _jsonCache = new Map();
+  var _modelCache = new Map();
+  var _warnings = [];
+
+  // ---------------- 小工具 ----------------
+  function warn(msg) {
+    if (_warnings.indexOf(msg) === -1) _warnings.push(msg);
+  }
+  function t(key, fb, params) {
+    var v = null;
+    try {
+      if (root.I18N && root.I18N.t) { v = root.I18N.t(key); if (v === key) v = null; }
+    } catch (e) { v = null; }
+    if (v == null) v = fb != null ? fb : key;
+    if (params) v = String(v).replace(/\{(\w+)\}/g, function (m, n) { return params[n] != null ? params[n] : m; });
+    return v;
+  }
+  function cacheSet(map, k, v) {
+    if (map.size >= CACHE_CAP) {
+      var first = map.keys().next();
+      if (!first.done) map.delete(first.value);
+    }
+    map.set(k, v);
+    return v;
+  }
+  function isObj(v) { return v !== null && typeof v === 'object' && !Array.isArray(v); }
+  function clamp(v, a, b) { return v < a ? a : (v > b ? b : v); }
+
+  // ---------- 颜色 ----------
+  function parseColor(s) {
+    if (typeof s !== 'string') return null;
+    var v = s.trim();
+    if (NAMED_COLORS[v]) return hexToRgb(NAMED_COLORS[v]);
+    var m = /^#([0-9a-f]{6})$/i.exec(v);
+    if (m) return hexToRgb('#' + m[1]);
+    m = /^#([0-9a-f]{3})$/i.exec(v);
+    if (m) {
+      var h = m[1];
+      return hexToRgb('#' + h[0] + h[0] + h[1] + h[1] + h[2] + h[2]);
+    }
+    m = /^rgba?\(([^)]+)\)$/i.exec(v);
+    if (m) {
+      var p = m[1].split(',').map(function (x) { return parseFloat(x); });
+      return { r: p[0] | 0, g: p[1] | 0, b: p[2] | 0, a: p.length > 3 ? p[3] : 1 };
+    }
+    return null;
+  }
+  function hexToRgb(hex) {
+    var n = parseInt(hex.slice(1), 16);
+    return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255, a: 1 };
+  }
+  function rgbCss(c, alpha) {
+    if (!c) return '#FFFFFF';
+    var a = alpha == null ? (c.a == null ? 1 : c.a) : alpha;
+    return a >= 1 ? 'rgb(' + c.r + ',' + c.g + ',' + c.b + ')'
+      : 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + a + ')';
+  }
+  function scaleColor(c, f) {
+    return { r: Math.round(c.r * f), g: Math.round(c.g * f), b: Math.round(c.b * f), a: c.a == null ? 1 : c.a };
+  }
+  function lerpColor(a, b, k) {
+    return {
+      r: Math.round(a.r + (b.r - a.r) * k),
+      g: Math.round(a.g + (b.g - a.g) * k),
+      b: Math.round(a.b + (b.b - a.b) * k),
+      a: 1
+    };
+  }
+  function hslToRgb(h, s, l) {
+    h = ((h % 360) + 360) % 360 / 360;
+    var r, g, b;
+    if (s === 0) { r = g = b = l; }
+    else {
+      var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      var p = 2 * l - q;
+      var hue = function (tt) {
+        if (tt < 0) tt += 1;
+        if (tt > 1) tt -= 1;
+        if (tt < 1 / 6) return p + (q - p) * 6 * tt;
+        if (tt < 1 / 2) return q;
+        if (tt < 2 / 3) return p + (q - p) * (2 / 3 - tt) * 6;
+        return p;
+      };
+      r = hue(h + 1 / 3); g = hue(h); b = hue(h - 1 / 3);
+    }
+    return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255), a: 1 };
+  }
+
+  // ---------------- 内置回退字形 (5x7 点阵, 覆盖 ASCII 0x20-0x7E) ----------------
+  // 每个字符 5 ?x 7 ? 每位丢? ?5 个字符编?(0-9A-V ?base32 行?
+  var FALLBACK_ROWS = {
+    'A': '0E11 11 1F11 11 11', 'B': '1E11 11 1E11 11 1E', 'C': '0E11 10 10 10 11 0E',
+    'D': '1E11 11 11 11 11 1E', 'E': '1F10 10 1E10 10 1F', 'F': '1F10 10 1E10 10 10',
+    'G': '0E11 10 1711 11 0E', 'H': '11 11 11 1F11 11 11', 'I': '1F04 04 04 04 04 1F',
+    'J': '07 02 02 02 12 0C', 'K': '11 12 14 1814 12 11', 'L': '10 10 10 10 10 1F',
+    'M': '11 1B15 15 11 11 11', 'N': '11 1915 1311 11 11', 'O': '0E11 11 11 11 11 0E',
+    'P': '1E11 11 1E10 10 10', 'Q': '0E11 11 11 1512 0D', 'R': '1E11 11 1E14 12 11',
+    'S': '0F10 10 0E01 01 1E', 'T': '1F04 04 04 04 04 04', 'U': '11 11 11 11 11 11 0E',
+    'V': '11 11 11 11 11 0A04', 'W': '11 11 11 1515 1B11', 'X': '11 11 0A04 0A11 11',
+    'Y': '11 11 0A04 04 04 04', 'Z': '1F01 02 04 08 10 1F'
+  };
+
+  function buildFallbackFont() {
+    var glyphs = Object.create(null);
+    var mk = function (ch, rows) {
+      // rows: 7 个数? 每个 5 bit
+      var px = [];
+      for (var y = 0; y < 7; y++) {
+        var row = rows[y] | 0;
+        var line = [];
+        for (var x = 0; x < 5; x++) line.push(((row >> (4 - x)) & 1) ? 1 : 0);
+        px.push(line);
+      }
+      glyphs[ch.codePointAt(0)] = { type: 'fallback', px: px, w: 5, h: 7, advance: 6, ascent: 7 };
+    };
+    // 数字与字母的点阵数据 (紧凑字面?
+    var G = {
+      '0': [14, 17, 19, 21, 25, 17, 14], '1': [4, 12, 4, 4, 4, 4, 14],
+      '2': [14, 17, 1, 2, 4, 8, 31], '3': [31, 2, 4, 2, 1, 17, 14],
+      '4': [2, 6, 10, 18, 31, 2, 2], '5': [31, 16, 30, 1, 1, 17, 14],
+      '6': [6, 8, 16, 30, 17, 17, 14], '7': [31, 1, 2, 4, 8, 8, 8],
+      '8': [14, 17, 17, 14, 17, 17, 14], '9': [14, 17, 17, 15, 1, 2, 12],
+      'A': [14, 17, 17, 31, 17, 17, 17], 'B': [30, 17, 17, 30, 17, 17, 30],
+      'C': [14, 17, 16, 16, 16, 17, 14], 'D': [30, 17, 17, 17, 17, 17, 30],
+      'E': [31, 16, 16, 30, 16, 16, 31], 'F': [31, 16, 16, 30, 16, 16, 16],
+      'G': [14, 17, 16, 23, 17, 17, 15], 'H': [17, 17, 17, 31, 17, 17, 17],
+      'I': [14, 4, 4, 4, 4, 4, 14], 'J': [7, 2, 2, 2, 2, 18, 12],
+      'K': [17, 18, 20, 24, 20, 18, 17], 'L': [16, 16, 16, 16, 16, 16, 31],
+      'M': [17, 27, 21, 21, 17, 17, 17], 'N': [17, 25, 21, 19, 17, 17, 17],
+      'O': [14, 17, 17, 17, 17, 17, 14], 'P': [30, 17, 17, 30, 16, 16, 16],
+      'Q': [14, 17, 17, 17, 21, 18, 13], 'R': [30, 17, 17, 30, 20, 18, 17],
+      'S': [15, 16, 16, 14, 1, 1, 30], 'T': [31, 4, 4, 4, 4, 4, 4],
+      'U': [17, 17, 17, 17, 17, 17, 14], 'V': [17, 17, 17, 17, 17, 10, 4],
+      'W': [17, 17, 17, 21, 21, 27, 17], 'X': [17, 17, 10, 4, 10, 17, 17],
+      'Y': [17, 17, 10, 4, 4, 4, 4], 'Z': [31, 1, 2, 4, 8, 16, 31],
+      '!': [4, 4, 4, 4, 4, 0, 4], '?': [14, 17, 1, 2, 4, 0, 4],
+      '.': [0, 0, 0, 0, 0, 0, 4], ',': [0, 0, 0, 0, 0, 4, 8],
+      ':': [0, 0, 4, 0, 0, 4, 0], ';': [0, 0, 4, 0, 0, 4, 8],
+      '-': [0, 0, 0, 31, 0, 0, 0], '_': [0, 0, 0, 0, 0, 0, 31],
+      '+': [0, 4, 4, 31, 4, 4, 0], '=': [0, 0, 31, 0, 31, 0, 0],
+      '/': [1, 2, 2, 4, 8, 8, 16], '\\': [16, 8, 8, 4, 2, 2, 1],
+      '*': [0, 10, 4, 31, 4, 10, 0], '#': [10, 10, 31, 10, 31, 10, 10],
+      '(': [2, 4, 8, 8, 8, 4, 2], ')': [8, 4, 2, 2, 2, 4, 8],
+      '[': [14, 8, 8, 8, 8, 8, 14], ']': [14, 2, 2, 2, 2, 2, 14],
+      '<': [2, 4, 8, 16, 8, 4, 2], '>': [8, 4, 2, 1, 2, 4, 8],
+      "'": [4, 4, 8, 0, 0, 0, 0], '"': [10, 10, 20, 0, 0, 0, 0],
+      '%': [25, 26, 2, 4, 8, 11, 19], '&': [12, 18, 20, 8, 21, 18, 13],
+      '@': [14, 17, 23, 21, 23, 16, 14], '$': [4, 15, 20, 14, 5, 30, 4],
+      '~': [0, 0, 8, 21, 2, 0, 0], '^': [4, 10, 17, 0, 0, 0, 0],
+      '|': [4, 4, 4, 4, 4, 4, 4], '{': [6, 4, 4, 8, 4, 4, 6], '}': [12, 4, 4, 2, 4, 4, 12]
+    };
+    Object.keys(G).forEach(function (ch) { mk(ch, G[ch]); });
+    glyphs[32] = { type: 'space', w: 0, h: 0, advance: 4, ascent: 7 };
+    return glyphs;
+  }
+
+  // ---------------- 原版字体加载 ----------------
+  function mcApi() {
+    var a = root.electronAPI;
+    return a && a.mc ? a.mc : null;
+  }
+  function readText(p) {
+    var m = mcApi();
+    if (!m || !m.readText) return Promise.resolve(null);
+    return m.readText(p).then(function (r) { return (r && r.success) ? r.content : null; }).catch(function () { return null; });
+  }
+  function readDataUrl(p) {
+    var m = mcApi();
+    if (!m || !m.readBinary) return Promise.resolve(null);
+    return m.readBinary(p).then(function (r) { return (r && r.success) ? r.dataUrl : null; }).catch(function () { return null; });
+  }
+  function loadImagePath(p) {
+    if (!p) return Promise.resolve(null);
+    if (_imgCache.has(p)) return _imgCache.get(p);
+    var pr = readDataUrl(p).then(function (url) {
+      if (!url || typeof Image === 'undefined') return null;
+      return new Promise(function (res) {
+        var im = new Image();
+        im.onload = function () { res(im); };
+        im.onerror = function () { res(null); };
+        im.src = url;
+      });
+    }).catch(function () { return null; });
+    return cacheSet(_imgCache, p, pr);
+  }
+  function loadJsonPath(p) {
+    if (!p) return Promise.resolve(null);
+    if (_jsonCache.has(p)) return _jsonCache.get(p);
+    var pr = readText(p).then(function (txt) {
+      if (!txt) return null;
+      try { return JSON.parse(txt); } catch (e) { return null; }
+    }).catch(function () { return null; });
+    return cacheSet(_jsonCache, p, pr);
+  }
+  function assets() { return root.CEMCAssets || null; }
+  function resolvePath(kind, id) {
+    var A = assets();
+    return A && A.resolve ? A.resolve(kind, id) : null;
+  }
+  // 同一个资源 id 可能在多个资源包里都有（当前工程包 / 其它包 / 原版），
+  // 只取第一个路径会读错包（<image:...> 变成「找不到图片」小红块、字体回退点阵）。
+  // 这里返回全部候选路径，由调用方按顺序尝试读取。
+  function resolveCandidates(kind, id) {
+    var A = assets();
+    if (A && A.resolveCandidates) {
+      var list = A.resolveCandidates(kind, id);
+      if (list && list.length) return list;
+    }
+    var p = resolvePath(kind, id);
+    return p ? [p] : [];
+  }
+  function nsDirsOf(ns) {
+    var A = assets();
+    ns = ns || 'minecraft';
+    if (A && A.nsDirs) { var l = A.nsDirs(ns); if (l && l.length) return l; }
+    if (A && A.nsDir) { var d0 = A.nsDir(ns); if (d0) return [d0]; }
+    return [];
+  }
+  // 依次尝试候选路径，返回第一个真正读到的图片
+  async function loadImageAny(kind, id) {
+    var cands = resolveCandidates(kind, id);
+    for (var i = 0; i < cands.length; i++) {
+      var img = await loadImagePath(cands[i]);
+      if (img) return img;
+    }
+    return null;
+  }
+  async function loadJsonAny(kind, id) {
+    var cands = resolveCandidates(kind, id);
+    for (var i = 0; i < cands.length; i++) {
+      var j = await loadJsonPath(cands[i]);
+      if (j) return j;
+    }
+    return null;
+  }
+  // provider ?file 字段?namespace:path (可带 textures/ 前缀)
+  function fontTextureCandidates(fileRef, defaultNs) {
+    var s = String(fileRef || '');
+    var i = s.indexOf(':');
+    var ns = i === -1 ? (defaultNs || 'minecraft') : s.slice(0, i);
+    var p = i === -1 ? s : s.slice(i + 1);
+    p = p.replace(/^textures\//, '');
+    p = p.replace(/\.png$/i, '');
+    return resolveCandidates('texture', ns + ':' + p);
+  }
+  function fontTexturePath(fileRef, defaultNs) {
+    return fontTextureCandidates(fileRef, defaultNs)[0] || null;
+  }
+  function fontJsonPath(id) {
+    var s = String(id || 'minecraft:default');
+    if (s.indexOf(':') === -1) s = 'minecraft:' + s;
+    return resolvePath('font', s);
+  }
+
+  function loadFontData() {
+    if (_fontPromise) return _fontPromise;
+    // 资源索引尚未就绪时不要缓存回逢字体 (否则索引完成后仍是降级字?
+    var A = assets();
+    if (A && A.status && A.status().state !== 'ready' && !_fontSettled) {
+      warn('assets-not-ready');
+      if (A.onReady) A.onReady(function () { _fontSettled = true; _fonts = null; _fontPromise = null; });
+      return Promise.resolve(buildFallbackFont());
+    }
+    _fontSettled = true;
+    _fontPromise = (async function () {
+      var glyphs = Object.create(null);
+      var A = assets();
+      if (!A || !A.status || A.status().state !== 'ready') {
+        warn('no-assets');
+        return buildFallbackFont();
+      }
+      try {
+        var seenFonts = Object.create(null);
+        var chain = [];
+        await expandFont('minecraft:default', 0, seenFonts, chain);
+        if (!chain.length) { warn('no-font-providers'); return buildFallbackFont(); }
+        for (var i = 0; i < chain.length; i++) {
+          var prov = chain[i];
+          if (prov.type === 'space') {
+            var adv = prov.advances || {};
+            Object.keys(adv).forEach(function (ch) {
+              var cp = ch.codePointAt(0);
+              glyphs[cp] = { type: 'space', w: 0, h: 0, advance: adv[ch] | 0, ascent: 7 };
+            });
+            continue;
+          }
+          if (prov.type !== 'bitmap') continue;
+          await loadBitmapProvider(prov, glyphs);
+        }
+      } catch (e) {
+        warn('font-load-failed: ' + (e && e.message));
+      }
+      // 用回逢字形补齐缺失?ASCII
+      var fb = buildFallbackFont();
+      Object.keys(fb).forEach(function (k) {
+        if (!glyphs[k]) glyphs[k] = fb[k];
+      });
+      return glyphs;
+    })();
+    return _fontPromise;
+  }
+
+  async function expandFont(fontId, depth, seenFonts, out) {
+    if (depth > 4 || seenFonts[fontId]) return;
+    seenFonts[fontId] = 1;
+    // 字体 JSON 可能位于任意资源包 (工程包优先, 原版兜底) —— 只查一个根会让
+    // minecraft:default 落到某个不含 font/ 的工程包里, 整个预览回退成点阵字体
+    var json = await loadJsonAny('font', fontId);
+    if (!json || !Array.isArray(json.providers)) return;
+    for (var i = 0; i < json.providers.length; i++) {
+      var prov = json.providers[i];
+      if (!prov || typeof prov !== 'object') continue;
+      if (prov.type === 'reference') {
+        await expandFont(prov.id, depth + 1, seenFonts, out);
+      } else {
+        out.push(prov);
+      }
+    }
+  }
+
+  async function loadBitmapProvider(prov, glyphs) {
+    var cands = fontTextureCandidates(prov.file, 'minecraft');
+    var img = null;
+    for (var ci = 0; ci < cands.length && !img; ci++) img = await loadImagePath(cands[ci]);
+    if (!img) { warn('missing-font-texture: ' + prov.file); return; }
+    var chars = Array.isArray(prov.chars) ? prov.chars : null;
+    if (!chars || !chars.length) return;
+    // 注意: 原版的 chars 用 codePoints() 统计列数 (代理对算 1 个),
+    // 直接用 String.length 会把 U+1F300 之类的字符算成 2 列,
+    // 导致格子宽度被腰斩、整个 provider 的字形都被压窄。
+    var rowCount = chars.length;
+    var rows = [];
+    var colCount = 0;
+    for (var i = 0; i < rowCount; i++) {
+      var cps = decodeChars(chars[i]);
+      rows.push(cps);
+      colCount = Math.max(colCount, cps.length);
+    }
+    if (!colCount) return;
+    var cellW = img.width / colCount;
+    var cellH = img.height / rowCount;
+    // 原版 BitmapProvider 的定义: `height` 缺省值是 8 (不是格子高度),
+    // 渲染时按 scale = height / 格子高度 缩放。CE 生成的 provider 一定会写 height,
+    // 但第三方字体包常常省略, 之前用格子高度兜底会让字形整体偏大/偏小。
+    var renderH = prov.height != null ? Math.abs(prov.height) : 8;
+    var scale = cellH > 0 ? renderH / cellH : 1;
+    var ascent = prov.ascent != null ? prov.ascent : renderH - 1;
+    // 整张图一次取出像? 避免每个字形都做丢?canvas 操作
+    var atlas = atlasPixels(img);
+    for (var r = 0; r < rowCount; r++) {
+      var row = rows[r];                   // 已解码的码位数组
+      for (var c = 0; c < row.length; c++) {
+        var cp = row[c];
+        if (!cp) continue;                 // \u0000 = 无字?
+        if (glyphs[cp]) continue;          // 先出现的 provider 优先
+        var x0 = c * cellW;
+        var y0 = r * cellH;
+        var trimmed = atlas ? trimmedWidth(atlas, x0, y0, cellW, cellH) : 0;
+        glyphs[cp] = {
+          type: 'bitmap', img: img,
+          sx: x0, sy: y0, sw: cellW, sh: cellH,
+          w: Math.round(cellW * scale), h: Math.round(renderH),
+          advance: (Math.round(trimmed * scale) + (trimmed ? 1 : 0)) || 1,
+          ascent: ascent
+        };
+      }
+    }
+  }
+  // 把整张贴图读进内?(只做丢?canvas 操作)
+  function atlasPixels(img) {
+    try {
+      if (typeof document === 'undefined') return null;
+      var cv = document.createElement('canvas');
+      cv.width = img.width;
+      cv.height = img.height;
+      var ctx = cv.getContext('2d');
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(img, 0, 0);
+      return { data: ctx.getImageData(0, 0, cv.width, cv.height).data, w: cv.width, h: cv.height };
+    } catch (e) {
+      warn('atlas-read-failed: ' + (e && e.message));
+      return null;
+    }
+  }
+  function trimmedWidth(atlas, x0, y0, w, h) {
+    var x1 = Math.min(atlas.w, Math.ceil(x0 + w));
+    var y1 = Math.min(atlas.h, Math.ceil(y0 + h));
+    var sx = Math.max(0, Math.floor(x0));
+    var sy = Math.max(0, Math.floor(y0));
+    for (var x = x1 - 1; x >= sx; x--) {
+      for (var y = sy; y < y1; y++) {
+        if (atlas.data[(y * atlas.w + x) * 4 + 3] > 0) return x - sx + 1;
+      }
+    }
+    return 0;
+  }
+  // 把一行 chars 解成码位数组 (支持 "\u0041\u0042" 转义串, 并合并 UTF-16 代理对)
+  function decodeChars(str) {
+    var s = String(str);
+    var units = [];
+    if (s.indexOf('\\u') === 0) {
+      var re = /\\u([0-9a-fA-F]{4})/g;
+      var m;
+      while ((m = re.exec(s)) !== null) units.push(parseInt(m[1], 16));
+    }
+    if (!units.length) {
+      for (var i = 0; i < s.length; i++) units.push(s.charCodeAt(i));
+    }
+    var out = [];
+    for (var k = 0; k < units.length; k++) {
+      var u = units[k];
+      if (u >= 0xD800 && u <= 0xDBFF && k + 1 < units.length) {
+        var lo = units[k + 1];
+        if (lo >= 0xDC00 && lo <= 0xDFFF) {
+          out.push(0x10000 + ((u - 0xD800) << 10) + (lo - 0xDC00));
+          k++;
+          continue;
+        }
+      }
+      out.push(u);
+    }
+    return out;
+  }
+  // 统计一行 chars 的码位数 (CE / MC 都按码位分列)
+  function countCodepoints(str) {
+    return decodeChars(str).length;
+  }
+  // 用采样法估算字形实际占用的像素宽?(旧字形实? 保留给外部调试使?
+  function measureTrimmed(img, x0, y0, w, h) {
+    if (!img) return 0;
+    try {
+      if (typeof document === 'undefined') return 0;
+      var cv = document.createElement('canvas');
+      cv.width = Math.max(1, Math.ceil(w));
+      cv.height = Math.max(1, Math.ceil(h));
+      var ctx = cv.getContext('2d');
+      ctx.drawImage(img, x0, y0, w, h, 0, 0, cv.width, cv.height);
+      var data = ctx.getImageData(0, 0, cv.width, cv.height).data;
+      for (var x = cv.width - 1; x >= 0; x--) {
+        for (var y = 0; y < cv.height; y++) {
+          if (data[(y * cv.width + x) * 4 + 3] > 0) return x + 1;
+        }
+      }
+ } catch (e) { /* tainted canvas ?*/ }
+    return 0;
+  }
+
+  // ---------------- 文本解析 ----------------
+  // 产出 item 列表: {kind:'glyph'|'space'|'image'|'break', cp, style, ...}
+
+  function cloneStyle(s) {
+    return {
+      color: s.color, bold: s.bold, italic: s.italic, underlined: s.underlined,
+      strikethrough: s.strikethrough, obfuscated: s.obfuscated,
+      font: s.font, shadow: s.shadow, gradId: s.gradId
+    };
+  }
+  function defaultStyle() {
+    return { color: { r: 255, g: 255, b: 255, a: 1 }, shadow: true };
+  }
+
+  /**
+   * 解析带标签的文本, 产出样式化字形序列
+   * @returns {items: Array, width:number, height:number}
+   */
+  function parseText(text, opts) {
+    var o = opts || {};
+    var resolveTags = o.resolveTags !== false && options.resolveTags !== false;
+    // 两个命名空间各自可关: 关掉时标签按普通文本原样显示 (方便看到原始配置)
+    var mmOn = resolveTags && o.resolveMiniMessage !== false && options.resolveMiniMessage !== false;
+    var ceOn = resolveTags && o.resolveCeTags !== false && options.resolveCeTags !== false;
+    o = Object.assign({}, o, { mmOn: mmOn, ceOn: ceOn });
+    var items = [];
+    var style = o.style ? cloneStyle(o.style) : defaultStyle();
+    if (o.baseColor) style.color = o.baseColor;
+    var grads = {};        // gradId -> {type:'gradient'|'rainbow', stops, phase, reversed}
+    var gradSeq = 0;
+    var lines = [];        // 行高累计
+    var lineH = LINE_HEIGHT;
+    var lineCount = 1;
+
+    var s = String(text == null ? '' : text);
+    var i = 0;
+    var guard = 0;
+    while (i < s.length && guard++ < 200000) {
+      var ch = s[i];
+      // ---- 转义 ----
+      if (ch === '\\' && i + 1 < s.length && (s[i + 1] === '<' || s[i + 1] === '\\' || s[i + 1] === '&')) {
+        pushGlyph(items, s[i + 1], style);
+        i += 2; continue;
+      }
+      // ---- 旧版 § 颜色码 ----
+      if (ch === '\u00a7' && i + 1 < s.length) {
+        var code = s[i + 1].toLowerCase();
+        if (LEGACY_COLORS[code]) {
+          style.color = hexToRgb(LEGACY_COLORS[code]);
+          style.bold = style.italic = style.underlined = style.strikethrough = style.obfuscated = false;
+          i += 2; continue;
+        }
+        if (LEGACY_FORMATS[code]) { style[LEGACY_FORMATS[code]] = true; i += 2; continue; }
+        if (code === 'r') { style = defaultStyle(); i += 2; continue; }
+      }
+      // ---- & 颜色码 (部分配置文件使用) ----
+      if (ch === '&' && i + 1 < s.length && /^[0-9a-fk-or]$/i.test(s[i + 1])) {
+        var c2 = s[i + 1].toLowerCase();
+        if (LEGACY_COLORS[c2]) { style.color = hexToRgb(LEGACY_COLORS[c2]); i += 2; continue; }
+        if (LEGACY_FORMATS[c2]) { style[LEGACY_FORMATS[c2]] = true; i += 2; continue; }
+        if (c2 === 'r') { style = defaultStyle(); i += 2; continue; }
+      }
+      // ---- 换行 ----
+      if (ch === '\n') {
+        items.push({ kind: 'break' });
+        lineCount++;
+        i++; continue;
+      }
+      // ---- MiniMessage / CE 标签 ----
+      if (ch === '<' && resolveTags) {
+        var close = findTagEnd(s, i);
+        if (close > i) {
+          var raw = s.slice(i + 1, close);
+          var handled = applyTag(raw, style, grads, function (g) { gradSeq = Math.max(gradSeq, g); },
+            items, o);
+          if (handled) {
+            if (handled === 'break') { lineCount++; }
+            if (handled === 'consumed') { /* nothing */ }
+            i = close + 1;
+            continue;
+          }
+        }
+      }
+      // ---- 普通字符 ----
+      var cp = s.codePointAt(i);
+      var clen = cp > 0xFFFF ? 2 : 1;
+      pushGlyph(items, s.slice(i, i + clen), style);
+      i += clen;
+    }
+    // ---- 渐变着色 ----
+    applyGradients(items, grads);
+    // ---- 测量 ----
+    var font = glyphsSync();
+    var width = 0, maxW = 0, maxH = lineH;
+    for (var k = 0; k < items.length; k++) {
+      var it = items[k];
+      if (it.kind === 'break') { maxW = Math.max(maxW, width); width = 0; maxH += lineH; continue; }
+      width += itemAdvance(it, font);
+    }
+    maxW = Math.max(maxW, width);
+    return { items: items, width: maxW, height: maxH, lines: Math.max(1, maxH / lineH) };
+  }
+
+  function pushGlyph(items, str, style) {
+    var cp = str.codePointAt(0);
+    items.push({ kind: 'glyph', cp: cp, ch: str, style: cloneStyle(style), gradId: style.gradId });
+  }
+
+  function findTagEnd(s, start) {
+    // <tag> / <tag:arg> / <tag:'a:b'> ; 只在遇到 ' 时跳?
+    var quote = null;
+    for (var i = start + 1; i < s.length; i++) {
+      var c = s[i];
+      if (c === '\n') return -1;
+      if (quote) { if (c === quote) quote = null; continue; }
+      if (c === "'" || c === '"') { quote = c; continue; }
+      if (c === '>') return i;
+      if (c === '<') return -1;
+    }
+    return -1;
+  }
+
+  // 将内?MiniMessage 样式?(?"'<!shadow><white>'") 应用到临时样?
+  function styleFromFormat(fmt, base) {
+    var st = cloneStyle(base);
+    if (!fmt) return st;
+    var inner = String(fmt).trim();
+    if ((inner.charAt(0) === "'" && inner.charAt(inner.length - 1) === "'") ||
+        (inner.charAt(0) === '"' && inner.charAt(inner.length - 1) === '"')) {
+      inner = inner.slice(1, -1);
+    }
+    var re = /<([^<>]*)>/g;
+    var m;
+    while ((m = re.exec(inner)) !== null) {
+      var nm = m[1].replace(/^\//, '');
+      var negated = nm.charAt(0) === '!';
+      if (negated) nm = nm.slice(1);
+      var low = nm.toLowerCase();
+      var deco = DECOR_ALIASES[low];
+      if (deco) { st[deco] = !negated; continue; }
+      if (low === 'shadow') { st.shadow = !negated; continue; }
+      if (NAMED_COLORS[low]) { if (!negated) st.color = hexToRgb(NAMED_COLORS[low]); continue; }
+      var hex = parseColor(low);
+      if (hex && /^#/.test(low)) { if (!negated) st.color = hex; continue; }
+    }
+    return st;
+  }
+
+  var _gradCounter = 0;
+  /**
+   * 处理一个标签
+   * @returns {string|undefined|boolean} 处理结果: 'break' 表示换行, true 表示已消费
+   */
+  // 把「无法求值的动态标签」显示成灰色占位符, 让用户看得见这里有什么
+  function pushPlaceholder(items, text, style) {
+    var st = cloneStyle(style);
+    st.color = hexToRgb('#7F7F7F');
+    st.shadow = false;
+    for (var i = 0; i < text.length; i++) pushGlyph(items, text[i], st);
+  }
+
+  function applyTag(raw, style, grads, bump, items, o) {
+    var name = raw;
+    var arg = '';
+    var ci = raw.indexOf(':');
+    if (ci !== -1) { name = raw.slice(0, ci); arg = raw.slice(ci + 1); }
+    name = name.trim();
+    var closing = false, negated = false;
+    // </i> / <!i> / <!/i> 三种关闭写法都要认 (前缀顺序任意)
+    for (var pass = 0; pass < 2; pass++) {
+      if (name.charAt(0) === '/') { closing = true; name = name.slice(1); }
+      else if (name.charAt(0) === '!') { negated = true; name = name.slice(1); }
+      else break;
+    }
+    var low = name.toLowerCase();
+    var off = closing || negated;
+    var mm = o.mmOn !== false;   // MiniMessage 命名空间是否启用
+    var ce = o.ceOn !== false;   // CraftEngine 命名空间是否启用
+
+    // ==================== MiniMessage ====================
+    // 装饰: <i>/<italic>/<em> ... ; <!i>/</i>  = 去掉该样式
+    var deco = DECOR_ALIASES[low];
+    if (deco) {
+      if (!mm) return false;
+      style[deco] = !off;
+      return true;
+    }
+    if (low === 'reset') {
+      if (!mm) return false;
+      var d = defaultStyle();
+      Object.keys(d).forEach(function (k) { style[k] = d[k]; });
+      style.bold = style.italic = style.underlined = style.strikethrough = style.obfuscated = false;
+      style.gradId = null;
+      return true;
+    }
+    if (low === 'newline' || low === 'br') {
+      if (!mm) return false;
+      items.push({ kind: 'break' });
+      return 'break';
+    }
+    // 阴影: <shadow> / <!shadow> / </shadow> / <shadow:#rrggbb>
+    if (low === 'shadow') {
+      if (!mm) return false;
+      style.shadow = !off;
+      if (!off && arg) { var sc = parseColor(unquote(arg)); if (sc) style.shadowColor = sc; }
+      return true;
+    }
+    // 颜色
+    if (low === 'color' || low === 'colour') {
+      if (!mm) return false;
+      if (off) { style.color = null; return true; }
+      var c = parseColor(unquote(arg));
+      if (c) style.color = c;
+      return true;
+    }
+    if (NAMED_COLORS[low]) {
+      if (!mm) return false;
+      style.color = off ? null : hexToRgb(NAMED_COLORS[low]);
+      return true;
+    }
+    var hx = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(low);
+    if (hx) {
+      if (!mm) return false;
+      style.color = off ? null : parseColor(low);
+      return true;
+    }
+    if (low === 'font') {
+      if (!mm) return false;
+      style.font = off ? null : unquote(arg);
+      return true;
+    }
+
+    // 渐变 / 彩虹 / 过渡
+    if (low === 'gradient' || low === 'rainbow' || low === 'transition') {
+      if (!mm) return false;
+      if (off) { style.gradId = null; return true; }
+      var id = '$g' + (++_gradCounter);
+      if (low === 'rainbow') {
+        grads[id] = { type: 'rainbow', phase: parseFloat(unquote(arg)) || 0 };
+      } else {
+        var stops = splitArgs(arg).map(function (x) { return parseColor(unquote(x)); }).filter(Boolean);
+        grads[id] = { type: low === 'transition' ? 'transition' : 'gradient', stops: stops.length ? stops : [hexToRgb('#FFFFFF')] };
+      }
+      style.gradId = id;
+      return true;
+    }
+
+    // 点击 / 悬浮 / 插入: 改变的是交互而非外观, 预览里直接消费掉
+    if (MM_OPAQUE[low]) {
+      if (!mm) return false;
+      return true;
+    }
+    // 翻译: 先查工程译文, 查不到就灰占位
+    if (MM_TRANSLATE[low]) {
+      if (!mm) return false;
+      var tval = langLookup(unquote(arg));
+      if (tval != null) { parseTextInto(tval, style, items, grads, o); return true; }
+      pushPlaceholder(items, '<' + low + ':' + arg + '>', style);
+      return true;
+    }
+    // 键位 / 选择器 / 计分板 / NBT: 预览无法求值 → 灰占位
+    if (MM_PLACEHOLDER[low]) {
+      if (!mm) return false;
+      pushPlaceholder(items, '<' + low + ':' + arg + '>', style);
+      return true;
+    }
+
+    // ==================== CraftEngine ====================
+    if (!ce) return false;
+    if (low === 'shift') {
+      var px = null;
+      if (/^-?\d+(\.\d+)?$/.test(unquote(arg))) px = parseFloat(unquote(arg));
+      else if (options.mcRoot) px = null;
+      if (px != null && isFinite(px)) {
+        items.push({ kind: 'shift', dx: px, style: cloneStyle(style) });
+        return true;
+      }
+      // 无法解析时按 0 处理 (offset-characters 未配?)
+      items.push({ kind: 'shift', dx: 0, style: cloneStyle(style) });
+      return true;
+    }
+    if (low === 'image') {
+      var parts = splitArgs(arg).map(function (x) { return unquote(x); });
+      var imgId = parts.length >= 2 ? parts[0] + ':' + parts[1] : (parts[0] || '');
+      var row = parts.length >= 4 ? parseInt(parts[2], 10) : null;
+      var col = parts.length >= 4 ? parseInt(parts[3], 10) : null;
+      var fmt = parts.length >= 4 ? parts[4] : (parts.length === 3 ? parts[2] : null);
+      var st2 = fmt ? styleFromFormat(fmt, style) : cloneStyle(style);
+      var info = options.resolveImages === false ? null : imageGlyph(imgId, row, col);
+      items.push({
+        kind: 'image', id: imgId, row: row, col: col,
+        info: info, style: st2, tag: '<image:' + arg + '>'
+      });
+      return true;
+    }
+    if (low === 'global') {
+      var ga = splitArgs(arg).map(function (x) { return x; });
+      var gid = unquote(ga[0] || '');
+      if (options.resolveGlobals !== false && _projectData.globals[gid] != null) {
+        var body = String(_projectData.globals[gid]);
+        // 支持 <arg:0> 等索引参?
+        var args = ga.slice(1).map(function (x) { return unquote(x); });
+        body = body.replace(/<arg:(\d+)>/g, function (m, idx) {
+          var v = args[parseInt(idx, 10)];
+          return v != null ? v : m;
+        });
+        var sub = parseTextInto(body, style, items, grads, o);
+        return true;
+      }
+      // 未定? 原样保留
+      return false;
+    }
+    // CE 的 i18n(服务端语言) / l10n(客户端语言); MiniMessage 的 lang/translate 已在上方处理
+    if (low === 'i18n' || low === 'l10n') {
+      var key = unquote(arg);
+      var val = langLookup(key);
+      if (val != null) { parseTextInto(val, style, items, grads, o); return true; }
+      return false;
+    }
+    if (low === 'expr') {
+      var ea = splitArgs(arg);
+      var fmt = unquote(ea[0]);
+      var expr = ea.length > 1 ? unquote(ea.slice(1).join(':')) : '';
+      var r = evalExpr(expr);
+      if (r !== null) {
+        var txt = fmt === 'bool' ? (r ? 'true' : 'false')
+          : (fmt ? formatNumber(r, fmt) : String(Math.round(r * 100) / 100));
+        parseTextInto(txt, style, items, grads, o);
+        return true;
+      }
+      return false;
+    }
+    if (low === 'random') {
+      var ra = splitArgs(arg);
+      var rid = unquote(ra[0] || 'random');
+      var val2 = randomRoll(rid, ra.slice(1).map(function (x) { return unquote(x); }));
+      if (val2 !== null) { parseTextInto(val2, style, items, grads, o); return true; }
+      return false;
+    }
+    if (low === 'arg' || low === 'viewer_arg' || low === 'var' || low === 'papi' ||
+        low === 'viewer_papi' || low === 'rel_papi') {
+      // papi 支持 <papi:name:default> —— 预览里没有 PlaceholderAPI, 有默认值就显示默认值
+      if (low === 'papi' || low === 'viewer_papi' || low === 'rel_papi') {
+        var pa = splitArgs(arg);
+        if (pa.length >= 2) {
+          parseTextInto(unquote(pa[1]), style, items, grads, o);
+          return true;
+        }
+      }
+      pushPlaceholder(items, '<' + low + ':' + arg + '>', style);
+      return true;
+    }
+    if (low === 'head_texture') {
+      items.push({ kind: 'head', style: cloneStyle(style), hash: unquote(arg) });
+      return true;
+    }
+    if (low === 'bubble' || low === 'nameplate' || low === 'background') {
+      // 形如 <bubble:id:left:right:'text'> ?只渲染文本参?
+      var ba = splitArgs(arg);
+      if (ba.length) {
+        var bodyTxt = unquote(ba[ba.length - 1]);
+        parseTextInto(bodyTxt, style, items, grads, o);
+        return true;
+      }
+      return false;
+    }
+    return false;
+  }
+
+  function parseTextInto(text, style, items, grads, o) {
+    var tmp = parseText(text, Object.assign({}, o, { style: style }));
+    // 合并 (保持目标数组)
+    for (var i = 0; i < tmp.items.length; i++) items.push(tmp.items[i]);
+    return true;
+  }
+  function unquote(s) {
+    s = String(s == null ? '' : s).trim();
+    if (s.length >= 2) {
+      var a = s.charAt(0), b = s.charAt(s.length - 1);
+      if ((a === "'" && b === "'") || (a === '"' && b === '"')) return s.slice(1, -1);
+    }
+    return s;
+  }
+  function splitArgs(arg) {
+    // ?: 分隔, 但引号内?: 不切
+    var out = [];
+    var cur = '';
+    var q = null;
+    for (var i = 0; i < String(arg).length; i++) {
+      var c = arg[i];
+      if (q) { cur += c; if (c === q) q = null; continue; }
+      if (c === "'" || c === '"') { q = c; cur += c; continue; }
+      if (c === ':') { out.push(cur); cur = ''; continue; }
+      cur += c;
+    }
+    out.push(cur);
+    return out;
+  }
+
+  // 箢易表达式求?(仅支持数字四则运算与比较, ?<expr:> 预览)
+  function evalExpr(expr) {
+    var e = String(expr || '').trim();
+    if (!e) return null;
+    if (!/^[-+*/%().\d\s<>=!&|]+$/.test(e)) return null;
+    if (/[<>]=?|==|!=/.test(e)) {
+      try {
+        var parts = e.split(/(>=|<=|==|!=|>|<)/);
+        if (parts.length === 3) {
+          var a = safeNum(parts[0]), b = safeNum(parts[2]);
+          if (a === null || b === null) return null;
+          switch (parts[1]) {
+            case '>': return a > b; case '<': return a < b;
+            case '>=': return a >= b; case '<=': return a <= b;
+            case '==': return a === b; case '!=': return a !== b;
+          }
+        }
+      } catch (err) { return null; }
+      return null;
+    }
+    try {
+      /* eslint-disable no-new-func */
+      var v = Function('"use strict";return (' + e + ');')();
+      return (typeof v === 'number' && isFinite(v)) ? v : null;
+    } catch (err) { return null; }
+  }
+  function safeNum(x) {
+    var v = parseFloat(String(x).trim());
+    return isNaN(v) ? null : v;
+  }
+  function formatNumber(v, fmt) {
+    var m = /^(0*)(?:\.(0+))?$/.exec(fmt);
+    if (!m) return String(v);
+    var dec = m[2] ? m[2].length : 0;
+    return dec ? v.toFixed(dec) : String(Math.round(v));
+  }
+  var _randCache = Object.create(null);
+  function randomRoll(id, args) {
+    if (_randCache[id] !== undefined) return _randCache[id];
+    var type = 'uniform', nums = [];
+    if (args.length === 1 && /^-?\d+(\.\d+)?~-?\d+(\.\d+)?$/.test(args[0])) {
+      nums = args[0].split('~').map(parseFloat);
+    } else if (args.length === 1 && /^-?\d+(\.\d+)?$/.test(args[0])) {
+      nums = [parseFloat(args[0]), parseFloat(args[0])];
+    } else if (args.length >= 2) {
+      type = args[0];
+      nums = args.slice(1).map(function (x) { return parseFloat(x); }).filter(function (x) { return !isNaN(x); });
+    }
+    var v = null;
+    try {
+      if (type === 'fixed' || type === 'constant') v = nums[0] || 0;
+      else {
+        var min = nums.length ? nums[0] : 0;
+        var max = nums.length > 1 ? nums[1] : (nums.length ? nums[0] : 1);
+        v = min + Math.random() * (max - min);
+      }
+    } catch (e) { v = null; }
+    if (v === null) return null;
+    v = Math.round(v * 100) / 100;
+    _randCache[id] = String(v);
+    return _randCache[id];
+  }
+  function langLookup(key) {
+    if (!key) return null;
+    var pd = _projectData.langs || {};
+    if (pd[key] != null) return pd[key];
+    var A = assets();
+    if (A && A.langObject) {
+      var o = A.langObject(options.lang) || A.langObject('en_us');
+      if (o && o[key] != null) return o[key];
+    }
+    return null;
+  }
+
+  function applyGradients(items, grads) {
+    var groups = {};
+    for (var i = 0; i < items.length; i++) {
+      var it = items[i];
+      if (!it.gradId || !grads[it.gradId]) continue;
+      (groups[it.gradId] = groups[it.gradId] || []).push(it);
+    }
+    Object.keys(groups).forEach(function (gid) {
+      var spec = grads[gid];
+      var arr = groups[gid];
+      var total = arr.length;
+      for (var k = 0; k < total; k++) {
+        var t = total <= 1 ? 0 : k / (total - 1);
+        if (spec.type === 'rainbow') arr[k].gradColor = hslToRgb(t * 360 + (spec.phase || 0), 1, 0.55);
+        else {
+          var stops = spec.stops;
+          var seg = Math.min(stops.length - 1, Math.floor(t * (stops.length - 1)));
+          var local = (t * (stops.length - 1)) - seg;
+          arr[k].gradColor = lerpColor(stops[seg], stops[Math.min(stops.length - 1, seg + 1)], local);
+        }
+      }
+    });
+  }
+
+  function glyphsSync() { return _fonts || buildFallbackFont(); }
+
+  // 字形宽度 (像素)
+  function glyphFor(cp) {
+    var f = glyphsSync();
+    // 字体覆盖: <font:...> 暂不做多字体切换, 统一查主?
+    return f[cp] || null;
+  }
+  function itemAdvance(it, font) {
+    if (it.kind === 'break') return 0;
+    if (it.kind === 'shift') return it.dx || 0;
+    if (it.kind === 'head') return 9;
+    if (it.kind === 'image') {
+      if (it.info && it.info.img) return it.info.width + 1;
+      return 7;   // 未解析的占位块宽度
+    }
+    var g = glyphFor(it.cp);
+    if (!g) return 6;
+    var adv = g.advance || 6;
+    if (it.style && it.style.bold) adv += 1;
+    return adv;
+  }
+
+  // ---------------- 绘制 ----------------
+  function setPixelFont(ctx) {
+    ctx.imageSmoothingEnabled = false;
+  }
+  function drawItems(ctx, items, x, y, o) {
+    var opts = o || {};
+    var shadow = opts.shadow !== false && options.shadow !== false;
+    var cx = x, cy = y;
+    var startX = x;
+    var width = 0, maxW = 0;
+    var f = glyphsSync();
+    for (var i = 0; i < items.length; i++) {
+      var it = items[i];
+      if (it.kind === 'break') {
+        maxW = Math.max(maxW, cx - startX);
+        cx = startX; cy += LINE_HEIGHT; continue;
+      }
+      if (it.kind === 'shift') { cx += it.dx || 0; continue; }
+      var color = it.gradColor || (it.style && it.style.color) || { r: 255, g: 255, b: 255, a: 1 };
+      var itemShadow = shadow && !(it.style && it.style.shadow === false);
+      if (it.kind === 'image') {
+        drawImageGlyph(ctx, it, cx, cy, color, itemShadow);
+        cx += itemAdvance(it, f);
+        continue;
+      }
+      if (it.kind === 'head') {
+        drawHeadPlaceholder(ctx, cx, cy, color, itemShadow);
+        cx += 9;
+        continue;
+      }
+      var g = glyphFor(it.cp);
+      if (!g) { cx += 6; continue; }
+      if (g.type === 'space') { cx += g.advance || 4; continue; }
+      var baseY = cy - (g.ascent != null ? g.ascent : (g.h - 1));
+      if (itemShadow) drawGlyph(ctx, g, it, cx + 1, baseY + 1, scaleColor(color, SHADOW_FACTOR));
+      if (it.style && it.style.obfuscated) {
+        // 混淆: 用随机字形的形状, 保留颜色 (静化以便可读)
+        drawGlyph(ctx, g, it, cx, baseY, color);
+      } else {
+        drawGlyph(ctx, g, it, cx, baseY, color);
+      }
+      if (it.style && it.style.bold) drawGlyph(ctx, g, it, cx + 1, baseY, color);
+ if (it.style && it.style.italic) { /* 斜体?drawGlyph 中处?*/ }
+      var adv = g.advance || 6;
+      if (it.style && it.style.bold) adv += 1;
+      // 下划?/ 删除?
+      if (it.style && it.style.underlined) {
+        ctx.fillStyle = rgbCss(color);
+        ctx.fillRect(cx, cy + 1, Math.max(1, adv - 1), 1);
+      }
+      if (it.style && it.style.strikethrough) {
+        ctx.fillStyle = rgbCss(color);
+        ctx.fillRect(cx, cy - 4, Math.max(1, adv - 1), 1);
+      }
+      cx += adv;
+    }
+    maxW = Math.max(maxW, cx - startX);
+    return { width: maxW, x: cx, y: cy };
+  }
+  // ---- 字形着色 ----
+  // MC 的字体图集是纯白字形, 颜色完全来自文本颜色: 必须先把字形画到离屏画布,
+  // 再用 source-in 填充颜色, 否则扢有文字都会是白色 (阴影也会丢起变白不可见)?
+  var _tintCache = new Map();
+  var _TINT_CAP = 2000;
+  function colorKey(c) {
+    if (!c) return 'w';
+    return (((c.r | 0) << 16) | ((c.g | 0) << 8) | (c.b | 0)) + (c.a == null || c.a >= 1 ? '' : '@' + Math.round(c.a * 100));
+  }
+  function tintedGlyph(g, color) {
+    if (!document || !document.createElement) return null;
+    var key = g.sx + ',' + g.sy + ',' + g.sw + ',' + g.sh + ',' + g.w + ',' + g.h + '|' + colorKey(color);
+    var hit = _tintCache.get(key);
+    if (hit) return hit;
+    var cv;
+    try { cv = document.createElement('canvas'); } catch (e) { return null; }
+    cv.width = Math.max(1, Math.round(g.w));
+    cv.height = Math.max(1, Math.round(g.h));
+    var c = cv.getContext('2d');
+    c.imageSmoothingEnabled = false;
+    try { c.drawImage(g.img, g.sx, g.sy, g.sw, g.sh, 0, 0, cv.width, cv.height); }
+    catch (e) { return null; }
+    c.globalCompositeOperation = 'source-in';
+    c.fillStyle = rgbCss(color);
+    c.fillRect(0, 0, cv.width, cv.height);
+    c.globalCompositeOperation = 'source-over';
+    if (_tintCache.size >= _TINT_CAP) {
+      var f = _tintCache.keys().next();
+      if (!f.done) _tintCache.delete(f.value);
+    }
+    _tintCache.set(key, cv);
+    return cv;
+  }
+  function drawGlyph(ctx, g, it, x, y, color) {
+    if (g.type === 'fallback') {
+      ctx.fillStyle = rgbCss(color);
+      for (var ry = 0; ry < g.px.length; ry++) {
+        for (var rx = 0; rx < g.px[ry].length; rx++) {
+          if (g.px[ry][rx]) ctx.fillRect(x + rx, y + ry, 1, 1);
+        }
+      }
+      return;
+    }
+    if (!g.img) return;
+    var sprite = tintedGlyph(g, color);
+    if (!sprite) {
+      // 离屏失败 (极少数环?: 逢化为直接绘制, 颜色会丢失但不会报错
+      try { ctx.drawImage(g.img, g.sx, g.sy, g.sw, g.sh, x, y, g.w, g.h); } catch (e) { /* ignore */ }
+      return;
+    }
+    try {
+      if (it.style && it.style.italic) {
+        ctx.save();
+        ctx.transform(1, 0, -0.25, 1, 0.25 * g.h, 0);
+        ctx.drawImage(sprite, x, y);
+        ctx.restore();
+      } else {
+        ctx.drawImage(sprite, x, y);
+      }
+ } catch (e) { /* 尺寸异常时跳?*/ }
+  }
+  function drawImageGlyph(ctx, it, x, y, color, shadow) {
+    var info = it.info;
+    if (!info) {
+      // 连配置条目都没有: 画一个小小的红色占位块 (不能按标签长度拉长, 否则会糊出一大片)
+      ctx.fillStyle = 'rgba(255,80,80,0.35)';
+      ctx.fillRect(x, y - 7, 6, 8);
+      ctx.strokeStyle = 'rgba(255,120,120,0.9)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x + 0.5, y - 6.5, 5, 7);
+      return;
+    }
+    var h = info.height;
+    var w = Math.max(1, info.width || 1);
+    var asc = info.ascent != null ? info.ascent : h - 1;
+    var top = y - asc;
+    if (info.missing || !info.img) {
+      // 条目存在但图片没读到: 按配置的 height 画出「本来应该占多大」的红框
+      var mh = clamp(Math.abs(h) || 8, 4, 256);
+      var mw = clamp(Math.abs(w) || 8, 4, 256);
+      ctx.save();
+      ctx.fillStyle = 'rgba(255,80,80,0.18)';
+      ctx.fillRect(x, top, mw, mh);
+      ctx.strokeStyle = 'rgba(255,120,120,0.85)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash && ctx.setLineDash([2, 2]);
+      ctx.strokeRect(x + 0.5, top + 0.5, mw - 1, mh - 1);
+      ctx.setLineDash && ctx.setLineDash([]);
+      if (mh >= 10 && mw >= 10) {
+        ctx.fillStyle = 'rgba(255,150,150,0.95)';
+        ctx.font = '9px monospace';
+        ctx.fillText('?', x + mw / 2 - 2, top + mh / 2 + 3);
+      }
+      ctx.restore();
+      return;
+    }
+    var sx = info.sx || 0, sy = info.sy || 0;
+    var sw = info.sw, sh = info.sh;
+    if (shadow) {
+      try {
+        ctx.save();
+        ctx.globalAlpha = 0.35;
+        ctx.drawImage(info.img, sx, sy, sw, sh, x + 1, top + 1, w, h);
+        ctx.restore();
+      } catch (e) { /* ignore */ }
+    }
+    try { ctx.drawImage(info.img, sx, sy, sw, sh, x, top, w, h); }
+    catch (e) { /* ignore */ }
+  }
+  function drawHeadPlaceholder(ctx, x, y, color, shadow) {
+    if (shadow) { ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fillRect(x + 1, y - 7, 8, 8); }
+    ctx.fillStyle = rgbCss(color);
+    ctx.fillRect(x, y - 8, 8, 8);
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(x + 2, y - 6, 1, 1);
+    ctx.fillRect(x + 5, y - 6, 1, 1);
+    ctx.fillRect(x + 2, y - 3, 4, 1);
+  }
+
+  // ---------------- 字体图像 (CraftEngine images 段) ----------------
+  function imageGlyph(id, row, col) {
+    var e = _projectData.images[id];
+    if (!e) return null;
+    var entry = e;
+    // ref 引用
+    if (entry.ref && !entry.file) {
+      var parts = String(entry.ref).split(':');
+      var rid = parts.length >= 2 ? parts[0] + ':' + parts[1] : entry.ref;
+      var base = _projectData.images[rid];
+      if (!base) return null;
+      var r0 = parts.length >= 3 ? parseInt(parts[2], 10) : (entry.row || 0);
+      var c0 = parts.length >= 4 ? parseInt(parts[3], 10) : (entry.col || entry.column || 0);
+      return imageGlyphFrom(base, entry.row != null ? entry.row : r0, entry.column != null ? entry.column : (entry.col != null ? entry.col : c0));
+    }
+    return imageGlyphFrom(entry, row, col);
+  }
+  function imageGlyphFrom(entry, row, col) {
+    if (!entry) return null;
+    var grid = gridSize(entry);
+    var rows = grid ? grid.rows : 1;
+    var cols = grid ? grid.cols : 1;
+    var r = (row != null && !isNaN(row)) ? row : 0;
+    var c = (col != null && !isNaN(col)) ? col : 0;
+    r = clamp(r, 0, rows - 1);
+    c = clamp(c, 0, cols - 1);
+    var cfgH = imageHeightOf(entry);
+    var cfgA = imageAscentOf(entry, cfgH);
+    if (!entry._img) {
+      // 图片没读到 (路径不在扫描到的资源包里 / 文件缺失): 仍然按配置的 height 占位,
+      // 否则预览里只剩一个小红块, 看不出这张图本来应该有多大
+      var ph = clamp(cfgH == null ? 8 : Math.abs(cfgH), 4, 256);
+      return { img: null, missing: true, sw: 1, sh: 1, sx: 0, sy: 0, width: ph, height: ph, ascent: cfgA == null ? ph - 1 : cfgA };
+    }
+    var img = entry._img;
+    var cw = img.width / cols;
+    var chh = img.height / rows;
+    var outH = cfgH != null ? cfgH : chh;
+    var scale = chh > 0 ? outH / chh : 1;
+    return {
+      img: img, sw: cw, sh: chh,
+      sx: c * cw, sy: r * chh,               // 精灵图里选中的那一格 (之前恒为第一格)
+      width: Math.max(1, Math.round(cw * scale)),
+      height: Math.max(1, Math.round(outH)),
+      ascent: cfgA != null ? cfgA : outH - 1
+    };
+  }
+  // CE: height 别名为 scale / scale_ratio
+  function imageHeightOf(entry) {
+    if (!entry) return null;
+    var v = entry.height != null ? entry.height : (entry.scale != null ? entry.scale : entry.scale_ratio);
+    var n = typeof v === 'string' ? parseFloat(v) : v;
+    return (typeof n === 'number' && isFinite(n)) ? n : null;
+  }
+  // CE: ascent 别名为 y_position; 缺省 height - 1
+  function imageAscentOf(entry, height) {
+    var v = entry ? (entry.ascent != null ? entry.ascent : entry.y_position) : null;
+    var n = typeof v === 'string' ? parseFloat(v) : v;
+    if (typeof n === 'number' && isFinite(n)) return n;
+    return height != null ? height - 1 : null;
+  }
+  function gridSize(entry) {
+    if (!entry) return null;
+    if (entry.grid_size != null) {
+      var raw = Array.isArray(entry.grid_size) ? entry.grid_size.join(',') : String(entry.grid_size);
+      var g = raw.split(/[,x×\s]+/).filter(Boolean).map(Number);
+      if (g.length >= 2 && g[0] > 0 && g[1] > 0) return { rows: g[0], cols: g[1] };
+    }
+    // chars 可以是列表 (每行一个字符串) 或单个字符串 (只有一行)
+    var rowsArr = null;
+    if (Array.isArray(entry.chars) && entry.chars.length) rowsArr = entry.chars;
+    else if (typeof entry.chars === 'string' && entry.chars) rowsArr = [entry.chars];
+    if (rowsArr) {
+      var cols = 0;
+      rowsArr.forEach(function (r) { cols = Math.max(cols, countCodepoints(r)); });
+      if (cols > 0) return { rows: rowsArr.length, cols: cols };
+    }
+    return null;
+  }
+
+  // ---------------- CE 工程数据 (images / global_variables / emoji / lang) ----------------
+  function configDirOf(filePath) {
+    var parts = String(filePath || '').replace(/\\/g, '/').split('/');
+    for (var i = parts.length - 2; i >= 1; i--) {
+      if (parts[i] === 'configuration' || parts[i] === 'configurations') return parts.slice(0, i + 1).join('/');
+    }
+    return null;
+  }
+  function readTextFile(p) {
+    var a = root.electronAPI;
+    if (!a || !a.readFile) return Promise.resolve(null);
+    return a.readFile(p).then(function (r) { return (r && r.success) ? r.content : null; }).catch(function () { return null; });
+  }
+  function listDir(p) {
+    var a = root.electronAPI;
+    if (!a || !a.readdir) return Promise.resolve([]);
+    return a.readdir(p).then(function (r) { return (r && r.success) ? r.files : []; }).catch(function () { return []; });
+  }
+
+  async function collectProjectDataImpl() {
+    var images = {}, globals = {}, emojis = {}, langs = {}, furniture = {}, items = {};
+    var A = assets();
+    var resRoot = A && A.projectResourcesRoot ? A.projectResourcesRoot() : null;
+    var dirs = [];
+    if (resRoot) {
+      var packs = await listDir(resRoot);
+      for (var i = 0; i < packs.length; i++) {
+        if (!packs[i].isDirectory || packs[i].name.charAt(0) === '.') continue;
+        var pd = String(packs[i].path).replace(/\\/g, '/');
+        dirs.push(pd + '/configuration');
+        dirs.push(pd + '/configurations');
+      }
+    }
+    var cd = configDirOf(_activeFile);
+    if (cd) dirs.push(cd);
+    var seen = Object.create(null);
+    var files = [];
+    for (var d = 0; d < dirs.length; d++) {
+      if (seen[dirs[d]]) continue;
+      seen[dirs[d]] = 1;
+      await walkYaml(dirs[d], 0, files, seen);
+    }
+    var Y = root.jsyaml || (typeof YAML !== 'undefined' ? YAML : null);
+    for (var f = 0; f < files.length; f++) {
+      var txt = await readTextFile(files[f]);
+      if (!txt) continue;
+      var doc = null;
+      if (Y) { try { doc = Y.load(txt); } catch (e) { doc = null; } }
+      if (!doc || typeof doc !== 'object') continue;
+      harvestConfigObject(doc, images, globals, emojis, langs, furniture, items);
+    }
+    // 图片资源预加?
+    for (var id in images) {
+      if (!Object.prototype.hasOwnProperty.call(images, id)) continue;
+      await preloadImageEntry(id, images[id], images);
+    }
+    return { images: images, globals: globals, emojis: emojis, langs: langs, furniture: furniture, items: items };
+  }
+  async function walkYaml(dir, depth, out, seen) {
+    if (depth > 3) return;
+    var files = await listDir(dir);
+    var subdirs = [];
+    for (var i = 0; i < files.length; i++) {
+      if (files[i].isDirectory) { subdirs.push(files[i].path); continue; }
+      if (/\.ya?ml$/i.test(files[i].name)) out.push(String(files[i].path).replace(/\\/g, '/'));
+    }
+    for (var s = 0; s < subdirs.length && s < 24; s++) {
+      var p = String(subdirs[s]).replace(/\\/g, '/');
+      if (seen[p]) continue;
+      seen[p] = 1;
+      await walkYaml(p, depth + 1, out, seen);
+    }
+  }
+  function harvestConfigObject(doc, images, globals, emojis, langs, furniture, items) {
+    var keys = Object.keys(doc);
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      var base = key.replace(/#.*$/, '');
+      var val = doc[key];
+      if (!val || typeof val !== 'object' || Array.isArray(val)) continue;
+      if (base === 'images' || base === 'image') {
+        Object.keys(val).forEach(function (k) {
+          if (!isObj(val[k])) return;
+          images[k] = Object.assign({}, val[k]);
+        });
+      } else if (base === 'furniture') {
+        // 家具条目: 供 furniture_item 行为按 id 引用
+        if (furniture) Object.keys(val).forEach(function (k) {
+          if (isObj(val[k])) furniture[k] = val[k];
+        });
+      } else if (base === 'items' || base === 'item') {
+        if (items) Object.keys(val).forEach(function (k) {
+          if (isObj(val[k])) items[k] = val[k];
+        });
+        // 物品里内联的家具 (behavior.type: furniture_item) —— 也收一份, 便于按物品 id 找到家具
+        if (furniture) Object.keys(val).forEach(function (k) {
+          var inline = furnitureInlineOf(val[k]);
+          if (inline) furniture['#item:' + k] = inline;
+        });
+      } else if (base === 'global_variables' || base === 'global_variable') {
+        Object.keys(val).forEach(function (k) {
+          var v = val[k];
+          if (typeof v === 'string') globals[k] = v;
+        });
+      } else if (base === 'emoji' || base === 'emojis') {
+        Object.keys(val).forEach(function (k) {
+          if (isObj(val[k])) emojis[k] = val[k];
+        });
+      } else if (base === 'translations' || base === 'translation' || base === 'l10n' ||
+                 base === 'i18n' || base === 'localization' || base === 'internationalization' ||
+                 base === 'lang' || base === 'language' || base === 'languages') {
+        // 结构: <lang>: { key: value } ?{ key: value }
+        Object.keys(val).forEach(function (k) {
+          var v = val[k];
+          if (typeof v === 'string') { langs[k] = v; return; }
+          if (isObj(v)) {
+            Object.keys(v).forEach(function (k2) {
+              if (typeof v[k2] === 'string') langs[k2] = v[k2];
+            });
+          }
+        });
+      }
+    }
+  }
+  // 找到图片文件的实际路? CE ?file ?namespace:path (相对资源?assets/<ns>/textures)
+  function imageFileCandidates(fileRef) {
+    var s = String(fileRef || '');
+    var i = s.indexOf(':');
+    var ns = i === -1 ? null : s.slice(0, i);
+    var p = i === -1 ? s : s.slice(i + 1);
+    p = p.replace(/\.png$/i, '');
+    var out = [];
+    // 1) 作为纹理 id 解析 —— 遍历该命名空间的全部根 (当前工程包 → 其它工程包 → 原版)
+    var rel = p.replace(/^textures\//, '');
+    resolveCandidates('texture', (ns || 'minecraft') + ':' + rel).forEach(function (x) { out.push(x); });
+    // 2) 直连工程目录 (贴图不一定放在 textures/ 下, 老工程常见)
+    var dirs = nsDirsOf(ns);
+    for (var d = 0; d < dirs.length; d++) {
+      var nd = dirs[d];
+      out.push(nd + '/textures/' + rel + '.png');
+      out.push(nd + '/' + p + '.png');
+      out.push(nd + '/' + p);
+    }
+    var seen = Object.create(null);
+    return out.filter(function (x) {
+      if (!x || seen[x]) return false;
+      seen[x] = 1;
+      return true;
+    });
+  }
+  async function preloadImageEntry(id, entry, all) {
+    if (!entry || entry._img || !entry.file) return;
+    var cands = imageFileCandidates(entry.file);
+    for (var i = 0; i < cands.length; i++) {
+      var img = await loadImagePath(cands[i]);
+      if (img) { entry._img = img; entry._path = cands[i]; return; }
+    }
+    warn('missing-image: ' + id + ' (' + entry.file + ')');
+  }
+
+  // ---------------- 物品 / 模型渲染 ----------------
+  function normalizeItemRef(ref) {
+    if (ref == null) return { id: null };
+    if (typeof ref === 'string') {
+      if (!ref) return { id: null };
+      return ref.indexOf(':') !== -1 ? { id: ref } : { id: ref };
+    }
+    if (isObj(ref)) return ref;
+    return { id: null };
+  }
+  function looksLikeTextureId(s) {
+    return typeof s === 'string' && /^(?:\w+:)?(?:block|item|gui|font|entity|misc)\//.test(s);
+  }
+
+  async function resolveItemModel(ref) {
+    var r = normalizeItemRef(ref);
+    var id = r.id || r.material || null;
+    // 显式纹理 / 模型
+    if (r.texture) return { kind: 'flat', texture: String(r.texture) };
+    if (r.model) return { kind: 'block', model: String(r.model) };
+    if (!id) return { kind: 'none', error: 'no item id' };
+    var s = String(id);
+    if (s.indexOf(':') === -1) s = 'minecraft:' + s;
+    var ns = s.slice(0, s.indexOf(':'));
+    var path0 = s.slice(s.indexOf(':') + 1);
+
+    // 0) 工程里定义过的物品: 优先用它自己声明的 model / texture / material。
+    //    家具元素通常引用包内自定义物品 (item: default:my_chair), 只有这样才画得出材质。
+    var proj = _projectData.items && _projectData.items[s];
+    if (proj) {
+      var po = fobj(proj) || {};
+      var pd = fobj(po.data) || po;
+      var ptex = fval(pd.texture) || fval(pd.item_texture) || fval(pd.icon);
+      var pmdl = fval(pd.model) || fval(pd.item_model) || fval(pd.blueprint) ||
+                 fval(po.model) || fval(po.item_model) || fval(po.blueprint);
+      if (ptex) return { kind: 'flat', texture: String(ptex) };
+      if (pmdl) {
+        var ms = String(pmdl);
+        if (ms.indexOf(':') === -1) ms = ns + ':' + ms;
+        // 按模型内容决定 3D/平面 (带 elements 的椅子模型不能被拍平)
+        var cls = await classifyModel(ms);
+        if (cls) return cls;
+        var pmTex = await flatTextureOf(ms);
+        if (pmTex) return { kind: 'flat', texture: pmTex, model: ms };
+        return { kind: 'flat', texture: ms };
+      }
+      // 只写了原版材质 → 回到该原版物品继续解析
+      var pmat = fval(pd.material) || fval(po.material);
+      if (pmat) {
+        var mid = String(pmat);
+        if (mid.indexOf(':') === -1) mid = 'minecraft:' + mid;
+        if (mid !== s) return await resolveItemModel(mid);
+      }
+    }
+
+    // 1) 原版 item model definition (items/<path>.json)
+    var def = await loadJsonAny('item', s);
+    if (def && def.model && typeof def.model === 'object') {
+      var mdef = pickModelDef(def.model);
+      if (mdef) {
+        // pickModelDef 只能按路径猜 3D/平面, 这里用模型内容再确认一次
+        if (mdef.model) {
+          var cls2 = await classifyModel(mdef.model);
+          if (cls2) return cls2;
+        }
+        return mdef;
+      }
+    }
+    // 2) 直接当模型路径 (item/)
+    //    注意: id 本身可能已经带 "item/" 或 "block/" 前缀, 不能无脑再拼一次
+    var itemCands = [];
+    if (/^item\//.test(path0)) itemCands.push('minecraft:' + path0);
+    itemCands.push('minecraft:item/' + path0);
+    for (var ic = 0; ic < itemCands.length; ic++) {
+      if (!resolveCandidates('model', itemCands[ic]).length) continue;
+      var cls3 = await classifyModel(itemCands[ic]);
+      if (cls3 && cls3.kind === 'block') return cls3;
+      if (cls3) return cls3;
+      var tex0 = await flatTextureOf(itemCands[ic]);
+      if (tex0) return { kind: 'flat', texture: tex0, model: itemCands[ic] };
+    }
+    // 3) 方块模型
+    var blockCands = [];
+    if (/^block\//.test(path0)) blockCands.push('minecraft:' + path0);
+    blockCands.push('minecraft:block/' + path0);
+    for (var bc = 0; bc < blockCands.length; bc++) {
+      if (await loadJsonAny('model', blockCands[bc])) return { kind: 'block', model: blockCands[bc] };
+    }
+    // 4) 当作纹理
+    if (looksLikeTextureId(path0) || looksLikeTextureId(s)) {
+      return { kind: 'flat', texture: s };
+    }
+    return { kind: 'flat', texture: ns + ':item/' + path0 };
+  }
+  // 1.21.4+ item model definition ?我们支持的最小集?
+  function pickModelDef(m) {
+    var type = m.type || 'minecraft:model';
+    type = String(type).replace(/^minecraft:/, '');
+    // 1.21.4+ ?model 定义里目标模型写?`model` 字段 (旧写法是 `path`)
+    var target = m.path || m.model;
+    if (type === 'model') {
+      if (target) {
+        return isBlockModelPath(target) ? { kind: 'block', model: String(target) }
+          : { kind: 'flat', model: String(target) };
+      }
+      if (m.blueprint) return { kind: 'flat', texture: m.blueprint };
+      return { kind: 'flat', texture: null, model: null };
+    }
+    if (type === 'composite' && Array.isArray(m.models) && m.models.length) {
+      return pickModelDef(m.models[0]);
+    }
+    if (type === 'select' || type === 'range_dispatch') {
+      var c = m.cases || m.entries;
+      if (Array.isArray(c) && c.length) return pickModelDef(c[0].model || {});
+      if (m.fallback) return pickModelDef(m.fallback);
+      return { kind: 'flat' };
+    }
+    if (type === 'condition') return pickModelDef(m.on_true || m.on_false || {});
+    if (type === 'empty') return { kind: 'none' };
+    return { kind: 'flat' };
+  }
+  function isBlockModelPath(p) {
+    return /(?:^|:)block\//.test(String(p));
+  }
+  // 一个模型该按 3D 几何体渲染, 还是拍平成一张图标?
+  // 必须看模型内容 (elements), 不能看路径名字 —— 物品模型 (models/item/*.json)
+  // 同样可以带 elements (椅子/家具模型就是这样), 按路径判断会把它们拍平成一张贴图糊在画面上。
+  async function classifyModel(modelId) {
+    var id = String(modelId);
+    if (id.indexOf(':') === -1) id = 'minecraft:' + id;
+    var chain = await loadModelChain(id);
+    if (!chain) return null;
+    if (Array.isArray(chain.elements) && chain.elements.length) {
+      return { kind: 'block', model: id };
+    }
+    // 没有几何体: 只能是平面图标 (item/generated 之类), 取它的 layer0 贴图
+    var tex = await flatTextureOf(id);
+    return { kind: 'flat', texture: tex, model: id };
+  }
+  // 平面物品贴图: 读取模型? ?layer0 / textures 的第丢?
+  async function flatTextureOf(modelId) {
+    var model = await loadModelChain(modelId);
+    if (!model || !model.textures) return null;
+    var texKeys = ['layer0', 'layer1', 'texture', 'all', 'side', 'top', 'front', 'particle'];
+    for (var i = 0; i < texKeys.length; i++) {
+      var v = model.textures[texKeys[i]];
+      if (typeof v === 'string' && v.charAt(0) !== '#') return v;
+    }
+    var ks = Object.keys(model.textures);
+    for (var j = 0; j < ks.length; j++) {
+      if (typeof model.textures[ks[j]] === 'string' && model.textures[ks[j]].charAt(0) !== '#') return model.textures[ks[j]];
+    }
+    return null;
+  }
+  async function loadModelChain(modelId, depth) {
+    depth = depth || 0;
+    if (depth > 8) return null;
+    if (_modelCache.has(modelId)) return _modelCache.get(modelId);
+    var pr = (async function () {
+      var id = String(modelId);
+      if (id.indexOf(':') === -1) id = 'minecraft:' + id;
+      var json = await loadJsonAny('model', id);
+      if (!json) return null;
+      var merged = { textures: {}, elements: null, display: null, parent: json.parent || null };
+      if (json.textures) Object.assign(merged.textures, json.textures);
+      if (json.elements) merged.elements = json.elements;
+      if (json.display) merged.display = json.display;
+      if (json.parent) {
+        var par = await loadModelChain(json.parent, depth + 1);
+        if (par) {
+          var t = {};
+          Object.assign(t, par.textures, merged.textures);
+          merged.textures = t;
+          if (!merged.elements) merged.elements = par.elements;
+          if (!merged.display) merged.display = par.display;
+        }
+      }
+      return merged;
+    })();
+    return cacheSet(_modelCache, modelId, pr);
+  }
+  function resolveTextureRef(model, ref) {
+    var seen = 0;
+    var v = ref;
+    while (typeof v === 'string' && v.charAt(0) === '#' && seen++ < 8) {
+      v = model.textures[v.slice(1)];
+    }
+    return typeof v === 'string' ? v : null;
+  }
+
+  // ??4 个角 (顺序?MC FaceBakery 丢? 用于 UV 映射)
+  function faceCorners(face, f, t) {
+    var x1 = f[0], y1 = f[1], z1 = f[2], x2 = t[0], y2 = t[1], z2 = t[2];
+    return {
+      down: [[x1, y1, z1], [x1, y1, z2], [x2, y1, z2], [x2, y1, z1]],
+      up: [[x1, y2, z1], [x1, y2, z2], [x2, y2, z2], [x2, y2, z1]],
+      north: [[x2, y2, z1], [x2, y1, z1], [x1, y1, z1], [x1, y2, z1]],
+      south: [[x1, y2, z2], [x1, y1, z2], [x2, y1, z2], [x2, y2, z2]],
+      west: [[x1, y2, z1], [x1, y1, z1], [x1, y1, z2], [x1, y2, z2]],
+      east: [[x2, y2, z2], [x2, y1, z2], [x2, y1, z1], [x2, y2, z1]]
+    }[face];
+  }
+  function defaultUV(face, f, t) {
+    var x1 = f[0], y1 = f[1], z1 = f[2], x2 = t[0], y2 = t[1], z2 = t[2];
+    switch (face) {
+      case 'up': case 'down': return [x1, z1, x2, z2];
+      case 'north': case 'south': return [16 - x2, 16 - y2, 16 - x1, 16 - y1];
+      default: return [z1, 16 - y2, z2, 16 - y1];
+    }
+  }
+  function uvQuad(face, uv, corners) {
+    var u1 = uv[0], v1 = uv[1], u2 = uv[2], v2 = uv[3];
+    switch (face) {
+      case 'down': return [[u1, v1], [u1, v2], [u2, v2], [u2, v1]];
+      case 'up': return [[u1, v2], [u1, v1], [u2, v1], [u2, v2]];
+      case 'north': return [[u1, v1], [u1, v2], [u2, v2], [u2, v1]];
+      case 'south': return [[u2, v1], [u2, v2], [u1, v2], [u1, v1]];
+      case 'west': return [[u2, v1], [u2, v2], [u1, v2], [u1, v1]];
+      case 'east': return [[u1, v1], [u1, v2], [u2, v2], [u2, v1]];
+      default: return [[u1, v1], [u1, v2], [u2, v2], [u2, v1]];
+    }
+  }
+
+  var FACE_NORMALS = {
+    up: [0, 1, 0], down: [0, -1, 0], north: [0, 0, -1],
+    south: [0, 0, 1], west: [-1, 0, 0], east: [1, 0, 0]
+  };
+  // 视图方向 (yaw 45°, pitch 30°): ?+x +y +z 方向看向方块 ?可见?up / south / east
+  var VIEW = { x: COS30, y: SIN30 * 2, z: COS30 };
+  function faceVisible(face) {
+    var n = FACE_NORMALS[face];
+    if (!n) return false;
+    return (n[0] * VIEW.x + n[1] * VIEW.y + n[2] * VIEW.z) > 0.0001;
+  }
+  // MC 物品渲染使用两盏方向? 使顶面最亮两个侧面亮度不?(否则方块看起来是平的)?
+  // 参? 光照方向约为 (±0.2, 1.0, ?.7), 环境?0.6?
+  var SHADE_LIGHTS = [
+    { x: 0.1617, y: 0.8084, z: -0.5659 },
+    { x: -0.1617, y: 0.8084, z: 0.5659 }
+  ];
+  var SHADE_AMBIENT = 0.6;
+  var SHADE_WEIGHT = 0.5;
+  var _faceBrightness = Object.create(null);
+  function faceBrightness(face) {
+    if (_faceBrightness[face] != null) return _faceBrightness[face];
+    var n = FACE_NORMALS[face];
+    var b = 1;
+    if (n) {
+      b = SHADE_AMBIENT;
+      for (var i = 0; i < SHADE_LIGHTS.length; i++) {
+        var L = SHADE_LIGHTS[i];
+        var d = n[0] * L.x + n[1] * L.y + n[2] * L.z;
+        if (d > 0) b += SHADE_WEIGHT * d;
+      }
+      if (b > 1) b = 1;
+      if (b < 0.35) b = 0.35;
+    }
+    _faceBrightness[face] = b;
+    return b;
+  }
+  // 把亮度换算成霢要叠加的黑色 alpha
+  function faceShadeAlpha(face) {
+    var b = faceBrightness(face);
+    var a = 1 - b;
+    return a > 0 ? a : 0;
+  }
+  // 按法线直接算明暗 (元素带旋转时法线也跟着转, 不能再用面名字查表)
+  function normalShadeAlpha(n) {
+    var b = SHADE_AMBIENT;
+    for (var i = 0; i < SHADE_LIGHTS.length; i++) {
+      var L = SHADE_LIGHTS[i];
+      var d = n[0] * L.x + n[1] * L.y + n[2] * L.z;
+      if (d > 0) b += SHADE_WEIGHT * d;
+    }
+    if (b > 1) b = 1;
+    if (b < 0.35) b = 0.35;
+    var a = 1 - b;
+    return a > 0 ? a : 0;
+  }
+  // MC 元素旋转 (FaceBakery.rotateVertexBy): 绕某个轴旋转顶点, 原点取 rotation.origin
+  // MC 用的是 -angle 弧度, 这里保持一致
+  function rotateAbout(p, axis, angleDeg, origin) {
+    if (!angleDeg) return p.slice ? p.slice() : [p[0], p[1], p[2]];
+    var rad = -angleDeg * Math.PI / 180;
+    var c = Math.cos(rad), sn = Math.sin(rad);
+    var o = origin || [0, 0, 0];
+    var x = p[0] - o[0], y = p[1] - o[1], z = p[2] - o[2];
+    var nx = x, ny = y, nz = z;
+    if (axis === 'x') { ny = y * c + z * sn; nz = z * c - y * sn; }
+    else if (axis === 'y') { nx = x * c - z * sn; nz = z * c + x * sn; }
+    else { nx = x * c + y * sn; ny = y * c - x * sn; }
+    return [nx + o[0], ny + o[1], nz + o[2]];
+  }
+  // 方向向量旋转 (不含平移)
+  function rotateDir(n, axis, angleDeg) {
+    return rotateAbout(n, axis, angleDeg, [0, 0, 0]);
+  }
+
+  // ---------------- 3x3 旋转矩阵 (行主序) ----------------
+  // 家具元素支持 MC 展示实体式旋转: rotation(单数=绕Y / 3数=欧拉角度 / 4数=四元数 xyzw),
+  // 外加 yaw/pitch 实体朝向。两种约定见 furnitureRotationMatrix 上的说明。
+  function mat3Mul(a, b) {
+    var r = new Array(9);
+    for (var i = 0; i < 3; i++) {
+      for (var j = 0; j < 3; j++) {
+        r[i * 3 + j] = a[i * 3] * b[j] + a[i * 3 + 1] * b[3 + j] + a[i * 3 + 2] * b[6 + j];
+      }
+    }
+    return r;
+  }
+  function mat3Apply(m, p) {
+    return [
+      m[0] * p[0] + m[1] * p[1] + m[2] * p[2],
+      m[3] * p[0] + m[4] * p[1] + m[5] * p[2],
+      m[6] * p[0] + m[7] * p[1] + m[8] * p[2]
+    ];
+  }
+  function rotMatX(deg) {
+    var a = deg * Math.PI / 180, c = Math.cos(a), s = Math.sin(a);
+    return [1, 0, 0, 0, c, -s, 0, s, c];
+  }
+  // 标准右手系绕 Y 轴旋转 (JOML / 展示实体 transformation 四元数的约定):
+  // +X → -Z (+90°); CE 的 rotation 字段走这个约定
+  function rotMatY(deg) {
+    var a = deg * Math.PI / 180, c = Math.cos(a), s = Math.sin(a);
+    return [c, 0, s, 0, 1, 0, -s, 0, c];
+  }
+  // MC 实体 yaw 约定: 0 = +Z(南), 正值顺时针 (俯视), 90 = -X(西)。
+  // CE 的 yaw 字段 (实体朝向, armor_stand/better_model/展示实体本体) 走这个约定
+  function rotMatYaw(deg) {
+    var a = deg * Math.PI / 180, c = Math.cos(a), s = Math.sin(a);
+    return [c, 0, -s, 0, 1, 0, s, 0, c];
+  }
+  function rotMatZ(deg) {
+    var a = deg * Math.PI / 180, c = Math.cos(a), s = Math.sin(a);
+    return [c, -s, 0, s, c, 0, 0, 0, 1];
+  }
+  function quatToMat(q) {
+    var x = q[0], y = q[1], z = q[2], w = q[3];
+    var n = Math.sqrt(x * x + y * y + z * z + w * w) || 1;
+    x /= n; y /= n; z /= n; w /= n;
+    return [
+      1 - 2 * (y * y + z * z), 2 * (x * y - z * w), 2 * (x * z + y * w),
+      2 * (x * y + z * w), 1 - 2 * (x * x + z * z), 2 * (y * z - x * w),
+      2 * (x * z - y * w), 2 * (y * z + x * w), 1 - 2 * (x * x + y * y)
+    ];
+  }
+  function axisAngleToMat(axis, deg) {
+    var l = Math.sqrt(axis[0] * axis[0] + axis[1] * axis[1] + axis[2] * axis[2]) || 1;
+    var h = deg * Math.PI / 360, s = Math.sin(h);
+    return quatToMat([axis[0] / l * s, axis[1] / l * s, axis[2] / l * s, Math.cos(h)]);
+  }
+  // 绕竖直轴旋转 (度, MC yaw 语义), axisXZ = 旋转中心 [x, z]
+  function rotYmc(p, deg, axisXZ) {
+    if (!deg) return [p[0], p[1], p[2]];
+    var a = deg * Math.PI / 180, c = Math.cos(a), s = Math.sin(a);
+    var ox = axisXZ ? axisXZ[0] : 0, oz = axisXZ ? axisXZ[1] : 0;
+    var x = p[0] - ox, z = p[2] - oz;
+    return [ox + x * c - z * s, p[1], oz + x * s + z * c];
+  }
+  // 元素的 rotation/yaw/pitch → 复合旋转矩阵 (null = 无旋转)
+  // 两套约定 (和 CE 一致):
+  //   rotation  展示实体的 transformation 旋转 (单数=绕Y / 3数=欧拉角 / 4数=四元数 xyzw),
+  //             右手系 (JOML), 与四元数写法自洽; 欧拉角按 X→Y→Z 复合
+  //   yaw/pitch 实体朝向 (MC 约定: yaw 0=南, 正值顺时针; pitch 正值低头)
+  // 复合次序: rotation → pitch(X) → yaw(Y)
+  function furnitureRotationMatrix(el) {
+    var m = null;
+    var apply = function (nm) { m = m ? mat3Mul(nm, m) : nm; };
+    var raw = fval(el.rotation);
+    if (raw != null) {
+      if (typeof raw === 'number') {
+        apply(rotMatY(raw));
+      } else if (typeof raw === 'string' || Array.isArray(raw)) {
+        var parts = Array.isArray(raw)
+          ? raw.map(function (x) { return parseFloat(fval(x)); })
+          : String(raw).trim().split(/[\s,]+/).filter(Boolean).map(parseFloat);
+        if (parts.length && parts.every(function (x) { return isFinite(x); })) {
+          if (parts.length === 1) apply(rotMatY(parts[0]));
+          else if (parts.length === 3) {
+            if (parts[0]) apply(rotMatX(parts[0]));
+            if (parts[1]) apply(rotMatY(parts[1]));
+            if (parts[2]) apply(rotMatZ(parts[2]));
+          } else if (parts.length >= 4) {
+            apply(quatToMat(parts));
+          }
+        }
+      } else {
+        var ro = fobj(raw);
+        // {angle, axis} 轴角形式 (angle 按弧度, 同展示实体 transformation)
+        if (ro && fnum(ro.angle)) {
+          apply(axisAngleToMat(fvec(ro.axis, [0, 1, 0]), fnum(ro.angle) * 180 / Math.PI));
+        }
+      }
+    }
+    var pitch = fnum(el.pitch);
+    if (pitch) apply(rotMatX(pitch));
+    var yaw = fnum(el.yaw);
+    if (yaw != null && yaw) apply(rotMatYaw(yaw));
+    return m;
+  }
+  // ---------------- 家具坐标系 ----------------
+  // 家具里所有相对坐标 (元素 position、碰撞箱 position、座位) 都以「原点方块的底部中心」
+  // 为原点 —— 这是 CE 官方默认包的做法 (wooden_chair 的座位 0,0,-0.1 落在方块中心;
+  // flower_basket 的 ceiling 变体 position: 0,-0.46,0 正好挂在方块下方)。
+  var FURN_ORIGIN = [0.5, 0, 0.5];
+  function furnWorld(x, y, z) {   // 家具相对坐标 (方块) → 场景 1/16 方块单位
+    return [(FURN_ORIGIN[0] + x) * 16, (FURN_ORIGIN[1] + y) * 16, (FURN_ORIGIN[2] + z) * 16];
+  }
+  // 元素 → 模型空间(0..16)到世界空间(1/16 单位)的坐标变换, 供 3D 模型渲染使用。
+  // 世界点 = anchor + rot * (scale * (p - 8,8,8)), 再整体绕场景竖直轴旋转 viewYaw。
+  // 位置: anchor = 原点 + position + translation。position 默认 0,0,0 = 方块底部中心;
+  // 官方模型普遍再写 translation: 0,0.5,0 把 0..16 的模型抬到方块正中 (展示实体把模型居中在锚点上)。
+  function furnitureElementXf(el, viewYaw) {
+    var type = furnitureElementType(el);
+    var pos = fvec(el.position, [0, 0, 0]);
+    var tr = fvec(el.translation, [0, 0, 0]);
+    var sc = fscale(el.scale);
+    var rot = furnitureRotationMatrix(el);
+    var a = furnWorld(pos[0] + tr[0], pos[1] + tr[1], pos[2] + tr[2]);
+    var ax = a[0], ay = a[1], az = a[2];
+    return {
+      type: type, pos: pos, tr: tr, sc: sc, rot: rot, anchor: [ax, ay, az],
+      pt: function (p) {
+        var x = (p[0] - 8) * sc[0], y = (p[1] - 8) * sc[1], z = (p[2] - 8) * sc[2];
+        if (rot) { var r = mat3Apply(rot, [x, y, z]); x = r[0]; y = r[1]; z = r[2]; }
+        return rotYmc([ax + x, ay + y, az + z], viewYaw);
+      },
+      nrm: function (n) {
+        var r = rot ? mat3Apply(rot, [n[0], n[1], n[2]]) : [n[0], n[1], n[2]];
+        return rotYmc(r, viewYaw);
+      }
+    };
+  }
+  var FURN_IDENTITY_XF = {
+    pt: function (p) { return [p[0], p[1], p[2]]; },
+    nrm: function (n) { return [n[0], n[1], n[2]]; }
+  };
+
+  // 收集一个模型在给定变换下的全部可见面 (不含贴图加载)。
+  // 返回 [{face, corners(世界坐标), uvs, texId, depth, shade, shadeAlpha}] 或 null。
+  async function collectModelFaces(modelId, xf) {
+    var model = await loadModelChain(modelId);
+    return collectFacesFromModel(model, xf);
+  }
+  // 平面物品元素 (item/generated 那种一张贴图) 的等价卡片模型:
+  // 一张竖直的 16x16 面 —— 这样元素 rotation/yaw 和视角旋转都能真正作用到它身上
+  // (MC 的展示实体本来也是把平面模型当竖直卡片渲染, 不是永远朝向镜头)。
+  // 正反两面都建, 从背面看就是左右镜像的贴图, 和游戏里一致;
+  // shade: false —— 贴图不做方向光压暗, 保持物品原本的颜色 (和旧的平面图标观感一致)。
+  function flatCardModel(textureId) {
+    return {
+      textures: { layer0: textureId },
+      elements: [{
+        from: [0, 0, 7.5], to: [16, 16, 8.5],
+        faces: {
+          north: { texture: '#layer0', shade: false },
+          south: { texture: '#layer0', shade: false }
+        }
+      }]
+    };
+  }
+  function collectFacesFromModel(model, xf) {
+    if (!model || !Array.isArray(model.elements)) return null;
+    var T = xf || FURN_IDENTITY_XF;
+    var faces = [];
+    for (var e = 0; e < model.elements.length; e++) {
+      var el = model.elements[e];
+      if (!el || !Array.isArray(el.from) || !Array.isArray(el.to)) continue;
+      var rot = el.rotation || null;
+      var rotAxis = rot && rot.angle ? String(rot.axis || 'y').toLowerCase() : null;
+      var rotAngle = rotAxis ? Number(rot.angle) || 0 : 0;
+      var rotOrigin = rotAxis ? (Array.isArray(rot.origin) && rot.origin.length === 3 ? rot.origin : [8, 8, 8]) : null;
+      var f = el.from, tt = el.to;
+      var faceNames = Object.keys(el.faces || {});
+      for (var fi = 0; fi < faceNames.length; fi++) {
+        var face = faceNames[fi];
+        var nrm = FACE_NORMALS[face];
+        if (!nrm) continue;
+        var visN = T.nrm(rotAxis ? rotateDir(nrm, rotAxis, rotAngle) : nrm);
+        if ((visN[0] * VIEW.x + visN[1] * VIEW.y + visN[2] * VIEW.z) <= 0.0001) continue;
+        var fd = el.faces[face];
+        if (!fd) continue;
+        var texId = resolveTextureRef(model, fd.texture);
+        if (!texId) continue;
+        var uv = fd.uv && fd.uv.length === 4 ? fd.uv.slice() : defaultUV(face, f, tt);
+        var corners = faceCorners(face, f, tt);
+        if (rotAxis) {
+          corners = corners.map(function (p) { return rotateAbout(p, rotAxis, rotAngle, rotOrigin); });
+        }
+        corners = corners.map(function (p) { return T.pt(p); });
+        var uvs = uvQuad(face, uv, corners);
+        // face.rotation: 把角 「UV」的对应关系整体旋转 90°/180°/270° (MC FaceBakery 的做法)
+        var steps = ((((fd.rotation || 0) % 360) + 360) % 360) / 90;
+        if (steps) uvs = uvs.slice(steps).concat(uvs.slice(0, steps));
+        var cxm = 0, cym = 0, czm = 0;
+        corners.forEach(function (p) { cxm += p[0] / 4; cym += p[1] / 4; czm += p[2] / 4; });
+        faces.push({ face: face, corners: corners, uvs: uvs, texId: texId,
+          depth: cxm * VIEW.x + cym * VIEW.y + czm * VIEW.z,
+          shade: fd.shade !== false && el.shade !== false, tint: fd.tintindex,
+          shadeAlpha: (rotAxis || xf) ? normalShadeAlpha(visN) : null });
+      }
+    }
+    return faces.length ? faces : null;
+  }
+
+  async function drawBlockModel(ctx, modelId, cx, cy, size, xf) {
+    var faces = await collectModelFaces(modelId, xf);
+    if (!faces) return false;
+    // 加载贴图
+    var texCache = {};
+    for (var i = 0; i < faces.length; i++) {
+      var id = faces[i].texId;
+      if (!texCache[id]) texCache[id] = await loadImageAny('texture', id);
+      faces[i].img = texCache[id];
+    }
+    // 缩放: 16 单位方块在等轴测下宽 (x+z)*cos30 ≈27.7, 高 (x+z)*sin30 + y = 32
+    var unit = size / 32;
+    ctx.save();
+    paintFaces(ctx, faces, unit, cx, cy);
+    ctx.restore();
+    return true;
+  }
+  // 把已收集 (已变换/已排序) 的面画到 (ox, oy) 屏幕锚点上
+  function paintFaces(ctx, faces, unit, ox, oy) {
+    for (var k = 0; k < faces.length; k++) {
+      var fc = faces[k];
+      if (!fc.img) continue;
+      drawTexturedQuad(ctx, fc, unit, ox, oy);
+    }
+  }
+  function drawTexturedQuad(ctx, fc, unit, ox, oy) {
+    var pts = fc.corners.map(function (p) {
+      var s = project(p[0], p[1], p[2]);
+      return { x: ox + s.x * unit, y: oy + s.y * unit };
+    });
+    // UV (0..16) ?贴图坐标
+    var tw = fc.img.width, th = fc.img.height;
+    var uv = fc.uvs.map(function (q) {
+      return { u: (q[0] / 16) * tw, v: (q[1] / 16) * th };
+    });
+    // 仿射: ?3 个角点解?(平行四边形精?
+    var p0 = pts[0], p1 = pts[1], p3 = pts[3];
+    var q0 = uv[0], q1 = uv[1], q2 = uv[3];
+    var det = (q1.u - q0.u) * (q2.v - q0.v) - (q2.u - q0.u) * (q1.v - q0.v);
+    if (Math.abs(det) < 1e-6) return;
+    var a = ((p1.x - p0.x) * (q2.v - q0.v) - (p3.x - p0.x) * (q1.v - q0.v)) / det;
+    var b = ((p3.x - p0.x) * (q1.u - q0.u) - (p1.x - p0.x) * (q2.u - q0.u)) / det;
+    var c = ((p1.y - p0.y) * (q2.v - q0.v) - (p3.y - p0.y) * (q1.v - q0.v)) / det;
+    var d = ((p3.y - p0.y) * (q1.u - q0.u) - (p1.y - p0.y) * (q2.u - q0.u)) / det;
+    var e0 = p0.x - a * q0.u - b * q0.v;
+    var f0 = p0.y - c * q0.u - d * q0.v;
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+    ctx.closePath();
+    ctx.clip();
+    ctx.transform(a, c, b, d, e0, f0);
+    try { ctx.drawImage(fc.img, 0, 0); } catch (err) { /* ignore */ }
+    ctx.restore();
+    if (fc.shade) {
+      var alpha = fc.shadeAlpha != null ? fc.shadeAlpha : faceShadeAlpha(fc.face);
+      if (alpha > 0) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        for (var j = 1; j < pts.length; j++) ctx.lineTo(pts[j].x, pts[j].y);
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(0,0,0,' + alpha + ')';
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+  }
+
+  // 有平面的纹理能直接当 16x16 图标; 否则用方块模?
+  async function drawItem(ctx, itemRef, x, y, size) {
+    size = size || 16;
+    var res = { kind: 'none', error: null };
+    try {
+      var info = await resolveItemModel(itemRef);
+      res.kind = info.kind;
+      if (info.kind === 'none') return res;
+      if (info.kind === 'block' && info.model) {
+        var ok = await drawBlockModel(ctx, info.model, x + size / 2, y + size / 2, size);
+        if (ok) return res;
+        // 方块模型不可用时尝试它的纹理
+        var t2 = await flatTextureOf(info.model);
+        if (t2) { info = { kind: 'flat', texture: t2 }; res.kind = 'flat'; }
+        else return res;
+      }
+      if (info.model && !info.texture) {
+        var t3 = await flatTextureOf(info.model);
+        if (t3) info.texture = t3;
+      }
+      if (info.texture) {
+        var img = await loadImageAny('texture', info.texture);
+        if (img) {
+          ctx.save();
+          ctx.imageSmoothingEnabled = false;
+          ctx.drawImage(img, x, y, size, size);
+          ctx.restore();
+          return res;
+        }
+        res.error = 'missing texture ' + info.texture;
+        // 缺贴图时用占?
+        ctx.fillStyle = 'rgba(255,255,255,0.10)';
+        ctx.fillRect(x, y, size, size);
+        ctx.fillStyle = 'rgba(255,80,80,0.85)';
+        ctx.fillRect(x, y, size, 1); ctx.fillRect(x, y + size - 1, size, 1);
+        ctx.fillRect(x, y, 1, size); ctx.fillRect(x + size - 1, y, 1, size);
+        return res;
+      }
+      // 完全没有可用资源
+      ctx.fillStyle = 'rgba(255,255,255,0.10)';
+      ctx.fillRect(x, y, size, size);
+      return res;
+    } catch (e) {
+      res.error = String(e && e.message || e);
+      return res;
+    }
+  }
+
+  // ---------------- 界面尺寸 (GUI Scale) ----------------
+  // MC 的「界面尺寸」把整个 GUI 从「GUI 像素」放大成屏幕像素 —— 字体图像的像素数
+  // 也随之变化 (height: 140 在 3x 下就是 420 个屏幕像素高)。这里用同一个模型:
+  // 场景先按 GUI 像素原尺寸绘制, 再整体按界面尺寸做整数倍最近邻放大 (和原版一样是方块感,
+  // 但绝不会糊)。0 / 缺省 = 自动, 选一个能放进预览区且不超过 4 的最大倍率。
+  var GUI_SCALE_MAX = 6;   // 「自动」能到几倍 (窗口拉大后预览也跟着变大; 手动还能选到 6x)
+  var _stageW = 0;
+  function setStageWidth(w) { _stageW = w > 0 ? Math.round(w) : 0; }
+  function normScale(v) {
+    var n = parseInt(v, 10);
+    if (!isFinite(n) || n <= 0) return 0;   // 0 = 自动
+    return clamp(n, 1, 8);
+  }
+  function autoScaleFor(logicalW) {
+    if (!_stageW || !logicalW) return 1;
+    var avail = Math.max(64, _stageW - 36);  // 预览区左右内边距
+    // 选能放进预览区的最小倍率 (和 MC 的「自动」一个思路), 不强行放大 ——
+    // 1x 就是 height 个像素的原尺寸, 图像按原始 PNG 一次性采样, 不会因为被放大而变糊
+    for (var s = 1; s <= GUI_SCALE_MAX; s++) {
+      if (logicalW * s > avail) return Math.max(1, s - 1);
+    }
+    return GUI_SCALE_MAX;
+  }
+  // ---------------- 画布 / 场景 ----------------
+  // 关键: 画布直接按「最终设备像素」分配, 再用 setTransform 把逻辑(GUI)像素放大到设备像素。
+  // 这样每个字形/字体图像都是「从原始 PNG 一次性采样到最终尺寸」——
+  // 而不是先缩到 height 再整体放大 (那会先丢一次细节, 放大后就成了糊掉的方块)。
+  // MC 用的是 NEAREST 过滤, 所以 1 次采样的方块感才是原版效果。
+  function makeSurface(w, h, scale, basisW) {
+    // scale <= 0 = 自动: 按逻辑宽度和预览区宽度选倍率 (basisW 可覆盖用于计算的宽度)
+    var s = scale > 0 ? Math.max(1, scale | 0) : autoScaleFor(basisW || w);
+    var cv = document.createElement('canvas');
+    cv.width = Math.max(1, Math.ceil(w * s));
+    cv.height = Math.max(1, Math.ceil(h * s));
+    var ctx = cv.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+    if (s !== 1) ctx.setTransform(s, 0, 0, s, 0, 0);
+    return { canvas: cv, ctx: ctx, scale: s, w: w, h: h };
+  }
+  // 画布已经是最终分辨率, blit 只做 1:1 搬运 (不再重采样)
+  function blit(canvas, surface) {
+    canvas.width = surface.canvas.width;
+    canvas.height = surface.canvas.height;
+    var ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(surface.canvas, 0, 0);
+    if (canvas.style) {
+      canvas.style.width = canvas.width + 'px';
+      canvas.style.height = canvas.height + 'px';
+    }
+    canvas.setAttribute && canvas.setAttribute('data-gui-scale', String(surface.scale || 1));
+  }
+
+  // 一行的实际占位: 字体图像/高字形会向上(基线以上)和向下同时撑开。
+  // MC 本身允许图像压到上一行, 但预览里那样会糊成一团, 所以这里按内容撑开 —
+  // 关键是「基线以上」的高度也必须算进去, 否则 ascent 大的字体图像会被画布顶边切掉
+  // (CE 内置 GUI 图的 ascent 高达 18~20, 而普通文字只有 7)。
+  var LINE_ASCENT = 7;   // 普通文字: 基线以上 7px
+  function lineMetricsOf(items) {
+    var up = LINE_ASCENT, down = LINE_HEIGHT - LINE_ASCENT;
+    for (var i = 0; i < items.length; i++) {
+      var it = items[i];
+      if (!it || it.kind === 'break') continue;
+      if (it.kind === 'image') {
+        if (it.info) {
+          var ih = Math.max(0, it.info.height);
+          var ia = it.info.ascent != null ? it.info.ascent : ih - 1;
+          if (ia > up) up = ia;
+          if (ih - ia > down) down = ih - ia;
+        }
+        continue;
+      }
+      if (it.kind === 'head') { if (8 > up) up = 8; continue; }
+      if (it.kind !== 'glyph') continue;
+      var g = glyphFor(it.cp);
+      if (!g || g.type === 'space') continue;
+      var gh = g.h || 0;
+      var a = g.ascent != null ? g.ascent : (gh - 1);
+      if (a > up) up = a;
+      if (gh - a > down) down = gh - a;
+    }
+    return { up: up, down: down, height: up + down };
+  }
+  function lineHeightOf(items) {
+    return lineMetricsOf(items).height;
+  }
+
+  // ---- 聊天场景 ----
+  async function sceneChat(canvas, scene) {
+    await fontReady();
+    var scale = normScale(scene.scale);
+    var chatW = parseInt(scene.chatWidth, 10) || 320;
+    var lines = [].concat(scene.lines || []);
+    var o = Object.assign({}, options, scene.options || {});
+    var parsed = [];
+    var textW = 0;
+    for (var i = 0; i < lines.length; i++) {
+      var raw = typeof lines[i] === 'string' ? lines[i] : (lines[i].text || '');
+      var sender = (typeof lines[i] === 'object' && lines[i].sender) ? ('<' + lines[i].sender + '> ') : '';
+      var wrapped = wrapText(sender + raw, chatW, o);
+      for (var w = 0; w < wrapped.length; w++) {
+        var p = parseTextWith(wrapped[w], o);
+        p.metrics = lineMetricsOf(p.items);
+        p.advance = p.metrics.height;
+        parsed.push(p);
+        textW = Math.max(textW, p.width);
+      }
+    }
+    var padX = 2, padY = 3;
+    var totalH = padY * 2;
+    for (var ph = 0; ph < Math.max(1, parsed.length); ph++) {
+      totalH += parsed[ph] ? parsed[ph].advance : LINE_HEIGHT;
+    }
+    var cw = Math.max(80, Math.min(chatW + padX * 2, textW + padX * 2 + 4));
+    var surf = makeSurface(cw, totalH, scale);
+    // 聊天半明背景
+    surf.ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    surf.ctx.fillRect(0, 0, cw, totalH);
+    var y = padY + 7;
+    for (var k = 0; k < parsed.length; k++) {
+      drawItems(surf.ctx, parsed[k].items, padX + 1, y, { shadow: true });
+      y += parsed[k].advance || LINE_HEIGHT;
+    }
+    blit(canvas, surf);
+    return { width: canvas.width, height: canvas.height, warnings: _warnings.slice() };
+  }
+  function parseTextWith(text, o) {
+    return parseText(text, { resolveTags: o.resolveTags !== false });
+  }
+
+  // ---- 物品 Lore / 悬浮提示 ----
+  // 抽出「工具提示面板」的画法, 供物品提示(lore)与物品栏(item)两个场景共用
+  async function buildTooltipSurface(scene, forceNoItem, scaleOverride) {
+    var name = scene.name != null ? String(scene.name) : '';
+    var lore = (scene.lore || []).map(function (x) { return typeof x === 'string' ? x : String(x && x.text || ''); });
+    var pName = parseText(name, {});
+    var pLore = lore.map(function (l) { return parseText(l, {}); });
+    var itemSize = 16;
+    var showItem = !forceNoItem && scene.showItem !== false;
+    var hasIcon = !!(scene.item || scene.itemId);
+    if (showItem && !hasIcon) showItem = false;
+    var iconW = showItem ? itemSize + 4 : 0;
+    var contentW = Math.max(pName.width, Math.max.apply(null, [0].concat(pLore.map(function (p) { return p.width; }))));
+    var padX = 6, padY = 5;
+    var w = contentW + padX * 2 + iconW;
+    // 行高固定 9px: 与游戏一致 —— 字体图像比文字高时会溢出, 不去撑开 (按用户要求照抄游戏行为)
+    var h = padY * 2 + LINE_HEIGHT + (pLore.length ? 2 + pLore.length * LINE_HEIGHT : 0);
+    var surf = makeSurface(Math.max(40, w), Math.max(20, h),
+      scaleOverride != null ? scaleOverride : normScale(scene.scale));
+    // 背景 (MC 工具提示: #100010 底 + 边框)
+    var border = rarityBorder(scene.rarity);
+    surf.ctx.fillStyle = 'rgba(16,0,16,0.94)';
+    surf.ctx.fillRect(0, 0, surf.w, surf.h);
+    surf.ctx.strokeStyle = border;
+    surf.ctx.lineWidth = 1;
+    surf.ctx.strokeRect(0.5, 0.5, surf.w - 1, surf.h - 1);
+    if (showItem) {
+      await drawItem(surf.ctx, scene.item || scene.itemId, padX, padY, itemSize);
+    }
+    var tx = padX + iconW;
+    drawItems(surf.ctx, pName.items, tx, padY + 7, { shadow: true });
+    var ly = padY + LINE_HEIGHT + 2 + 7;
+    for (var i = 0; i < pLore.length; i++) {
+      drawItems(surf.ctx, pLore[i].items, tx, ly, { shadow: true });
+      ly += LINE_HEIGHT;
+    }
+    return surf;
+  }
+  async function sceneLore(canvas, scene) {
+    await fontReady();
+    var surf = await buildTooltipSurface(scene, false);
+    blit(canvas, surf);
+    return { width: canvas.width, height: canvas.height, warnings: _warnings.slice() };
+  }
+  function rarityBorder(r) {
+    switch (r) {
+      case 'uncommon': return '#FFFF55';
+      case 'rare': return '#55FFFF';
+      case 'epic': return '#FF55FF';
+      default: return '#2D0A63';
+    }
+  }
+
+  // ---- 物品栏 (物品/方块预览的默认场景) ----
+  // 上方是悬浮提示, 下方是原版快捷栏 1x9 格子, 物品放在第一格并显示堆叠数 ——
+  // 与游戏内「鼠标悬停在快捷栏物品上」看到的画面一致。
+  var HOTBAR_SRC_X = 7, HOTBAR_SRC_Y = 197, HOTBAR_SRC_W = 163, HOTBAR_SRC_H = 18;
+  async function sceneItem(canvas, scene) {
+    await fontReady();
+    var scale = normScale(scene.scale);
+    // 先按 1x 量出提示框的逻辑尺寸, 再据此定下整个场景的倍率, 最后按同一倍率重建提示框 ——
+    // 否则「自动」下内层提示框和外层画布可能选到不同倍率, 贴上去就会错位/糊掉
+    var tip = await buildTooltipSurface(scene, false, scale > 0 ? scale : 1);
+    var gui = await loadImageAny('texture', GUI_GENERIC);
+    var stripW = HOTBAR_SRC_W, stripH = HOTBAR_SRC_H, gap = 10;
+    var PAD = 4;
+    var W = Math.max(stripW, tip.w) + PAD * 2;
+    var H = tip.h + gap + stripH + PAD * 2;
+    var finalScale = scale > 0 ? scale : autoScaleFor(W);
+    if (finalScale !== tip.scale) tip = await buildTooltipSurface(scene, false, finalScale);
+    var surf = makeSurface(W, H, finalScale);
+    // tip 已经是最终分辨率, 这里按它的「逻辑尺寸」摆放, 变换会把它映射回同样大小的设备像素 (1:1)
+    surf.ctx.drawImage(tip.canvas, Math.round((W - tip.w) / 2), PAD, tip.w, tip.h);
+    var sx = Math.round((W - stripW) / 2);
+    var sy = PAD + tip.h + gap;
+    if (gui) {
+      surf.ctx.drawImage(gui, HOTBAR_SRC_X, HOTBAR_SRC_Y, HOTBAR_SRC_W, HOTBAR_SRC_H, sx, sy, stripW, stripH);
+    } else {
+      drawFallbackHotbar(surf.ctx, sx, sy);
+      warn('gui-texture-missing');
+    }
+    var slot0x = sx + 1, slot0y = sy + 1;
+    await drawItem(surf.ctx, scene.item || scene.itemId, slot0x, slot0y, 16);
+    var count = scene.count != null ? scene.count : 1;
+    if (count > 1) {
+      var pCount = parseText(String(count), { style: { color: hexToRgb('#FFFFFF'), shadow: true } });
+      drawItems(surf.ctx, pCount.items, slot0x + 17 - pCount.width, slot0y + 8 + 7, { shadow: true });
+    }
+    // 原版「选中框」: 第一格加一圈白色描边
+    surf.ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+    surf.ctx.lineWidth = 1;
+    surf.ctx.strokeRect(sx + 0.5, sy + 0.5, 17, 17);
+    blit(canvas, surf);
+    return { width: canvas.width, height: canvas.height, warnings: _warnings.slice() };
+  }
+  function drawFallbackHotbar(ctx, sx, sy) {
+    ctx.fillStyle = '#8B8B8B';
+    ctx.fillRect(sx, sy, HOTBAR_SRC_W, HOTBAR_SRC_H);
+    ctx.fillStyle = '#373737';
+    ctx.fillRect(sx, sy, HOTBAR_SRC_W, 1);
+    ctx.fillRect(sx, sy, 1, HOTBAR_SRC_H);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(sx, sy + HOTBAR_SRC_H - 1, HOTBAR_SRC_W, 1);
+    ctx.fillRect(sx + HOTBAR_SRC_W - 1, sy, 1, HOTBAR_SRC_H);
+    for (var c = 1; c < 9; c++) {
+      ctx.fillStyle = '#373737';
+      ctx.fillRect(sx + c * 18, sy, 1, HOTBAR_SRC_H);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(sx + c * 18 - 1, sy, 1, HOTBAR_SRC_H);
+    }
+  }
+
+  // ---- 原版容器 GUI (9x1 ~ 9x6) ----
+  var GUI_GENERIC = 'minecraft:gui/container/generic_54';
+  async function loadGuiTexture() {
+    return loadImageAny('texture', GUI_GENERIC);
+  }
+  async function sceneGui(canvas, scene) {
+    await fontReady();
+    var scale = normScale(scene.scale);
+    var rows = clamp(parseInt(scene.rows, 10) || 3, 1, 6);
+    var img = await loadGuiTexture();
+    var imageHeight = 114 + 18 * rows;
+    var W = 176, H = imageHeight;
+    var surf = makeSurface(W, H, scale);
+    if (img) {
+      // 顶部 17px + 重复行带(18px x rows) + 玩家背包?97px)
+      surf.ctx.drawImage(img, 0, 0, 176, 17, 0, 0, 176, 17);
+      for (var r = 0; r < rows; r++) {
+        surf.ctx.drawImage(img, 0, 17, 176, 18, 0, 17 + r * 18, 176, 18);
+      }
+      surf.ctx.drawImage(img, 0, 125, 176, 97, 0, 17 + rows * 18, 176, 97);
+    } else {
+      // 无贴图时手绘丢个近似容?
+      drawFallbackContainer(surf.ctx, W, H, rows);
+      warn('gui-texture-missing');
+    }
+    // 标题 (MC: titleLabelX=8, titleLabelY=6, 颜色 0xFF404040)
+    // 与游戏一致: 不因为标题里有高字体图像就把界面下移, 溢出部分按原样被裁
+    if (scene.title != null && scene.title !== '') {
+      var pTitle = parseText(String(scene.title), { style: { color: hexToRgb('#404040'), shadow: false } });
+      drawItems(surf.ctx, pTitle.items, 8, 6 + 7, { shadow: false });
+    }
+    // 物品
+    var items = scene.items || [];
+    var slots = [];
+    for (var row = 0; row < rows; row++) {
+      for (var col = 0; col < 9; col++) slots.push({ x: 8 + 18 * col, y: 18 + 18 * row });
+    }
+    if (scene.fillPlayerInventory !== false) {
+      for (var pr = 0; pr < 3; pr++) {
+        for (var pc = 0; pc < 9; pc++) {
+          slots.push({ x: 8 + 18 * pc, y: 18 + rows * 18 + 14 + 18 * pr });
+        }
+      }
+      for (var hc = 0; hc < 9; hc++) {
+        slots.push({ x: 8 + 18 * hc, y: 18 + rows * 18 + 14 + 58 });
+      }
+    }
+    for (var i = 0; i < items.length && i < slots.length; i++) {
+      var it = items[i];
+      if (!it) continue;
+      var sl = slots[i];
+      await drawItem(surf.ctx, it, sl.x, sl.y, 16);
+      if (it.count != null && it.count > 1) {
+        var cs = String(it.count);
+        var pCount = parseText(cs, { style: { color: hexToRgb('#FFFFFF'), shadow: true } });
+        // MC: drawString(text, x + 17 - width, y + 9, white, true) —?这里?y 是文字顶?
+        // ?drawItems ?y 是基? 默认字形 ascent=7, 故基?= 顶部 + 7
+        var cx2 = sl.x + 17 - pCount.width;
+        drawItems(surf.ctx, pCount.items, cx2, sl.y + 9 + 7, { shadow: true });
+      }
+    }
+    // 悬浮槽高?
+    if (scene.hoverSlot != null && slots[scene.hoverSlot]) {
+      var hs = slots[scene.hoverSlot];
+      surf.ctx.save();
+      surf.ctx.fillStyle = 'rgba(255,255,255,0.55)';
+      surf.ctx.fillRect(hs.x, hs.y, 16, 16);
+      surf.ctx.strokeStyle = 'rgba(0,0,0,0.55)';
+      surf.ctx.lineWidth = 1;
+      surf.ctx.strokeRect(hs.x - 0.5, hs.y - 0.5, 17, 17);
+      surf.ctx.restore();
+    }
+    blit(canvas, surf);
+    return { width: canvas.width, height: canvas.height, warnings: _warnings.slice() };
+  }
+  function drawFallbackContainer(ctx, W, H, rows) {
+    // 近似原版容器: #C6C6C6 ?+ 3D 边框
+    ctx.fillStyle = '#C6C6C6';
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, W, 1); ctx.fillRect(0, 0, 1, H);
+    ctx.fillStyle = '#555555';
+    ctx.fillRect(0, H - 1, W, 1); ctx.fillRect(W - 1, 0, 1, H);
+    drawSlotRect(ctx, 8 + 18 * 0, 18, 18 * 9 + 2, rows * 18 + 2);
+    var pyIn = 18 + rows * 18 + 14;
+    drawSlotRect(ctx, 8, pyIn, 18 * 9 + 2, 18 * 3 + 2);
+    drawSlotRect(ctx, 8, pyIn + 58, 18 * 9 + 2, 18 + 2);
+  }
+  function drawSlotRect(ctx, x, y, w, h) {
+    ctx.fillStyle = '#8B8B8B';
+    ctx.fillRect(x - 1, y - 1, w, h);
+    ctx.fillStyle = '#373737';
+    ctx.fillRect(x - 1, y - 1, w, 1); ctx.fillRect(x - 1, y - 1, 1, h);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(x - 1, y + h - 2, w, 1); ctx.fillRect(x + w - 2, y - 1, 1, h);
+  }
+
+  // ---------------- 家具 (furniture) ----------------
+  // CE 家具是基于展示实体的装饰系统: 一个家具下有多个 variants,
+  // 每个变体 = elements (外观部件) + hitboxes (碰撞箱, 可带 seats 座位)。
+  // 预览用等轴测投影: 地面网格 → 元素按深度排序绘制 → 碰撞箱线框 + 座位标记。
+  var FURN_HITBOX_COLORS = {
+    interaction: '#4FC3F7', shulker: '#FFB74D', happy_ghast: '#BA68C8', custom: '#81C784'
+  };
+  var FURN_BLOCK_PX = 54;              // 一格方块在等轴测下的基准像素
+  var FURN_W = 272, FURN_H = 226;      // 最小画布 (内容超出时自动扩)
+  var FURN_UNIT = FURN_BLOCK_PX / 32;
+  var FURN_MAX_W = 860, FURN_MAX_H = 660;   // 自适应画布的上限
+  // 当前家具场景的视图状态 (渲染期间由 sceneFurniture 设置, 其余场景保持默认)
+  var sceneViewYaw = 0;
+  var sceneZoom = 1;
+  // 最近一次家具渲染的拾取数据 (画布逻辑坐标): 面板点击时查它
+  var _furnPick = null;
+
+  function fval(v) { return (v !== null && typeof v === 'object' && typeof v.__ceTag === 'string') ? v.v : v; }
+  function fobj(v) { v = fval(v); return (v !== null && typeof v === 'object' && !Array.isArray(v)) ? v : null; }
+  function flist(v) { v = fval(v); return v == null ? [] : (Array.isArray(v) ? v.map(fval) : [fval(v)]); }
+  function fnum(v) { var n = parseFloat(fval(v)); return isFinite(n) ? n : null; }
+  // 取字段: CE 的 YAML 同时接受 snake_case 与 kebab-case (官方默认包用的是 kebab-case,
+  // 例如 interaction-entity / display-transform / has-shadow), 这里两种都认
+  function fkey(o, name) {
+    if (!o) return undefined;
+    var v = fval(o[name]);
+    if (v !== undefined) return v;
+    var kebab = String(name).replace(/_/g, '-');
+    if (kebab !== name) {
+      v = fval(o[kebab]);
+      if (v !== undefined) return v;
+    }
+    return undefined;
+  }
+  // "x,y,z" / "x y z" / [x,y,z] / 单个数 → [x,y,z]
+  function fvec(v, def) {
+    var d = def || [0, 0, 0];
+    var raw = fval(v);
+    if (raw == null) return d.slice();
+    if (typeof raw === 'number') return [raw, raw, raw];
+    var parts;
+    if (Array.isArray(raw)) parts = raw.map(function (x) { return parseFloat(fval(x)); });
+    else parts = String(raw).replace(/[[\]]/g, '').split(/[,\s]+/).filter(Boolean).map(parseFloat);
+    if (!parts.length) return d.slice();
+    if (parts.length === 1) return [parts[0], parts[0], parts[0]];
+    return [
+      isFinite(parts[0]) ? parts[0] : d[0],
+      isFinite(parts[1]) ? parts[1] : d[1],
+      isFinite(parts[2]) ? parts[2] : d[2]
+    ];
+  }
+  // scale: 单个数 = 等比
+  function fscale(v) {
+    var raw = fval(v);
+    if (raw == null) return [1, 1, 1];
+    if (typeof raw === 'number') return [raw, raw, raw];
+    if (Array.isArray(raw) && raw.length === 1) { var n = parseFloat(fval(raw[0])); return [n, n, n]; }
+    return fvec(raw, [1, 1, 1]);
+  }
+  // 从条目数据里找出 variants 表 (可能在 data.variants 或 data.data.variants)
+  function furnitureVariants(data) {
+    var o = fobj(data);
+    if (!o) return [];
+    var vs = fobj(o.variants) || fobj(fobj(o.data) && fobj(o.data).variants);
+    if (!vs) return [];
+    return Object.keys(vs).map(function (name) {
+      var v = fobj(vs[name]) || {};
+      return {
+        name: name,
+        elements: flist(v.elements),
+        hitboxes: flist(v.hitboxes),
+        blueprint: fval(v.blueprint) || null,
+        lootSpawnOffset: fval(v.loot_spawn_offset),
+        raw: v
+      };
+    });
+  }
+
+  // ---------------- furniture_item 行为 ----------------
+  // 物品可以通过 behavior.type: furniture_item 携带家具: furniture 可以是
+  //   - 家具 id (字符串) → 去 furniture: 段里找
+  //   - 内联的完整家具配置 (含 variants)
+  var FURNITURE_ITEM_BEHAVIORS = {
+    furniture_item: 1, liquid_collision_furniture_item: 1
+  };
+  // 单个 behavior 节点 → 家具定义; 返回 {ref} 或 {inline}
+  function furnitureFromBehavior(beh) {
+    var b = fobj(beh);
+    if (!b) return null;
+    var type = fval(b.type);
+    if (!type || !FURNITURE_ITEM_BEHAVIORS[String(type).toLowerCase()]) return null;
+    var f = fval(b.furniture);
+    if (f == null) return null;
+    var fo = fobj(f);
+    if (fo) {
+      // 内联: 必须自己带 variants (否则当作引用对象)
+      if (fobj(fo.variants)) return { inline: fo };
+      var ref2 = fval(fo.id) || fval(fo.furniture);
+      return ref2 ? { ref: String(ref2) } : null;
+    }
+    return { ref: String(f) };
+  }
+  // 条目数据 → 家具定义 (支持 behavior / behaviors / 数组)
+  function furnitureInlineOf(data) {
+    var d = fobj(data);
+    if (!d) return null;
+    var cands = [];
+    var pushAll = function (v) {
+      if (Array.isArray(v)) { v.forEach(function (x) { cands.push(x); }); return; }
+      if (v != null) cands.push(v);
+    };
+    pushAll(fval(d.behavior));
+    pushAll(fval(d.behaviors));
+    var inner = fobj(d.data);
+    if (inner) {
+      pushAll(fval(inner.behavior));
+      pushAll(fval(inner.behaviors));
+    }
+    for (var i = 0; i < cands.length; i++) {
+      var got = furnitureFromBehavior(cands[i]);
+      if (got) {
+        if (got.inline) return got.inline;
+        var target = _projectData.furniture && _projectData.furniture[got.ref];
+        if (target) return fobj(target) || null;
+        return { __missingFurniture: got.ref };
+      }
+    }
+    return null;
+  }
+  // 按 id 取家具定义 (供面板/其它模块使用)
+  function furnitureById(id) {
+    var m = _projectData.furniture || {};
+    return fobj(m[String(id)]) || null;
+  }
+  // 条目是否声明了 furniture_item 行为 (即使找不到家具定义)
+  function furnitureItemRef(data) {
+    var d = fobj(data);
+    if (!d) return null;
+    var cands = [fval(d.behavior), fval(d.behaviors)];
+    var inner = fobj(d.data);
+    if (inner) { cands.push(fval(inner.behavior)); cands.push(fval(inner.behaviors)); }
+    var flat = [];
+    cands.forEach(function (v) { if (Array.isArray(v)) v.forEach(function (x) { flat.push(x); }); else if (v != null) flat.push(v); });
+    for (var i = 0; i < flat.length; i++) {
+      var got = furnitureFromBehavior(flat[i]);
+      if (got) return got.ref || '(inline)';
+    }
+    return null;
+  }
+  // 元素类型 (CE: item_display / text_display / block_display / item / armor_stand / better_model / model_engine)
+  function furnitureElementType(el) {
+    var t = fval(el && el.type);
+    return t ? String(t).toLowerCase() : 'item_display';
+  }
+  // 碰撞箱 → 相对原点的 1/16 单位包围盒。
+  // 坐标基准与官方家具配置一致 (见 CE 默认包的 wooden_chair / bench / flower_basket):
+  //   position 是相对「原点方块底部中心」的偏移;
+  //   盒体水平居中在这个点上、底面贴在它的 y 上 (原版 interaction/shulker 实体的包围箱就是这么算的)。
+  //   例: 椅子 width: 0.7 height: 1.2 position: 0,0,0 → 方块中心 0.7 宽、从地面起 1.2 高。
+  //   direction 只影响潜影贝模型朝向, 不改变包围箱 (原版潜影贝的箱子与朝向无关)。
+  function furnitureHitboxBox(h) {
+    var type = String(fval(h.type) || 'interaction').toLowerCase();
+    var p = fvec(h.position, [0, 0, 0]);
+    var c = furnWorld(p[0], p[1], p[2]);
+    var cx = c[0], cy = c[1], cz = c[2];
+    if (type === 'shulker') {
+      var s = fnum(h.scale) || 1;
+      var half = 8 * s;
+      // 潜影贝本体: scale 倍率的 1×1×1, 水平居中、底面在 position.y。
+      // 打开的那部分 (壳) 是另一个同尺寸箱体, 见 furnitureHitboxBoxes。
+      return { type: type, min: [cx - half, cy, cz - half], max: [cx + half, cy + 16 * s, cz + half] };
+    }
+    if (type === 'happy_ghast') {
+      var s2 = fnum(h.scale) || 1;
+      var half2 = 32 * s2;                 // scale=1 时 4×4×4 格
+      return { type: type, min: [cx - half2, cy, cz - half2], max: [cx + half2, cy + 64 * s2, cz + half2] };
+    }
+    if (type === 'custom') {
+      var s3 = fnum(h.scale) || 1;
+      var half3 = 8 * s3;                  // 近似 1×1×1 格 × scale (真实尺寸取决于 entity_type)
+      return { type: type, min: [cx - half3, cy, cz - half3], max: [cx + half3, cy + 16 * s3, cz + half3] };
+    }
+    // interaction: width × height (scale: 宽,高 可作简写), 水平居中、从 position 底面向上
+    var sc = fscale(h.scale);
+    var w = fnum(h.width); if (w == null) w = sc[0];
+    var hh = fnum(h.height); if (hh == null) hh = sc[1];
+    if (!isFinite(w) || w <= 0) w = 1;
+    if (!isFinite(hh) || hh <= 0) hh = 1;
+    var hw = w * 8;
+    return { type: type, min: [cx - hw, cy, cz - hw], max: [cx + hw, cy + hh * 16, cz + hw] };
+  }
+  // 一条碰撞箱配置可能对应多个箱体: 潜影贝在 peek > 0 时, 打开的壳是另一个 1×1×1 箱体,
+  // 沿 direction 方向推出 peek 比例的一格。所以 direction: east + peek: 100 在游戏里就是
+  // 「两个并排的 1×1×1、都在 y=0」; direction: up 时则是上下叠着的两个。
+  function furnitureHitboxBoxes(h) {
+    var base = furnitureHitboxBox(h);
+    var out = [base];
+    if (base.type === 'shulker') {
+      var peek = clamp(fnum(fkey(h, 'peek')) || 0, 0, 100) / 100;
+      if (peek > 0.001) {
+        var s = fnum(fkey(h, 'scale')) || 1;
+        var d = String(fkey(h, 'direction') || 'up').toLowerCase();
+        var v = d === 'down' ? [0, -1, 0]
+          : d === 'north' ? [0, 0, -1]
+          : d === 'south' ? [0, 0, 1]
+          : d === 'west' ? [-1, 0, 0]
+          : d === 'east' ? [1, 0, 0] : [0, 1, 0];
+        var off = peek * 16 * s;
+        out.push({
+          type: 'shulker', lid: true, dir: d,
+          min: [base.min[0] + v[0] * off, base.min[1] + v[1] * off, base.min[2] + v[2] * off],
+          max: [base.max[0] + v[0] * off, base.max[1] + v[1] * off, base.max[2] + v[2] * off]
+        });
+      }
+    }
+    return out;
+  }
+  // ---- 家具场景投影 ----
+  // 等轴测投影 (yaw 45° pitch 30°), 可叠加:
+  //   - viewYaw: 绕竖直轴的视图旋转 (±90/180 → 看家具的四个朝向)
+  //   - zoom:    视图缩放 (>1 放大)
+  // project() 返回「1/16 方块单位」下的屏幕偏移, 调用方乘 FURN_UNIT 或 zoom 后再加锚点。
+  function project(x, y, z) {
+    var sx = (x - z) * COS30;
+    var sy = (x + z) * SIN30 - y;
+    return { x: sx, y: sy };
+  }
+  function projectView(x, y, z, viewYaw) {
+    var p = rotYmc([x, y, z], viewYaw || 0);
+    return project(p[0], p[1], p[2]);
+  }
+  function viewDepth(x, y, z, viewYaw) {
+    var p = rotYmc([x, y, z], viewYaw || 0);
+    return p[0] * VIEW.x + p[1] * VIEW.y + p[2] * VIEW.z;
+  }
+  function fpt(cx, cy, x, y, z) {
+    var s = projectView(x, y, z, sceneViewYaw);
+    var u = FURN_UNIT * sceneZoom;
+    return { x: cx + s.x * u, y: cy + s.y * u };
+  }
+  // 画一个 3D 线框盒 (8 顶点 12 边)。半透明填充 + 背面虚线用于「填充」模式。
+  function drawWireBox(ctx, cx, cy, min, max, color, width, o) {
+    o = o || {};
+    var P = [];
+    for (var i = 0; i < 8; i++) {
+      P.push(fpt(cx, cy, (i & 1) ? max[0] : min[0], (i & 2) ? max[1] : min[1], (i & 4) ? max[2] : min[2]));
+    }
+    // 顶点编号: 0(-x,-y,-z) 1(+x,-y,-z) 2(-x,+y,-z) 3(+x,+y,-z) 4(-x,-y,+z) 5(+x,-y,+z) 6(-x,+y,+z) 7(+x,+y,+z)
+    var FACES = [
+      { idx: [0, 1, 3, 2], n: [0, 0, -1] },   // -z (北)
+      { idx: [4, 6, 7, 5], n: [0, 0, 1] },    // +z (南)
+      { idx: [0, 2, 6, 4], n: [-1, 0, 0] },   // -x (西)
+      { idx: [1, 5, 7, 3], n: [1, 0, 0] },    // +x (东)
+      { idx: [2, 3, 7, 6], n: [0, 1, 0] },    // 顶
+      { idx: [0, 4, 5, 1], n: [0, -1, 0] }    // 底
+    ];
+    var EDGES = [[0, 1], [0, 2], [0, 4], [1, 3], [1, 5], [2, 3], [2, 6], [3, 7], [4, 5], [4, 6], [5, 7], [6, 7]];
+    var fillA = o.fillAlpha != null ? o.fillAlpha : 0;
+    var front = [], back = [];
+    for (var fi = 0; fi < FACES.length; fi++) {
+      var fc = FACES[fi];
+      var nrm = rotYmc(fc.n, sceneViewYaw);
+      var dv = nrm[0] * VIEW.x + nrm[1] * VIEW.y + nrm[2] * VIEW.z;
+      // 顶/底面的法线绕竖直轴旋转不变, 直接用原值判定
+      if (fc.n[1] !== 0) dv = fc.n[1] * VIEW.y;
+      (dv > 0.0001 ? front : back).push(fc);
+    }
+    ctx.save();
+    if (fillA > 0) {
+      // 背面: 虚线 + 极淡填充 (识别出被家具挡住的后半部分)
+      ctx.setLineDash && ctx.setLineDash([3, 3]);
+      for (var bi = 0; bi < back.length; bi++) {
+        var bf = back[bi];
+        ctx.beginPath();
+        ctx.moveTo(P[bf.idx[0]].x, P[bf.idx[0]].y);
+        for (var bj = 1; bj < 4; bj++) ctx.lineTo(P[bf.idx[bj]].x, P[bf.idx[bj]].y);
+        ctx.closePath();
+        if (fillA > 0) {
+          ctx.fillStyle = withAlpha(color, fillA * 0.35);
+          ctx.fill();
+        }
+        ctx.strokeStyle = withAlpha(color, 0.35);
+        ctx.lineWidth = width || 1;
+        ctx.stroke();
+      }
+      ctx.setLineDash && ctx.setLineDash([]);
+      // 前面: 半透明填充
+      for (var fi2 = 0; fi2 < front.length; fi2++) {
+        var ff = front[fi2];
+        ctx.beginPath();
+        ctx.moveTo(P[ff.idx[0]].x, P[ff.idx[0]].y);
+        for (var fj = 1; fj < 4; fj++) ctx.lineTo(P[ff.idx[fj]].x, P[ff.idx[fj]].y);
+        ctx.closePath();
+        ctx.fillStyle = withAlpha(color, fillA);
+        ctx.fill();
+      }
+    }
+    // 边线
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width || 1;
+    ctx.beginPath();
+    for (var e = 0; e < EDGES.length; e++) {
+      var a = P[EDGES[e][0]], b = P[EDGES[e][1]];
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+  // '#rrggbb' + alpha → rgba()
+  function withAlpha(hex, a) {
+    var h = String(hex || '#ffffff');
+    if (h.charAt(0) !== '#') return h;
+    var r = parseInt(h.slice(1, 3), 16), g = parseInt(h.slice(3, 5), 16), b = parseInt(h.slice(5, 7), 16);
+    if (!isFinite(r) || !isFinite(g) || !isFinite(b)) return h;
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+  }
+  // 座位标记: 圆点 + (有 yaw 时) 朝向箭头
+  function drawSeatMarker(ctx, cx, cy, x, y, z, yaw, highlight) {
+    var q = fpt(cx, cy, x, y, z);
+    ctx.save();
+    ctx.fillStyle = highlight ? '#FFF59D' : '#FFD54F';
+    ctx.strokeStyle = 'rgba(0,0,0,0.55)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(q.x, q.y, highlight ? 3.5 : 2.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    if (yaw != null && yaw !== 0) {
+      // MC yaw: 0 = +Z(南), 正值顺时针 (俯视) → 90 = -X(西)
+      var a = yaw * Math.PI / 180;
+      var dx = -Math.sin(a), dz = Math.cos(a);
+      var tip = fpt(cx, cy, x + dx * 4, y, z + dz * 4);
+      ctx.strokeStyle = highlight ? '#FFF59D' : '#FFC107';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(q.x, q.y);
+      ctx.lineTo(tip.x, tip.y);
+      ctx.stroke();
+    }
+    ctx.restore();
+    return q;
+  }
+  // 座位: "x,y,z [yaw] [force]" 或 {position,yaw,...}
+  function furnitureSeat(seat) {
+    var o = fobj(seat);
+    if (o) {
+      var p = fvec(o.position, null) || [0, 0, 0];
+      return { pos: p, yaw: fnum(o.yaw) };
+    }
+    var s = String(fval(seat) == null ? '' : fval(seat)).trim();
+    if (!s) return null;
+    var parts = s.split(/[\s,]+/).filter(Boolean);
+    var n = parts.slice(0, 3).map(parseFloat);
+    if (n.length < 3 || !isFinite(n[0])) return null;
+    return { pos: n, yaw: isFinite(parseFloat(parts[3])) ? parseFloat(parts[3]) : null };
+  }
+  // 元素要画的东西: {kind:'item'|'block'|'text'|'external', ...}
+  function furnitureElementVisual(el) {
+    var type = furnitureElementType(el);
+    if (type === 'text_display') {
+      return { kind: 'text', text: fval(el.text) == null ? '' : String(fval(el.text)), el: el };
+    }
+    if (type === 'better_model' || type === 'model_engine' || type === 'external') {
+      return { kind: 'external', model: fval(el.model) || fval(el.blueprint) || '', el: el };
+    }
+    if (type === 'block_display') {
+      var b = fval(el.block);
+      return { kind: 'block', block: b == null ? '' : String(b), el: el };
+    }
+    var item = fval(el.item) || fval(el.item_model);
+    return { kind: 'item', item: item == null ? '' : String(item), el: el };
+  }
+
+  // ---- 拾取辅助: 点在凸多边形内 / 凸包 / 面积 ----
+  function pointInPoly(px, py, poly) {
+    var inside = false;
+    for (var i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      var xi = poly[i].x, yi = poly[i].y, xj = poly[j].x, yj = poly[j].y;
+      if (((yi > py) !== (yj > py)) && (px < (xj - xi) * (py - yi) / (yj - yi) + xi)) inside = !inside;
+    }
+    return inside;
+  }
+  function polyArea(poly) {
+    var a = 0;
+    for (var i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      a += (poly[j].x + poly[i].x) * (poly[j].y - poly[i].y);
+    }
+    return Math.abs(a / 2);
+  }
+  function convexHull(pts) {
+    if (pts.length < 3) return pts.slice();
+    var ps = pts.slice().sort(function (a, b) { return a.x - b.x || a.y - b.y; });
+    var cross = function (o, a, b) { return (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x); };
+    var lo = [], hi = [];
+    for (var i = 0; i < ps.length; i++) {
+      while (lo.length >= 2 && cross(lo[lo.length - 2], lo[lo.length - 1], ps[i]) <= 0) lo.pop();
+      lo.push(ps[i]);
+    }
+    for (var j = ps.length - 1; j >= 0; j--) {
+      while (hi.length >= 2 && cross(hi[hi.length - 2], hi[hi.length - 1], ps[j]) <= 0) hi.pop();
+      hi.push(ps[j]);
+    }
+    lo.pop(); hi.pop();
+    return lo.concat(hi);
+  }
+  // 点击拾取: 画布逻辑坐标 → 命中的碰撞箱。
+  // 相邻碰撞箱的投影会互相压住, 所以「同时包含该点」时按投影中心距离取最近的那个
+  // (同一位置上更小的箱子自然也会赢, 因为它离点击更近), 面积只作为距离相当时的微调。
+  // 数据来自最近一次家具渲染 (_furnPick), 非家具场景返回 null。
+  function furniturePickAt(px, py) {
+    if (!_furnPick || !_furnPick.boxes || !_furnPick.boxes.length) return null;
+    var best = null, bestScore = Infinity;
+    for (var i = 0; i < _furnPick.boxes.length; i++) {
+      var b = _furnPick.boxes[i];
+      if (!pointInPoly(px, py, b.poly)) continue;
+      var dx = b.cx - px, dy = b.cy - py;
+      var score = Math.sqrt(dx * dx + dy * dy) + polyArea(b.poly) * 0.0005;
+      if (score < bestScore) { bestScore = score; best = b; }
+    }
+    return best;
+  }
+  // 碰撞箱尺寸文案: 1/16 单位 → 方块 (去尾零)
+  function furnDim(n) {
+    var v = Math.round(n * 100) / 100;
+    return String(v);
+  }
+
+  async function sceneFurniture(canvas, scene) {
+    await fontReady();
+    var variants = furnitureVariants(scene.furniture || {});
+    var scale = normScale(scene.scale);
+
+    if (!variants.length) {
+      var surf0 = makeSurface(FURN_W, FURN_H, scale);
+      var ctx0 = surf0.ctx;
+      ctx0.fillStyle = 'rgba(0,0,0,0.72)';
+      ctx0.fillRect(0, 0, FURN_W, FURN_H);
+      var missing = (scene.furniture && scene.furniture.__missingFurniture) || null;
+      var msg = missing
+        ? '<red>furniture not found: ' + missing
+        : '<red>no variants (at least one is required)';
+      var pm = parseText(msg, {});
+      drawItems(ctx0, pm.items, 8, 20, { shadow: false });
+      if (missing) warn('furniture-missing-ref: ' + missing);
+      blit(canvas, surf0);
+      return { width: canvas.width, height: canvas.height, warnings: _warnings.slice() };
+    }
+    var vi = clamp(parseInt(scene.variant, 10) || 0, 0, variants.length - 1);
+    var v = variants[vi];
+
+    // ---- 视图状态: 旋转 (yaw, 45°步进) / 缩放 ----
+    sceneViewYaw = ((parseFloat(scene.yaw) || 0) % 360 + 360) % 360;
+    sceneZoom = clamp(parseFloat(scene.zoom) || 1, 0.25, 4);
+    var opt = {
+      hitboxes: scene.showHitboxes !== false,
+      seats: scene.showSeats !== false,
+      grid: scene.showGrid !== false,
+      // 填充默认关: 和 /ce debug furniture 一样先给纯线框, 避免半透明色盖住家具材质;
+      // 需要更直观的体积感时由面板打开
+      fill: scene.hbFill === true,
+      labels: scene.hbLabels !== false,
+      highlight: isFinite(parseInt(scene.hlHitbox, 10)) ? parseInt(scene.hlHitbox, 10) : -1
+    };
+    var unit = FURN_UNIT * sceneZoom;
+
+    // ---- 第一遍: 解析几何 + 内容包围盒 (画布按内容自适应) ----
+    var draws = [];          // {depth, kind:'face'|'sprite'|'text'|'external', ...}
+    var pickBoxes = [];
+    var externalModels = [];
+    var seatCount = 0;
+    var bMinX = 0, bMinY = 0, bMaxX = 0, bMaxY = 0, hasBound = false;
+    function grow(x, y) {
+      if (!hasBound) { bMinX = bMaxX = x; bMinY = bMaxY = y; hasBound = true; return; }
+      if (x < bMinX) bMinX = x; if (y < bMinY) bMinY = y;
+      if (x > bMaxX) bMaxX = x; if (y > bMaxY) bMaxY = y;
+    }
+    var scrOf = function (x, y, z) {
+      var s = projectView(x, y, z, sceneViewYaw);
+      return { x: s.x * unit, y: s.y * unit };
+    };
+    // 面片角点在 collectModelFaces 里已随 xf 旋转过 (含 viewYaw), 投影时不能再转一次
+    var scrOfRaw = function (x, y, z) {
+      var s = project(x, y, z);
+      return { x: s.x * unit, y: s.y * unit };
+    };
+    var growBox = function (min, max) {
+      for (var i = 0; i < 8; i++) {
+        var s = scrOf((i & 1) ? max[0] : min[0], (i & 2) ? max[1] : min[1], (i & 4) ? max[2] : min[2]);
+        grow(s.x, s.y);
+      }
+    };
+    var growFaces = function (faces) {
+      for (var i = 0; i < faces.length; i++) {
+        var c = faces[i].corners;
+        for (var j = 0; j < c.length; j++) {
+          var s = scrOfRaw(c[j][0], c[j][1], c[j][2]);
+          grow(s.x, s.y);
+        }
+      }
+    };
+
+    // 地面网格 (3x3) 与原点方块轮廓都参与包围盒 (隐藏时网格不计)
+    if (opt.grid) growBox([-16, 0, -16], [32, 0, 32]);
+    growBox([0, 0, 0], [16, 16, 16]);
+
+    for (var ei = 0; ei < v.elements.length; ei++) {
+      var el = fobj(v.elements[ei]) || {};
+      var xf = furnitureElementXf(el, sceneViewYaw);
+      var vis = furnitureElementVisual(el);
+      var sp = scrOf(xf.anchor[0], xf.anchor[1], xf.anchor[2]);
+      var avg = (xf.sc[0] + xf.sc[1] + xf.sc[2]) / 3;
+      var depth = viewDepth(xf.anchor[0], xf.anchor[1], xf.anchor[2], sceneViewYaw);
+
+      if (vis.kind === 'external') {
+        externalModels.push(vis.model || '(未指定模型)');
+        var esz = 16 * unit * avg;
+        draws.push({ depth: depth, kind: 'external', sx: sp.x, sy: sp.y, size: esz, model: vis.model || '' });
+        grow(sp.x - esz / 2, sp.y - esz / 2);
+        grow(sp.x + esz / 2, sp.y + esz / 2 + 14);
+        continue;
+      }
+      if (vis.kind === 'text') {
+        if (!vis.text) continue;
+        var ptx = parseText(vis.text, { style: { color: { r: 255, g: 255, b: 255, a: 1 }, shadow: fkey(el, 'has_shadow') === true } });
+        draws.push({ depth: depth, kind: 'text', sx: sp.x, sy: sp.y, parsed: ptx, el: el, avg: avg });
+        var tw = ptx.width * Math.max(0.05, avg);
+        var tx0 = sp.x - tw / 2, tx1 = sp.x + tw / 2;
+        var al = String(fval(el.alignment) || 'center').toLowerCase();
+        if (al === 'left') { tx0 = sp.x; tx1 = sp.x + tw; }
+        else if (al === 'right') { tx0 = sp.x - tw; tx1 = sp.x; }
+        grow(tx0 - 2, sp.y - (LINE_ASCENT + 2) * Math.max(0.05, avg));
+        grow(tx1 + 2, sp.y + (LINE_HEIGHT - LINE_ASCENT + 2) * Math.max(0.05, avg));
+        continue;
+      }
+      if (vis.kind === 'block' && vis.block) {
+        var bp = vis.block.indexOf(':') === -1 ? vis.block : vis.block.split(':')[1].replace(/\[.*\]$/, '');
+        var bns = vis.block.indexOf(':') === -1 ? 'minecraft' : vis.block.split(':')[0];
+        var bFaces = dnsOk(bns) ? await collectModelFaces(bns + ':block/' + bp, xf) : null;
+        if (bFaces) {
+          growFaces(bFaces);
+          for (var bf = 0; bf < bFaces.length; bf++) draws.push({ depth: bFaces[bf].depth, kind: 'face', face: bFaces[bf] });
+          continue;
+        }
+        // 没有几何体的方块: 按物品解析平面贴图
+        var bInfo = await resolveItemModel(bns + ':' + bp);
+        if (!bInfo || bInfo.kind === 'none') { warn('furniture-unknown-block: ' + vis.block); continue; }
+        vis = { kind: 'item', item: bns + ':' + bp };
+      }
+      // item_display / item / armor_stand (以及上面回退下来的 block)
+      if (vis.item) {
+        var im = await resolveItemModel(vis.item);
+        var iFaces = (im && im.kind === 'block' && im.model) ? await collectModelFaces(im.model, xf) : null;
+        var asCard = false;
+        if (!iFaces && im && im.texture) {
+          // 平面物品默认按竖直卡片渲染 —— 元素 rotation/yaw/pitch 与「视角旋转」都能作用到它;
+          // billboard: vertical/center/horizontal 时才保持朝向镜头 (公告板)
+          var bill = String(fval(el.billboard) || '').toLowerCase();
+          var camFacing = (bill === 'vertical' || bill === 'center' || bill === 'horizontal');
+          if (!camFacing) {
+            var cardTex = await loadImageAny('texture', im.texture);
+            if (cardTex) {
+              asCard = true;
+              // 完全侧对镜头时所有面都会被剔除 → 空数组, 此时什么都不画 (和游戏里一致)
+              iFaces = collectFacesFromModel(flatCardModel(im.texture), xf) || [];
+            }
+          }
+        }
+        if (asCard || iFaces) {
+          if (iFaces.length) {
+            growFaces(iFaces);
+            for (var iff = 0; iff < iFaces.length; iff++) draws.push({ depth: iFaces[iff].depth, kind: 'face', face: iFaces[iff] });
+          } else {
+            // 侧对镜头: 画面上没有它, 但包围盒要留出位置, 免得画布随旋转乱跳
+            var rad = 8 * Math.max(Math.abs(xf.sc[0]), Math.abs(xf.sc[1]), Math.abs(xf.sc[2])) * 1.35 * unit;
+            grow(sp.x - rad, sp.y - rad);
+            grow(sp.x + rad, sp.y + rad);
+          }
+        } else {
+          var ssz = 16 * unit * avg;   // 公告板: 1 格见方的卡片, 以锚点为中心
+          draws.push({ depth: depth, kind: 'sprite', sx: sp.x, sy: sp.y, size: ssz, item: vis.item });
+          grow(sp.x - ssz / 2, sp.y - ssz / 2);
+          grow(sp.x + ssz / 2, sp.y + ssz / 2);
+          if (!im || im.kind === 'none') warn('furniture-unknown-item: ' + vis.item);
+        }
+      }
+    }
+
+    // 碰撞箱 + 座位 (一条配置可能对应多个箱体, 例如潜影贝打开后的壳)
+    for (var hi = 0; hi < v.hitboxes.length; hi++) {
+      var hb = fobj(v.hitboxes[hi]) || {};
+      var hbBoxes = furnitureHitboxBoxes(hb);
+      var col = FURN_HITBOX_COLORS[hbBoxes[0].type] || '#4FC3F7';
+      var seatPts = [];
+      var seats = flist(hb.seats);
+      for (var si = 0; si < seats.length; si++) {
+        var st = furnitureSeat(seats[si]);
+        if (!st) continue;
+        seatCount++;
+        var sw = furnWorld(st.pos[0], st.pos[1], st.pos[2]);
+        var sq = scrOf(sw[0], sw[1], sw[2]);
+        seatPts.push({ st: st, q: sq, world: sw });
+        if (opt.seats) { grow(sq.x - 5, sq.y - 5); grow(sq.x + 8, sq.y + 8); }
+      }
+      for (var bi = 0; bi < hbBoxes.length; bi++) {
+        if (opt.hitboxes) growBox(hbBoxes[bi].min, hbBoxes[bi].max);
+        pickBoxes.push({ index: hi, hb: hb, box: hbBoxes[bi], color: col, seatPts: seatPts });
+      }
+    }
+
+    // ---- 画布: 内容自适应尺寸 + 居中, 顶部留页眉 (碰撞箱标注画在盒体上方, 额外留一行) ----
+    var PAD = 14, HEAD_H = 26;
+    var LABEL_PAD = (opt.hitboxes && opt.labels) ? 14 : 0;
+    var w = clamp(Math.ceil(bMaxX - bMinX) + PAD * 2, FURN_W, FURN_MAX_W);
+    var h = clamp(Math.ceil(bMaxY - bMinY) + PAD + HEAD_H + LABEL_PAD, FURN_H, FURN_MAX_H);
+    var surf = makeSurface(w, h, scale);
+    var ctx = surf.ctx;
+    ctx.fillStyle = 'rgba(0,0,0,0.72)';
+    ctx.fillRect(0, 0, w, h);
+    var ox = PAD + (w - PAD * 2 - (bMaxX - bMinX)) / 2 - bMinX;
+    var oy = HEAD_H + LABEL_PAD +
+      (h - PAD - HEAD_H - LABEL_PAD - (bMaxY - bMinY)) / 2 - bMinY;
+
+    // ---- 地面网格 (3x3 格, 随视图旋转) ----
+    if (opt.grid) {
+      for (var gx = -1; gx <= 1; gx++) {
+        for (var gz = -1; gz <= 1; gz++) {
+          var c0 = fpt(ox, oy, gx * 16, 0, gz * 16);
+          var c1 = fpt(ox, oy, (gx + 1) * 16, 0, gz * 16);
+          var c2 = fpt(ox, oy, (gx + 1) * 16, 0, (gz + 1) * 16);
+          var c3 = fpt(ox, oy, gx * 16, 0, (gz + 1) * 16);
+          ctx.beginPath();
+          ctx.moveTo(c0.x, c0.y); ctx.lineTo(c1.x, c1.y);
+          ctx.lineTo(c2.x, c2.y); ctx.lineTo(c3.x, c3.y);
+          ctx.closePath();
+          ctx.fillStyle = (gx === 0 && gz === 0) ? 'rgba(255,255,255,0.085)' : 'rgba(255,255,255,0.035)';
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(255,255,255,0.17)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+      }
+      // 北向标记: 画在网格北侧边缘, 跟随视图旋转, 方便对照 yaw/座位朝向
+      var npt = fpt(ox, oy, 8, 0, -20);
+      var pn = parseText('<dark_gray>N', {});
+      drawItems(ctx, pn.items, npt.x - pn.width / 2, npt.y, { shadow: false });
+    }
+    // 家具所在方块 (0,0,0) 的轮廓, 作为位置基准
+    drawWireBox(ctx, ox, oy, [0, 0, 0], [16, 16, 16], 'rgba(255,255,255,0.38)', 1, {});
+
+    // ---- 深度排序绘制: 面片 + 公告板混排 ----
+    draws.sort(function (a, b) { return a.depth - b.depth; });
+    var texCache = {};
+    for (var tdi = 0; tdi < draws.length; tdi++) {
+      if (draws[tdi].kind !== 'face') continue;
+      var tid = draws[tdi].face.texId;
+      if (!texCache[tid]) texCache[tid] = await loadImageAny('texture', tid);
+      draws[tdi].face.img = texCache[tid];
+    }
+    for (var ddi = 0; ddi < draws.length; ddi++) {
+      var d = draws[ddi];
+      if (d.kind === 'face') {
+        if (d.face.img) drawTexturedQuad(ctx, d.face, unit, ox, oy);
+        continue;
+      }
+      if (d.kind === 'sprite') {
+        // 修复: 展示实体把模型/图标渲染在实体位置「居中」, 不是底部贴地
+        var rr = await drawItem(ctx, d.item, ox + d.sx - d.size / 2, oy + d.sy - d.size / 2, d.size);
+        if (rr.kind === 'none') warn('furniture-unknown-item: ' + d.item);
+        continue;
+      }
+      if (d.kind === 'text') {
+        var tel = d.el, tavg = Math.max(0.05, d.avg);
+        var tal = String(fval(tel.alignment) || 'center').toLowerCase();
+        var ttx = -d.parsed.width / 2;
+        if (tal === 'left') ttx = 0;
+        else if (tal === 'right') ttx = -d.parsed.width;
+        ctx.save();
+        ctx.translate(ox + d.sx, oy + d.sy);
+        if (tavg !== 1) ctx.scale(tavg, tavg);
+        if (fkey(tel, 'use_default_background_color') === true || fkey(tel, 'background_color') != null) {
+          ctx.fillStyle = 'rgba(0,0,0,0.35)';
+          ctx.fillRect(ttx - 1, -9, d.parsed.width + 2, LINE_HEIGHT + 1);
+        }
+        drawItems(ctx, d.parsed.items, ttx, 0, { shadow: fkey(tel, 'has_shadow') === true });
+        ctx.restore();
+        continue;
+      }
+      if (d.kind === 'external') {
+        ctx.save();
+        ctx.setLineDash && ctx.setLineDash([4, 3]);
+        ctx.strokeStyle = '#BA68C8';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(ox + d.sx - d.size / 2 + 0.5, oy + d.sy - d.size / 2 + 0.5, d.size - 1, d.size - 1);
+        ctx.setLineDash && ctx.setLineDash([]);
+        var ptE = parseText('<light_purple>' + (d.model || 'model'), { style: { color: hexToRgb('#BA68C8') } });
+        drawItems(ctx, ptE.items, ox + d.sx - ptE.width / 2, oy + d.sy + d.size / 2 + 4, { shadow: false });
+        ctx.restore();
+        continue;
+      }
+    }
+
+    // ---- 碰撞箱 + 座位 (最后画, 始终在最上层, 与 /ce debug furniture 一致) ----
+    _furnPick = { boxes: [] };
+    for (var pi = 0; pi < pickBoxes.length; pi++) {
+      var pk = pickBoxes[pi];
+      var isHl = opt.highlight === pk.index;
+      if (opt.hitboxes) {
+        // 记录屏幕凸包多边形, 供面板点击拾取
+        var hullPts = [];
+        for (var hp = 0; hp < 8; hp++) {
+          hullPts.push(fpt(ox, oy, (hp & 1) ? pk.box.max[0] : pk.box.min[0], (hp & 2) ? pk.box.max[1] : pk.box.min[1], (hp & 4) ? pk.box.max[2] : pk.box.min[2]));
+        }
+        // 盒体投影中心 (拾取时用来判断哪个箱子离点击更近)
+        var boxC = fpt(ox, oy, (pk.box.min[0] + pk.box.max[0]) / 2, (pk.box.min[1] + pk.box.max[1]) / 2, (pk.box.min[2] + pk.box.max[2]) / 2);
+        var poly = convexHull(hullPts);
+        var dim = function (a, b) { return furnDim((b - a) / 16); };
+        _furnPick.boxes.push({
+          index: pk.index,
+          poly: poly,
+          type: pk.box.type,
+          color: pk.color,
+          cx: boxC.x, cy: boxC.y,
+          lid: !!pk.box.lid,
+          w: dim(pk.box.min[0], pk.box.max[0]),
+          h: dim(pk.box.min[1], pk.box.max[1]),
+          d: dim(pk.box.min[2], pk.box.max[2]),
+          pos: fvec(pk.hb.position, [0, 0, 0]),
+          seats: pk.seatPts.length
+        });
+        drawWireBox(ctx, ox, oy, pk.box.min, pk.box.max, pk.color, isHl ? 2 : 1.25,
+          { fillAlpha: isHl ? 0.28 : (opt.fill ? 0.10 : 0) });
+        if (isHl || opt.labels) {
+          // 类型 + 尺寸标注 (画布内只能 ASCII): 画在盒体最高角的上方。
+          // 潜影贝标上 direction / peek, 这样能看出为什么会有第二个箱体 (打开的壳)。
+          var dirTag = '';
+          if (pk.box.type === 'shulker') {
+            var hdir = String(fkey(pk.hb, 'direction') || 'up').toLowerCase();
+            if (hdir !== 'up') dirTag = ':' + hdir;
+            if (pk.box.lid) dirTag += ' lid';
+          }
+          var lab = pk.box.type + dirTag + ' ' + furnDim((pk.box.max[0] - pk.box.min[0]) / 16) +
+            'x' + furnDim((pk.box.max[1] - pk.box.min[1]) / 16) +
+            'x' + furnDim((pk.box.max[2] - pk.box.min[2]) / 16);
+          var top = hullPts[0];
+          for (var tp = 1; tp < hullPts.length; tp++) if (hullPts[tp].y < top.y) top = hullPts[tp];
+          var plab = parseText(isHl ? '<white>' + lab : furnColorTag(pk.color, lab), {});
+          drawItems(ctx, plab.items, ox + top.x - plab.width / 2, oy + top.y - 4, { shadow: false });
+        }
+      }
+      if (opt.seats) {
+        for (var spi = 0; spi < pk.seatPts.length; spi++) {
+          var sm = pk.seatPts[spi];
+          drawSeatMarker(ctx, ox, oy, sm.world[0], sm.world[1], sm.world[2], sm.st.yaw, isHl);
+        }
+      }
+    }
+
+    // ---- 说明 ----
+    // 画布里的文字只能用 ASCII: 原版字体数据包里 unifont 的 providers 是空的,
+    // 这个资源版本没有 CJK 字形, 中文画进画布会变成空白。
+    // 中文标签放在面板底部的状态栏 (DOM) 里显示。
+    var head = v.name + '   elements ' + v.elements.length +
+      '  ·  hitboxes ' + pickBoxes.length +
+      '  ·  seats ' + seatCount;
+    if (sceneViewYaw) head += '  ·  yaw ' + Math.round(sceneViewYaw) + 'deg';
+    if (variants.length > 1) head += '   (' + (vi + 1) + '/' + variants.length + ')';
+    var ph = parseText('<gray>' + head, {});
+    drawItems(ctx, ph.items, 6, 14, { shadow: false });
+    if (v.blueprint) {
+      var pb = parseText('<light_purple>external model: ' + v.blueprint, {});
+      drawItems(ctx, pb.items, 6, h - 12, { shadow: false });
+    }
+    if (externalModels.length) {
+      warn('furniture-external-model: ' + externalModels.join(', '));
+    }
+    if (!v.elements.length) warn('furniture-no-elements');
+    if (!v.hitboxes.length) warn('furniture-no-hitboxes');
+
+    blit(canvas, surf);
+    return { width: canvas.width, height: canvas.height, warnings: _warnings.slice() };
+  }
+  // 用碰撞箱自身的颜色给标注上色 (MiniMessage 支持 <#rrggbb>)
+  function furnColorTag(hex, text) {
+    return '<' + hex + '>' + text;
+  }
+  // 命名空间是否形如合法 id (block_display 的解析用)
+  function dnsOk(ns) { return !!ns && /^[a-z0-9_.-]+$/.test(ns); }
+
+  // ---- 字体图像总览: 只看当前选中的这一个条目 (按配置的真实尺寸 1:1 绘制) ----
+  // 之前是把工程里全部 images 条目堆在一个固定行高的列表里, 大图 (CE 内置 GUI 图 140px)
+  // 会互相重叠、被裁成窄条, 反而看不清。这里改为只展示当前条目。
+  async function sceneImageGallery(canvas, scene) {
+    await fontReady();
+    var scale = normScale(scene.scale);
+    var id = scene.imageId || scene.entryKey || null;
+    if (!id) {
+      var all = Object.keys(_projectData.images || {});
+      id = all.length === 1 ? all[0] : null;
+    }
+    if (!id || !_projectData.images[id]) {
+      var s0 = makeSurface(220, 20, scale);
+      var p0 = parseText(t('preview.noImages', '当前工程未找到 images 条目'), { style: { color: hexToRgb('#AAAAAA') } });
+      drawItems(s0.ctx, p0.items, 4, 12, {});
+      blit(canvas, s0);
+      return { width: canvas.width, height: canvas.height, warnings: _warnings.slice() };
+    }
+    var entry = _projectData.images[id];
+    var glyph = imageGlyph(id, null, null);
+    var info = glyph || { width: 8, height: 8, ascent: 7, missing: true };
+    var imgH = Math.max(0, info.height);
+    var imgW = Math.max(1, info.width);
+    var asc = info.ascent != null ? info.ascent : imgH - 1;
+    // 文字提示行 (条目 id + 配置的 height/ascent/文件名)
+    var cfgH = imageHeightOf(entry);
+    var cfgA = imageAscentOf(entry, cfgH);
+    var note = id + (cfgH != null ? '  height=' + cfgH : '') + (cfgA != null ? ' ascent=' + cfgA : '') +
+      (entry.file ? '  ' + String(entry.file).split('/').pop() : (entry.ref ? '  ref=' + entry.ref : ''));
+    var pNote = parseText('<gray>' + note, {});
+    var padX = 8, padY = 6;
+    var captionH = LINE_HEIGHT;
+    // 自动界面尺寸按「图片宽度」计算 (说明文字更长, 不该把图缩小)
+    var surf = makeSurface(Math.max(120, Math.max(imgW, pNote.width) + padX * 2), padY * 2 + imgH + 4 + captionH,
+      scale, imgW + padX * 2);
+    surf.ctx.fillStyle = 'rgba(0,0,0,0.85)';
+    surf.ctx.fillRect(0, 0, surf.w, surf.h);
+    // 直接把图像顶边放在 padY 处: 字形绘制位置 = 基线 - ascent, 所以基线取 padY + ascent
+    drawItems(surf.ctx, parseText('<image:' + id + '>', {}).items, padX, padY + asc, { shadow: false });
+    // 说明文字排在图片下方
+    drawItems(surf.ctx, pNote.items, padX, padY + imgH + 4 + LINE_ASCENT, { shadow: false });
+    blit(canvas, surf);
+    return { width: canvas.width, height: canvas.height, warnings: _warnings.slice() };
+  }
+
+  async function renderScene(canvas, scene) {
+    _warnings = [];
+    scene = scene || {};
+    if (!canvas || !canvas.getContext) {
+      return { width: 0, height: 0, warnings: ['no canvas'] };
+    }
+    try {
+      if (scene.options) setOptions(scene.options);
+      var type = scene.type || 'lore';
+      if (type !== 'furniture') { sceneViewYaw = 0; sceneZoom = 1; _furnPick = null; }
+      if (type === 'chat') return await sceneChat(canvas, scene);
+      if (type === 'gui') return await sceneGui(canvas, scene);
+      if (type === 'item' || type === 'inventory' || type === 'hotbar') return await sceneItem(canvas, scene);
+      if (type === 'image' || type === 'gallery') return await sceneImageGallery(canvas, scene);
+      if (type === 'furniture') return await sceneFurniture(canvas, scene);
+      return await sceneLore(canvas, scene);
+    } catch (e) {
+      warn('render-error: ' + (e && e.message));
+      try {
+        var s = makeSurface(200, 30, 1);
+        s.ctx.fillStyle = '#300';
+        s.ctx.fillRect(0, 0, 200, 30);
+        var p = parseText('render error: ' + (e && e.message), {});
+        s.ctx.fillStyle = '#fff';
+        drawItems(s.ctx, p.items, 4, 18, {});
+        blit(canvas, s);
+      } catch (e2) { /* ignore */ }
+      return { width: canvas.width || 0, height: canvas.height || 0, warnings: _warnings.slice() };
+    }
+  }
+
+  // ---------------- 换行 / 测量 ----------------
+  function wrapText(text, maxWidth, o) {
+    var out = [];
+    var paragraphs = String(text == null ? '' : text).split('\n');
+    for (var pi = 0; pi < paragraphs.length; pi++) {
+      var para = paragraphs[pi];
+      if (!para) { out.push(''); continue; }
+      var words = para.split(' ');
+      var line = '';
+      for (var w = 0; w < words.length; w++) {
+        var cand = line ? line + ' ' + words[w] : words[w];
+        if (measureText(cand, o).width <= maxWidth || !line) {
+          // 单词本身超宽 ?按字符切
+          if (!line && measureText(words[w], o).width > maxWidth) {
+            var chunk = '';
+            for (var ci = 0; ci < words[w].length; ci++) {
+              var c2 = chunk + words[w][ci];
+              if (measureText(c2, o).width > maxWidth && chunk) { out.push(chunk); chunk = ''; }
+              chunk += words[w][ci];
+            }
+            line = chunk;
+          } else {
+            line = cand;
+          }
+        } else {
+          out.push(line);
+          line = words[w];
+        }
+      }
+      if (line) out.push(line);
+    }
+    return out.length ? out : [''];
+  }
+  function measureText(text, o) {
+    var p = parseText(text, o || {});
+    return { width: p.width, height: p.height, lines: p.lines };
+  }
+  async function drawText(ctx, text, x, y, o) {
+    await fontReady();
+    var p = parseText(text, o || {});
+    return drawItems(ctx, p.items, x, y, o || {});
+  }
+
+  // ---------------- 生命周期 ----------------
+  function setOptions(patch) {
+    if (!patch) return options;
+    Object.keys(patch).forEach(function (k) {
+      if (patch[k] !== undefined) options[k] = patch[k];
+    });
+    return options;
+  }
+  function getOptions() { return Object.assign({}, options); }
+  function onReady(cb) {
+    if (typeof cb !== 'function') return;
+    if (_readyFired) { try { cb(); } catch (e) {} return; }
+    _readyListeners.push(cb);
+  }
+  async function init(opts) {
+    setOptions(opts || {});
+    _projectCacheKey = null;
+    _fonts = null;
+    _fontPromise = null;
+    if (typeof document === 'undefined') return;
+    if (options.mcRoot == null) {
+      var A = assets();
+      options.mcRoot = A && A.mcRoot ? A.mcRoot() : null;
+    }
+    try { await fontReady(); } catch (e) { warn('init-font: ' + (e && e.message)); }
+  }
+  function fontReady() {
+    if (_fonts) return Promise.resolve(_fonts);
+    return loadFontData().then(function (g) {
+      _fonts = g;
+      if (!_readyFired) {
+        _readyFired = true;
+        for (var i = 0; i < _readyListeners.length; i++) {
+          try { _readyListeners[i](); } catch (e) { /* ignore */ }
+        }
+        _readyListeners = [];
+      }
+      return g;
+    });
+  }
+  // 保留调用方注入的数据: 工程扫描结果优先, 但扫描为空/缺项时不要抹掉 setImages/setGlobals 的内容
+  function mergeProjectData(prev, next) {
+    if (!next) return prev;
+    if (!prev) return next;
+    var out = { images: {}, globals: {}, emojis: {}, langs: {}, furniture: {}, items: {} };
+    ['images', 'globals', 'emojis', 'langs', 'furniture', 'items'].forEach(function (k) {
+      var a = prev[k] || {}, b = next[k] || {};
+      var merged = {};
+      Object.keys(a).forEach(function (x) { merged[x] = a[x]; });
+      Object.keys(b).forEach(function (x) { merged[x] = b[x]; });
+      out[k] = merged;
+    });
+    return out;
+  }
+  async function setActiveFile(filePath) {
+    _activeFile = filePath || null;
+    var cd = configDirOf(_activeFile);
+    if (cd === _projectCacheKey) return _projectData;
+    _projectCacheKey = cd;
+    if (!cd) return _projectData;
+    try {
+      var next = await collectProjectDataImpl();
+      _projectData = mergeProjectData(_projectData, next);
+      // 合并进来的旧条目可能还没解码图片, 补一次预加载
+      await preloadImages().catch(function () {});
+    } catch (e) {
+      warn('project-data: ' + (e && e.message));
+    }
+    return _projectData;
+  }
+  async function collectProjectData(force) {
+    if (!force && _projectData && Object.keys(_projectData.images).length) return _projectData;
+    try {
+      _projectData = await collectProjectDataImpl();
+    } catch (e) { warn('project-data: ' + (e && e.message)); }
+    return _projectData;
+  }
+  function setImages(map) {
+    _projectData.images = map || {};
+    // 后台预加? 霢要等待完成时调用 preloadImages()
+    preloadImages().catch(function () {});
+  }
+  async function preloadImages(map) {
+    var imgs = map || _projectData.images || {};
+    var ids = Object.keys(imgs);
+    for (var i = 0; i < ids.length; i++) {
+      await preloadImageEntry(ids[i], imgs[ids[i]], imgs);
+    }
+    return imgs;
+  }
+  function setGlobals(map) { _projectData.globals = map || {}; }
+  function setLangs(map) { _projectData.langs = map || {}; }
+  function getProjectData() { return _projectData; }
+
+  // 诊断? 报告模型链解析结果与可见面数?
+  async function inspectModel(modelId) {
+    if (!modelId) return { ok: false, error: 'no model id' };
+    var id = String(modelId);
+    if (id.indexOf(':') === -1) id = 'minecraft:' + id;
+    var path = resolveCandidates('model', id)[0] || null;
+    if (!path) return { ok: false, error: 'model not found: ' + id, path: null };
+    var model = await loadModelChain(id);
+    if (!model) return { ok: false, error: 'model json unreadable', path: path };
+    var faces = 0, visible = 0, textures = {}, rotated = 0, skippedNoTex = 0;
+    var els = Array.isArray(model.elements) ? model.elements : [];
+    els.forEach(function (el) {
+      if (el && el.rotation && el.rotation.angle) rotated++;
+      Object.keys((el && el.faces) || {}).forEach(function (f) {
+        faces++;
+        var fd = el.faces[f];
+        if (!fd) { skippedNoTex++; return; }
+        if (faceVisible(f)) visible++;
+        var texId = resolveTextureRef(model, fd.texture);
+        if (texId) textures[texId] = 1; else skippedNoTex++;
+      });
+    });
+    return {
+      ok: faces > 0,
+      id: id, path: path, parent: model.parent,
+      elements: els.length, faces: faces, visibleFaces: visible,
+      rotatedElements: rotated, facesWithoutTexture: skippedNoTex,
+      textures: Object.keys(textures),
+    };
+  }
+
+  root.CEPreview = {
+    version: VERSION,
+    init: init,
+    setOptions: setOptions,
+    getOptions: getOptions,
+    onReady: onReady,
+    setActiveFile: setActiveFile,
+    collectProjectData: collectProjectData,
+    getProjectData: getProjectData,
+    setImages: setImages,
+    preloadImages: preloadImages,
+    setGlobals: setGlobals,
+    setLangs: setLangs,
+    fontReady: fontReady,
+    setStageWidth: setStageWidth,
+    autoScaleFor: autoScaleFor,
+    GUI_SCALE_MAX: GUI_SCALE_MAX,
+    // 标签命名空间 (供面板/诊断/测试复用): MiniMessage 与 CraftEngine 分属两套
+    tags: {
+      decorations: DECOR_ALIASES,
+      mmOpaque: MM_OPAQUE,
+      mmPlaceholder: MM_PLACEHOLDER,
+      mmTranslate: MM_TRANSLATE,
+      ce: CE_TAGS,
+      colors: NAMED_COLORS,
+    },
+    measureText: measureText,
+    measure: measureText,
+    wrapText: wrapText,
+    drawText: drawText,
+    parseText: parseText,
+    resolveItemModel: resolveItemModel,
+    inspectModel: inspectModel,
+    drawItem: drawItem,
+    renderScene: renderScene,
+    sceneChat: sceneChat,
+    sceneLore: sceneLore,
+    sceneItem: sceneItem,
+    sceneGui: sceneGui,
+    sceneFurniture: sceneFurniture,
+    furnitureVariants: furnitureVariants,
+    furnitureInlineOf: furnitureInlineOf,
+    furnitureById: furnitureById,
+    furnitureItemRef: furnitureItemRef,
+    furnitureHitboxBox: furnitureHitboxBox,
+    furnitureHitboxBoxes: furnitureHitboxBoxes,
+    furniturePickAt: function (px, py) { return furniturePickAt(px, py); },
+    furniturePickData: function () { return _furnPick; },
+    hasVariants: function (d) {
+      var o = fobj(d);
+      if (!o) return false;
+      return !!(fobj(o.variants) || fobj(fobj(o.data) && fobj(o.data).variants));
+    },
+    sceneImageGallery: sceneImageGallery,
+    listImages: function () { return Object.keys(_projectData.images || {}); },
+    lastWarnings: function () { return _warnings.slice(); },
+    _internals: {
+      NAMED_COLORS: NAMED_COLORS,
+      LINE_HEIGHT: LINE_HEIGHT,
+      parseColor: parseColor,
+      drawItems: drawItems,
+      // 家具几何 (供测试/诊断直接验证, 不参与渲染流程)
+      mat3Apply: mat3Apply,
+      furnitureRotationMatrix: furnitureRotationMatrix,
+      furnitureElementXf: furnitureElementXf,
+      furnitureSeat: furnitureSeat,
+      furnWorld: furnWorld,
+      FURN_ORIGIN: FURN_ORIGIN,
+    },
+  };
+})();

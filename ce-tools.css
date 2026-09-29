@@ -1,0 +1,250 @@
+/* ChoTenEditor — CraftEngine 预览面板 / 配置检查面板 / 字段诊断标记 样式
+ * 全部使用 styles.css 的主题变量, 因此深浅色与用户自定义配色都会自动生效。
+ */
+
+/* ============================ 预览面板 (WindowManager 窗口) ============================ */
+.cw-preview .cw-body { position: relative; }
+.pv-content {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  gap: 8px; padding: 10px 12px 12px;
+  font-size: 12px; color: var(--color-text-primary);
+  user-select: none;
+}
+.pv-wrap { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
+
+.pv-toolbar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--color-border);
+}
+.pv-group { display: flex; align-items: center; gap: 6px; }
+.pv-group.pv-right { margin-left: auto; }
+.pv-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 24px; padding: 0 10px;
+  border: 1px solid var(--color-border-light); border-radius: var(--radius-sm);
+  background: var(--color-bg-tertiary); color: var(--color-text-secondary);
+  font-size: 12px; cursor: pointer; transition: all var(--transition-fast);
+}
+.pv-btn:hover { color: var(--color-text-primary); border-color: var(--color-primary); }
+.pv-btn.active {
+  color: #fff; background: var(--color-primary); border-color: var(--color-primary);
+}
+.pv-field { display: inline-flex; align-items: center; gap: 4px; color: var(--color-text-tertiary); white-space: nowrap; }
+.pv-select {
+  height: 24px; padding: 0 4px;
+  border: 1px solid var(--color-border-light); border-radius: var(--radius-sm);
+  background: var(--color-bg-tertiary); color: var(--color-text-primary); font-size: 12px;
+}
+.pv-select:disabled { opacity: .45; }
+.pv-checks { flex-wrap: wrap; }
+.pv-check {
+  display: inline-flex; align-items: center; gap: 4px;
+  color: var(--color-text-secondary); cursor: pointer; white-space: nowrap;
+}
+.pv-check input { accent-color: var(--color-primary); }
+.pv-text { flex: 1 1 260px; min-width: 200px; }
+.pv-input {
+  flex: 1 1 auto; min-width: 140px; height: 24px; padding: 0 6px;
+  border: 1px solid var(--color-border-light); border-radius: var(--radius-sm);
+  background: var(--color-bg-tertiary); color: var(--color-text-primary);
+  font-family: var(--font-mono, Consolas, monospace); font-size: 11px;
+}
+.pv-input:focus { outline: none; border-color: var(--color-primary); }
+/* 偏移行单独占一整行 (flex-basis 100% 会强制换行), 内部控件保持同一行 */
+.pv-shift { flex: 1 0 100%; flex-wrap: nowrap; padding-top: 2px; }
+.pv-nudge { min-width: 34px; padding: 0 6px; font-variant-numeric: tabular-nums; }
+.pv-shiftval { flex: 0 0 auto; width: 58px; min-width: 58px; text-align: center; }
+.pv-toolbar { flex-wrap: wrap; }
+
+.pv-stage {
+  flex: 1; min-height: 180px; overflow: auto;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 14px;
+  border: 1px solid var(--color-border); border-radius: var(--radius-md);
+  background:
+    linear-gradient(45deg, rgba(128,128,128,.08) 25%, transparent 25%, transparent 75%, rgba(128,128,128,.08) 75%) 0 0 / 16px 16px,
+    linear-gradient(45deg, rgba(128,128,128,.08) 25%, transparent 25%, transparent 75%, rgba(128,128,128,.08) 75%) 8px 8px / 16px 16px,
+    var(--color-bg-primary);
+}
+.pv-stage canvas {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  box-shadow: 0 2px 10px rgba(0,0,0,.5);
+}
+.pv-status {
+  min-height: 16px; font-size: 11px; color: var(--color-text-tertiary);
+  font-family: var(--font-mono, Consolas, monospace);
+}
+.pv-status-warn { color: var(--color-warning); }
+.pv-status-error { color: var(--color-error); }
+/* 家具碰撞箱图例: 彩色圆点 + 类型名 */
+.pv-status .pv-dot {
+  display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+  margin: 0 3px 0 0; vertical-align: -1px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .35);
+}
+.pv-status .pv-sep { margin: 0 6px; opacity: .55; }
+.pv-furn-zoomval { min-width: 44px; justify-content: center; font-variant-numeric: tabular-nums; }
+.pv-source {
+  max-height: 168px; overflow: auto; margin: 0; padding: 8px 10px;
+  border: 1px solid var(--color-border); border-radius: var(--radius-sm);
+  background: var(--color-bg-tertiary); color: var(--color-text-secondary);
+  font-family: var(--font-mono, Consolas, monospace); font-size: 11px;
+  white-space: pre-wrap; word-break: break-all; user-select: text;
+}
+
+/* ============================ 配置检查面板 ============================ */
+.ce-problems {
+  flex: 0 0 auto;
+  display: flex; flex-direction: column;
+  height: 200px; max-height: 60vh;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+  overflow: hidden;
+}
+.ce-problems-head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-tertiary);
+  font-size: 12px;
+}
+.ce-problems-title { font-weight: 600; color: var(--color-text-primary); white-space: nowrap; }
+.ce-problems-filters { display: flex; gap: 6px; flex-wrap: wrap; }
+.ce-prob-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  height: 20px; padding: 0 8px;
+  border: 1px solid var(--color-border-light); border-radius: 10px;
+  background: transparent; color: var(--color-text-tertiary);
+  font-size: 11px; cursor: pointer; opacity: .55;
+  transition: all var(--transition-fast);
+}
+.ce-prob-chip.active { opacity: 1; border-color: currentColor; }
+.ce-prob-chip b { font-weight: 700; }
+.ce-prob-chip-error { color: var(--color-error); }
+.ce-prob-chip-warn { color: var(--color-warning); }
+.ce-prob-chip-weak { color: var(--color-text-secondary); }
+.ce-prob-chip-info { color: var(--color-info); }
+.ce-problems-file {
+  margin-left: auto; color: var(--color-text-tertiary);
+  font-family: var(--font-mono, Consolas, monospace); font-size: 11px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 40%;
+}
+.ce-problems-close {
+  width: 20px; height: 20px; border: none; border-radius: var(--radius-sm);
+  background: transparent; color: var(--color-text-tertiary); cursor: pointer;
+  font-size: 13px; line-height: 1;
+}
+.ce-problems-close:hover { background: var(--color-bg-hover); color: var(--color-error); }
+
+.ce-problems-list { flex: 1; min-height: 0; overflow: auto; }
+.ce-prob-empty { padding: 18px; text-align: center; color: var(--color-text-tertiary); }
+.ce-prob-row {
+  display: flex; align-items: baseline; gap: 8px;
+  padding: 4px 10px;
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer; font-size: 12px;
+  transition: background var(--transition-fast);
+}
+.ce-prob-row:hover { background: var(--color-bg-hover); }
+.ce-prob-sev { flex: 0 0 74px; font-size: 10px; font-weight: 700; letter-spacing: .3px; }
+.ce-prob-error .ce-prob-sev { color: var(--color-error); }
+.ce-prob-warn .ce-prob-sev { color: var(--color-warning); }
+.ce-prob-weak .ce-prob-sev { color: var(--color-text-secondary); }
+.ce-prob-info .ce-prob-sev { color: var(--color-info); }
+.ce-prob-loc {
+  flex: 0 1 auto; max-width: 42%;
+  color: var(--color-text-tertiary);
+  font-family: var(--font-mono, Consolas, monospace); font-size: 11px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.ce-prob-msg { flex: 1 1 auto; color: var(--color-text-primary); }
+.ce-prob-info .ce-prob-msg { color: var(--color-text-secondary); }
+.ce-prob-line { color: var(--color-text-tertiary); font-size: 11px; }
+
+/* ============================ 字段 / 工具条 诊断标记 ============================ */
+.ce-diag-btn { gap: 4px; }
+.ce-diag-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 16px; height: 16px; padding: 0 4px;
+  border-radius: 8px; font-size: 10px; font-weight: 700; color: #fff;
+  background: var(--color-text-tertiary);
+}
+.ce-diag-badge-none { background: var(--color-success); }
+.ce-diag-badge-error { background: var(--color-error); }
+.ce-diag-badge-warn { background: var(--color-warning); color: #000; }
+.ce-diag-badge-weak { background: var(--color-text-secondary); }
+.ce-diag-badge-info { background: var(--color-info); }
+
+.ce-diag-status {
+  font-family: var(--font-mono, Consolas, monospace); font-size: 11px;
+  color: var(--color-text-tertiary); cursor: pointer;
+}
+.ce-diag-status.has-error { color: var(--color-error); font-weight: 700; }
+.ce-diag-status.has-warn { color: var(--color-warning); font-weight: 700; }
+.ce-diag-status.has-weak { color: var(--color-text-secondary); }
+.ce-diag-status.has-info { color: var(--color-info); }
+
+.ce-diag-mark {
+  margin-left: 5px; font-size: 11px; cursor: pointer; user-select: none;
+}
+.ce-diag-mark-error { color: var(--color-error); }
+.ce-diag-mark-warn { color: var(--color-warning); }
+.ce-diag-mark-weak_warn { color: var(--color-text-secondary); }
+.ce-diag-mark-info { color: var(--color-info); }
+
+.ce-input.ce-diag-field-error { border-color: var(--color-error) !important; box-shadow: 0 0 0 1px var(--color-error) inset; }
+.ce-input.ce-diag-field-warn { border-color: var(--color-warning) !important; }
+.ce-input.ce-diag-field-weak { border-color: var(--color-border-light) !important; }
+.ce-input.ce-diag-field-info { border-color: var(--color-info) !important; }
+
+.ce-diag-entrymark {
+  display: inline-flex; align-items: center; gap: 4px;
+  margin-right: 8px; padding: 2px 8px;
+  border-radius: 10px; font-size: 11px; cursor: pointer;
+  border: 1px solid var(--color-border-light);
+}
+.ce-diag-entrymark.ce-diag-mark-error { color: var(--color-error); border-color: var(--color-error); }
+.ce-diag-entrymark.ce-diag-mark-warn { color: var(--color-warning); border-color: var(--color-warning); }
+.ce-diag-entrymark.ce-diag-mark-weak_warn { color: var(--color-text-secondary); }
+.ce-diag-entrymark.ce-diag-mark-info { color: var(--color-info); }
+
+/* CodeMirror 源码模式行标记 */
+.ce-cm-gutter { width: 14px; }
+.ce-cm-marker { display: inline-block; width: 14px; text-align: center; font-size: 11px; line-height: 16px; }
+.ce-cm-marker-error { color: var(--color-error); }
+.ce-cm-marker-warn { color: var(--color-warning); }
+.ce-cm-marker-weak { color: var(--color-text-secondary); }
+.ce-cm-marker-info { color: var(--color-info); }
+.CodeMirror .ce-cm-line-error { background: rgba(255, 23, 68, .10); }
+.CodeMirror .ce-cm-line-warn { background: rgba(255, 214, 0, .08); }
+
+/* 预览按钮 */
+.ce-preview-btn { gap: 4px; }
+
+/* 预览面板底部工具条入口 */
+#ce-preview-open-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+}
+
+/* 标签页问题计数徽章 */
+.editor-tab .ce-tab-diag {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 15px; height: 15px; margin-left: 5px; padding: 0 4px;
+  border-radius: 8px; font-size: 10px; font-weight: 700;
+  color: #fff; background: var(--color-text-tertiary);
+  flex: 0 0 auto;
+}
+.editor-tab .ce-tab-diag-error { background: var(--color-error); }
+.editor-tab .ce-tab-diag-warn { background: var(--color-warning); color: #000; }
+.editor-tab .ce-tab-diag-weak { background: var(--color-text-secondary); }
+.editor-tab .ce-tab-diag-info { background: var(--color-info); }
+
+/* 跳转到问题字段时的闪烁提示 */
+.ce-input.ce-diag-flash {
+  animation: ce-diag-flash 0.8s ease-in-out 2;
+}
+@keyframes ce-diag-flash {
+  0%, 100% { box-shadow: none; }
+  50% { box-shadow: 0 0 0 3px var(--color-primary-glow), 0 0 0 1px var(--color-primary); }
+}

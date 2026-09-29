@@ -101,7 +101,7 @@ var AIPanel = (function() {
       if (window.electronAPI && window.electronAPI.openExternal) {
         // 打开设置窗口
         try {
-          var settingsWin = window.open('settings.html', '_blank');
+          var settingsWin = window.open('settings.html' + (window.I18N && I18N.lang ? '?lang=' + encodeURIComponent(I18N.lang) : ''), '_blank');
         } catch(e) {}
       }
     };

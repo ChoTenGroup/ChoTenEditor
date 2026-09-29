@@ -1,10 +1,12 @@
 const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
+const { pathToFileURL } = require('url');
 const fs = require('fs');
 const https = require('https');
 const http = require('http');
 const { StringDecoder } = require('string_decoder');
 const ceProject = require('./ce-project.js');
+const mcAssets = require('./mc-assets.js');
 const appVersion = require('./package.json').version;
 
 // fs IPC 路径校验: 防非字符串/超长路径进入 fs API
@@ -267,6 +269,57 @@ ipcMain.handle('ce:resolveProjectRoot', async (event, filePath) => {
   }
 });
 
+// ============ Minecraft 资源索引 (补全 / 预览 数据源) ============
+ipcMain.handle('mc:scanAssets', async (event, root) => {
+  try {
+    return await mcAssets.scanAssets(root);
+  } catch (error) {
+    return { ok: false, error: error.message };
+  }
+});
+
+ipcMain.handle('mc:scanNamespace', async (event, nsDir, namespace) => {
+  try {
+    return { ok: true, registry: await mcAssets.scanNamespace(nsDir, namespace || path.basename(nsDir)) };
+  } catch (error) {
+    return { ok: false, error: error.message };
+  }
+});
+
+ipcMain.handle('mc:readSoundEvents', async (event, nsDir, langName) => {
+  try {
+    return { ok: true, events: await mcAssets.readSoundEvents(nsDir, langName) };
+  } catch (error) {
+    return { ok: false, error: error.message };
+  }
+});
+
+// 二进制读取 (PNG/OGG 等) → data URL, 供预览渲染使用
+ipcMain.handle('mc:readBinary', async (event, filePath) => {
+  try {
+    return await mcAssets.readBinaryDataUrl(filePath);
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// 文本读取 (模型 JSON / 字体 JSON / 语言 JSON)
+ipcMain.handle('mc:readText', async (event, filePath) => {
+  try {
+    return await mcAssets.readTextFile(filePath);
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('mc:detectRoots', async () => {
+  try {
+    return { ok: true, roots: await mcAssets.detectRoots() };
+  } catch (error) {
+    return { ok: false, error: error.message };
+  }
+});
+
 // Window controls
 ipcMain.on('window:openDevTools', (event) => {
   const win = BrowserWindow.fromWebContents(event.sender);
@@ -298,6 +351,86 @@ ipcMain.on('window:close', (event) => {
 });
 ipcMain.handle('app:getVersion', () => appVersion);
 ipcMain.on('app:getVersionSync', (event) => { event.returnValue = appVersion; });
+
+// ---- Checks (Debug) 窗口: 展示整个工程的配置问题 ----
+let checksWindow = null;
+let checksPayload = null;
+
+function openChecksWindow() {
+  if (checksWindow && !checksWindow.isDestroyed()) {
+    if (checksWindow.isMinimized()) checksWindow.restore();
+    checksWindow.focus();
+    return checksWindow;
+  }
+  checksWindow = new BrowserWindow({
+    width: 1100,
+    height: 780,
+    minWidth: 720,
+    minHeight: 420,
+    title: 'Checks — ChoTenEditor',
+    icon: path.join(__dirname, 'icon.png'),
+    backgroundColor: '#000000',
+    show: false,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
+  });
+  try { checksWindow.setMenuBarVisibility(false); } catch (e) {}
+  // 用 file:// URL 显式加载: loadFile 的路径解析依赖应用根, 入口脚本不在根时会跑偏
+  const checksPage = pathToFileURL(path.join(__dirname, 'checks.html')).href;
+  checksWindow.webContents.on('did-fail-load', (e, code, desc, url, isMain) => {
+    console.error('[CHECKS] did-fail-load', code, desc, url, 'main=' + isMain);
+  });
+  checksWindow.loadURL(checksPage).catch((e) => {
+    console.error('[CHECKS] load failed:', e && e.message);
+  });
+  // 页面加载完成后补推一次最新数据: 扫描可能在窗口还没加载完时就结束了, 那次推送会丢
+  checksWindow.webContents.on('did-finish-load', () => {
+    if (checksPayload) sendToChecksWindow('checks:update', checksPayload);
+  });
+  checksWindow.once('ready-to-show', () => { if (checksWindow && !checksWindow.isDestroyed()) checksWindow.show(); });
+  checksWindow.on('closed', () => { checksWindow = null; });
+  return checksWindow;
+}
+
+function sendToChecksWindow(channel, payload) {
+  if (checksWindow && !checksWindow.isDestroyed()) {
+    try { checksWindow.webContents.send(channel, payload); } catch (e) {}
+  }
+}
+
+ipcMain.handle('checks:open', (event, payload) => {
+  checksPayload = payload || null;
+  openChecksWindow();
+  return { ok: true };
+});
+
+ipcMain.handle('checks:update', (event, payload) => {
+  checksPayload = payload || null;
+  sendToChecksWindow('checks:update', checksPayload);
+  return { ok: true };
+});
+
+// 窗口加载完成后主动拉取最新数据 (避免「开窗 → 扫描完成」之间的推送丢失)
+ipcMain.handle('checks:data', () => checksPayload);
+
+ipcMain.handle('checks:requestRescan', () => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    try { mainWindow.webContents.send('checks:rescan'); } catch (e) {}
+  }
+  return { ok: true };
+});
+
+ipcMain.handle('checks:gotoIssue', (event, issue) => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    try { mainWindow.webContents.send('checks:goto', issue || {}); } catch (e) {}
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.focus();
+  }
+  return { ok: true };
+});
 
 ipcMain.handle('window:isMaximized', (event) => {
   const win = BrowserWindow.fromWebContents(event.sender);

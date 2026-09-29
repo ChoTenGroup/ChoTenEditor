@@ -37,8 +37,43 @@ try {
       resolveProjectRoot: (filePath) => ipcRenderer.invoke('ce:resolveProjectRoot', filePath),
     },
 
+    // Minecraft 资源索引 (补全 / 预览)
+    mc: {
+      scanAssets: (root) => ipcRenderer.invoke('mc:scanAssets', root),
+      scanNamespace: (nsDir, namespace) => ipcRenderer.invoke('mc:scanNamespace', nsDir, namespace),
+      readSoundEvents: (nsDir, langName) => ipcRenderer.invoke('mc:readSoundEvents', nsDir, langName),
+      readBinary: (filePath) => ipcRenderer.invoke('mc:readBinary', filePath),
+      readText: (filePath) => ipcRenderer.invoke('mc:readText', filePath),
+      detectRoots: () => ipcRenderer.invoke('mc:detectRoots'),
+    },
+
     // 系统字体列表
     listFonts: () => ipcRenderer.invoke('fonts:list'),
+
+    // 配置检查 (Checks → Debug) 独立窗口
+    checks: {
+      open: (payload) => ipcRenderer.invoke('checks:open', payload),
+      update: (payload) => ipcRenderer.invoke('checks:update', payload),
+      getData: () => ipcRenderer.invoke('checks:data'),
+      requestRescan: () => ipcRenderer.invoke('checks:requestRescan'),
+      gotoIssue: (issue) => ipcRenderer.invoke('checks:gotoIssue', issue),
+      // 单订阅: 重复调用先移除旧 listener, 避免累积
+      onUpdate: (callback) => {
+        if (api.checks.__updateListener) ipcRenderer.removeListener('checks:update', api.checks.__updateListener);
+        api.checks.__updateListener = (event, payload) => callback(payload);
+        ipcRenderer.on('checks:update', api.checks.__updateListener);
+      },
+      onRescan: (callback) => {
+        if (api.checks.__rescanListener) ipcRenderer.removeListener('checks:rescan', api.checks.__rescanListener);
+        api.checks.__rescanListener = () => callback();
+        ipcRenderer.on('checks:rescan', api.checks.__rescanListener);
+      },
+      onGoto: (callback) => {
+        if (api.checks.__gotoListener) ipcRenderer.removeListener('checks:goto', api.checks.__gotoListener);
+        api.checks.__gotoListener = (event, issue) => callback(issue);
+        ipcRenderer.on('checks:goto', api.checks.__gotoListener);
+      },
+    },
   };
 
   // Window controls
