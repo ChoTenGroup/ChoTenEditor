@@ -348,6 +348,32 @@ function init() {
     }
   });
 
+  // 关闭窗口: 主进程拦下 close 后先问渲染进程, 这里跑未保存确认再放行。
+  // (否则 beforeunload 会静默吃掉关闭请求 → 标题栏/任务栏 ✕ 全部无反应)
+  if (_electronAPI.onBeforeClose) {
+    let closeConfirmPending = false;
+    _electronAPI.onBeforeClose(async function () {
+      if (closeConfirmPending) return; // 用户连点关闭: 只保留一个确认框
+      closeConfirmPending = true;
+      try {
+        if (window.__hasDirtyTabs && window.__showDirtyConfirm) {
+          const result = await window.__showDirtyConfirm('');
+          if (result === 'cancel') return; // 用户取消: 不关闭
+          if (result === 'save' && window.__saveAllDirtyFiles) {
+            await window.__saveAllDirtyFiles();
+          }
+        }
+      } catch (e) {
+        console.warn('[RENDERER] 关闭确认失败:', e);
+      } finally {
+        closeConfirmPending = false;
+      }
+      window.__allowUnload = true;
+      if (_electronAPI.confirmClose) _electronAPI.confirmClose();
+      else if (_electronAPI.close) _electronAPI.close();
+    });
+  }
+
 }
 
 // ============================================
@@ -1601,7 +1627,7 @@ async function showDirtyConfirmDialog(fileName) {
   return await new Promise(function (resolve) {
     var overlay = document.createElement('div');
     overlay.className = 'cv-modal';
-    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:100001;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;';
     overlay.innerHTML =
       '<div style="background:var(--color-bg-secondary);border:1px solid var(--color-border);border-radius:10px;padding:24px;max-width:400px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.5);">' +
         '<h3 style="margin:0 0 12px;font-size:15px;">' + I18N.t('tabs.unsaved') + '</h3>' +
@@ -1634,7 +1660,7 @@ async function showUnsyncedConfirmDialog(fileName) {
   return await new Promise(function (resolve) {
     var overlay = document.createElement('div');
     overlay.className = 'cv-modal';
-    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:100001;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;';
     overlay.innerHTML =
       '<div style="background:var(--color-bg-secondary);border:1px solid var(--color-border);border-radius:10px;padding:24px;max-width:420px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.5);">' +
         '<h3 style="margin:0 0 12px;font-size:15px;">' + I18N.t('tabs.unsynced') + '</h3>' +
@@ -1672,7 +1698,7 @@ async function showUnsupportedFormatDialog(ext) {
   return await new Promise(function (resolve) {
     var overlay = document.createElement('div');
     overlay.className = 'cv-modal';
-    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:100001;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;';
     overlay.innerHTML =
       '<div style="background:var(--color-bg-secondary);border:1px solid var(--color-border);border-radius:10px;padding:24px;max-width:420px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.5);">' +
         '<h3 style="margin:0 0 12px;font-size:15px;">' + I18N.t('unsupported.title') + '</h3>' +

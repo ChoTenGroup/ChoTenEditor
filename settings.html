@@ -844,11 +844,13 @@
       document.getElementById('tb-maximize').addEventListener('click', () => {
         if (window.electronAPI) window.electronAPI.maximize();
       });
-      document.getElementById('tb-close').addEventListener('click', () => {
+      document.getElementById('tb-close').addEventListener('click', async () => {
         if (window.self !== window.top) {
           // 嵌入模式: 通知父页面关闭设置弹窗, 而非关闭整个应用
           window.parent.postMessage({ type: 'closeSettings' }, '*');
         } else if (window.electronAPI) {
+          // 独立窗口: 先落盘再关窗 (不再依赖会被卸载打断的 beforeunload 保存)
+          try { await saveSettings(); } catch (e) {}
           window.electronAPI.close();
         }
       });

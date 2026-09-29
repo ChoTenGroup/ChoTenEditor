@@ -54,6 +54,12 @@ let hideVersionHintsEl;
 let mcAssetsBrowseBtn;
 let mcAssetsDetectBtn;
 let mcAssetsStatusEl;
+// 个性化: 复选框标记
+let checkboxMarkOnEl;
+let checkboxMarkOffEl;
+// 实验性功能开关
+let experimentalRemoteEl;
+let experimentalAiStudioEl;
 
 // 积木块显示
 let blockFontSize;
@@ -116,6 +122,8 @@ const defaultConfig = {
     syntaxOperator: '#d4d4d4',
     syntaxPunctuation: '#d4d4d4',
     syntaxProperty: '#9cdcfe',
+    checkboxOn: '#00c853',
+    checkboxOff: '#ff1744',
   },
   editor: {
     fontSize: '14',
@@ -170,6 +178,14 @@ const defaultConfig = {
   mcAssetsPath: '',            // 原版 Minecraft assets 目录
   hidePremiumHints: false,     // 隐藏付费版提示
   hideVersionHints: false,     // 隐藏版本限制提示
+  // ---- 个性化: 复选框标记 (renderer 以 body class cb-mark-on/off 应用) ----
+  checkboxMarkOn: true,        // 选中时显示 √ (缺省开启)
+  checkboxMarkOff: false,      // 未选中时显示 ✕
+  // ---- 实验性功能 ----
+  experimental: {
+    remote: false,             // 远程模式
+    aiStudio: false,           // AI Studio (AI 面板)
+  },
   ai: {
     endpoint: 'https://api.openai.com/v1/chat/completions',
     model: 'gpt-4o',
@@ -347,6 +363,8 @@ function initializeDOMElements() {
     'syntax-operator': document.getElementById('color-syntax-operator'),
     'syntax-punctuation': document.getElementById('color-syntax-punctuation'),
     'syntax-property': document.getElementById('color-syntax-property'),
+    checkboxOn: document.getElementById('color-checkbox-on'),
+    checkboxOff: document.getElementById('color-checkbox-off'),
   };
 
   // 预设按钮
@@ -428,6 +446,11 @@ function initializeDOMElements() {
   mcAssetsBrowseBtn = document.getElementById('mc-assets-browse');
   mcAssetsDetectBtn = document.getElementById('mc-assets-detect');
   mcAssetsStatusEl = document.getElementById('mc-assets-status');
+  // 个性化 / 实验性
+  checkboxMarkOnEl = document.getElementById('checkbox-mark-on');
+  checkboxMarkOffEl = document.getElementById('checkbox-mark-off');
+  experimentalRemoteEl = document.getElementById('experimental-remote');
+  experimentalAiStudioEl = document.getElementById('experimental-ai-studio');
   bindCEToolEvents();
 
   console.log('  - themeSelect:', !!themeSelect);
@@ -509,13 +532,15 @@ function setupEventListeners() {
 
   // 返回按钮
   if (backBtn) {
-    backBtn.addEventListener('click', () => {
+    backBtn.addEventListener('click', async () => {
       playSound('back');
       console.log('[SETTINGS] 返回到编辑器');
       if (IS_EMBEDDED) {
-        // 弹窗模式：通知父页面关闭弹窗
+        // 弹窗模式：通知父页面关闭弹窗 (父页面会要求保存)
         window.parent.postMessage({ type: 'closeSettings' }, '*');
       } else {
+        // 独立页面：先落盘再导航，避免依赖 beforeunload (异步保存可能在卸载前没跑完)
+        try { await saveSettings(); } catch (e) { console.warn('[SETTINGS] 返回前保存失败:', e); }
         window.location.href = 'index.html?fromSettings=1';
       }
     });
@@ -719,22 +744,26 @@ function setupEventListeners() {
 
   // 语言切换：只保存选择，重启后生效
   // （热切换会造成设置页以外的界面残留旧语言、缓存失效，且刷新 iframe 会丢弃未保存的其他设置）
+  // 下拉框始终回显"当前生效语言"，与界面保持一致；待重启的目标语言由提示条说明，
+  // 否则会出现"界面是英文、下拉框却显示简体中文"的错位。
   var langSelect = document.getElementById('language');
   if (langSelect) {
-    var savedLang = getFullConfig().language;
-    langSelect.value = (savedLang === 'en_us' || savedLang === 'zh_cn') ? savedLang : I18N.lang;
+    langSelect.value = I18N.lang;
     updateLanguageRestartHint();
     langSelect.addEventListener('change', function() {
       playSound('click');
       var next = this.value;
-      I18N.saveLang(next);
-      updateLanguageRestartHint();
+      this.value = I18N.lang; // 立即回显当前生效语言
       if (next === I18N.lang) {
-        // 选回了当前界面语言，等于取消之前的更改
+        // 选回当前界面语言 = 取消待重启的更改
+        I18N.saveLang(next);
+        updateLanguageRestartHint();
         showNotification(I18N.t('settings.languageReverted'), 'info');
         return;
       }
-      var msg = I18N.t('settings.languageRestartMessage');
+      I18N.saveLang(next);
+      updateLanguageRestartHint();
+      var msg = I18N.t('settings.languageRestartMessage', { lang: languageLabel(next) });
       if (window.UI && typeof UI.alert === 'function') {
         UI.alert({ title: I18N.t('settings.languageRestartTitle'), message: msg });
       } else {
@@ -759,6 +788,11 @@ function setupEventListeners() {
   console.log('[SETTINGS] 事件监听器设置完成?');
 }
 
+// 语言代码 → 选项显示名
+function languageLabel(code) {
+  return code === 'en_us' ? 'English' : '简体中文';
+}
+
 // 语言设置已保存但当前界面仍是旧语言（即等待重启）时，提示用户需要重启
 function updateLanguageRestartHint() {
   var hint = document.getElementById('language-restart-hint');
@@ -766,9 +800,26 @@ function updateLanguageRestartHint() {
   var saved = getFullConfig().language;
   var pending = (saved === 'en_us' || saved === 'zh_cn') && saved !== I18N.lang;
   var key = pending ? 'settings.languageRestartPending' : 'settings.languageRestartHint';
-  hint.setAttribute('data-i18n', key);
-  hint.textContent = I18N.t(key);
+  // 待重启文案带 {lang} 参数: 去掉 data-i18n, 否则后续 applyDOM() 会用无参版本覆盖成 "{lang}"
+  if (pending) hint.removeAttribute('data-i18n');
+  else hint.setAttribute('data-i18n', key);
   hint.classList.toggle('pending', pending);
+  hint.textContent = pending
+    ? I18N.t(key, { lang: languageLabel(saved) })
+    : I18N.t(key);
+  if (!pending) return;
+  // 下拉框已回显当前生效语言, 无法靠"再选一次"取消, 这里给一个显式取消入口
+  var cancel = document.createElement('a');
+  cancel.href = 'javascript:void(0)';
+  cancel.textContent = ' ' + I18N.t('settings.languageCancelPending');
+  cancel.style.cssText = 'margin-left:6px;color:var(--color-primary);text-decoration:underline;';
+  cancel.addEventListener('click', function (e) {
+    e.preventDefault();
+    I18N.saveLang(I18N.lang);
+    updateLanguageRestartHint();
+    showNotification(I18N.t('settings.languageReverted'), 'info');
+  });
+  hint.appendChild(cancel);
 }
 
 // ============================================
@@ -1077,7 +1128,8 @@ async function saveSettings() {
   var existing;
   try { existing = existingRaw ? JSON.parse(existingRaw) : {}; } catch(e) { existing = {}; }
 
-  const config = {
+  // 表单管理的字段（覆盖到现有配置之上；表单不含的字段一律保留）
+  const formConfig = {
     theme: themeSelect ? themeSelect.value : 'dark',
     uiFont: uiFont ? normalizeFontFamily(uiFont.value) : '',
     colors: {},
@@ -1098,6 +1150,14 @@ async function saveSettings() {
     mcAssetsPath: mcAssetsPathEl ? mcAssetsPathEl.value.trim() : defaultConfig.mcAssetsPath,
     hidePremiumHints: hidePremiumHintsEl ? hidePremiumHintsEl.checked : defaultConfig.hidePremiumHints,
     hideVersionHints: hideVersionHintsEl ? hideVersionHintsEl.checked : defaultConfig.hideVersionHints,
+    // 个性化: 复选框标记 (缺省 √ 开 / ✕ 关, 与 renderer 的 body class 判定一致)
+    checkboxMarkOn: checkboxMarkOnEl ? checkboxMarkOnEl.checked : defaultConfig.checkboxMarkOn,
+    checkboxMarkOff: checkboxMarkOffEl ? checkboxMarkOffEl.checked : defaultConfig.checkboxMarkOff,
+    // 实验性功能开关 (renderer._experimentalEnabled 读取 experimental.<key>)
+    experimental: {
+      remote: experimentalRemoteEl ? experimentalRemoteEl.checked : defaultConfig.experimental.remote,
+      aiStudio: experimentalAiStudioEl ? experimentalAiStudioEl.checked : defaultConfig.experimental.aiStudio,
+    },
     prewarm: {
       files: prewarmFiles ? prewarmFiles.checked : defaultConfig.prewarm.files,
       filesMaxMb: prewarmFilesMax ? (function(){ var v = parseInt(prewarmFilesMax.value); return isNaN(v) ? defaultConfig.prewarm.filesMaxMb : v; })() : defaultConfig.prewarm.filesMaxMb,
@@ -1116,6 +1176,12 @@ async function saveSettings() {
       format: shortcutInputs.format ? shortcutInputs.format.value : defaultConfig.shortcuts.format,
     },
   };
+
+  // 以现有配置为基底合并：保留其它模块写入、设置表单不管理的字段
+  // (sound / soundVolume / remoteServer / remoteClient / ai.customPrompts …),
+  // 否则保存设置会把它们整段抹掉，表现为"设置保存不了"。
+  const config = Object.assign({}, existing, formConfig);
+  config.experimental = Object.assign({}, existing.experimental || {}, formConfig.experimental);
 
   Object.entries(colorInputs).forEach(([key, input]) => {
     if (input) {
@@ -1137,8 +1203,8 @@ async function saveSettings() {
   }
   config.allowDifferentVersions = remoteAllowDifferentVersions ? remoteAllowDifferentVersions.checked : false;
 
-  // AI 设置
-  config.ai = {
+  // AI 设置（合并而非替换: 保留 customPrompts 等表单不管理的子键）
+  config.ai = Object.assign({}, existing.ai || {}, {
     endpoint: aiEndpoint ? aiEndpoint.value : defaultConfig.ai.endpoint,
     model: aiModel ? aiModel.value : defaultConfig.ai.model,
     customModel: aiCustomModel ? aiCustomModel.value : '',
@@ -1147,7 +1213,7 @@ async function saveSettings() {
     customPrompt: aiCustomPrompt ? aiCustomPrompt.value : '',
     maxTokens: aiMaxTokens ? (function(){ var v = parseInt(aiMaxTokens.value); return isNaN(v) ? 4096 : v; })() : 4096,
     temperature: aiTemperature ? (function(){ var t = parseFloat(aiTemperature.value); return isNaN(t) ? 0.7 : t; })() : 0.7,
-  };
+  });
 
   // 保留背景设置
   const currentBg = getBackgroundConfig();
@@ -1393,6 +1459,15 @@ function loadSettings() {
   if (hideVersionHintsEl) hideVersionHintsEl.checked = config.hideVersionHints === true;
   detectMinecraftAssets(true);
 
+  // 个性化: 复选框标记 (checkboxMarkOn 缺省为 true, 与 renderer 一致)
+  if (checkboxMarkOnEl) checkboxMarkOnEl.checked = config.checkboxMarkOn !== false;
+  if (checkboxMarkOffEl) checkboxMarkOffEl.checked = config.checkboxMarkOff === true;
+
+  // 实验性功能开关
+  var exp = config.experimental || defaultConfig.experimental;
+  if (experimentalRemoteEl) experimentalRemoteEl.checked = exp.remote === true;
+  if (experimentalAiStudioEl) experimentalAiStudioEl.checked = exp.aiStudio === true;
+
   // AI 设置
   var aiCfg = config.ai || defaultConfig.ai;
   if (aiEndpoint) aiEndpoint.value = aiCfg.endpoint || defaultConfig.ai.endpoint;
@@ -1634,12 +1709,14 @@ document.head.appendChild(style);
 // ============================================
 // 页面加载时同步设置
 
-window.addEventListener('beforeunload', async function(e) {
-  await saveSettings();
-  // 检查是否有未保存的更改（通过 localStorage 比较实现）
-  // 返回非 void 值触发浏览器确认对话框
-  e.preventDefault();
-  e.returnValue = '';
+// 页面卸载时不再拦截，也不在嵌入模式下自行保存：
+// 嵌入弹窗关闭由父页面发 saveSettings 驱动 (requestCloseSettingsModal)，
+// 之前在这里无条件 saveSettings() + preventDefault() 会导致 Ctrl+R / 关窗时
+// 莫名弹出"设置已保存"，甚至阻断卸载 (窗口关不掉)。
+window.addEventListener('beforeunload', function () {
+  if (IS_EMBEDDED) return;
+  // 独立设置窗口: 尽力落盘一次，但绝不阻塞卸载
+  try { saveSettings(); } catch (e) {}
 });
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -1647,6 +1724,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   await I18N.ready;
   loadSettings();
   I18N.applyDOM();
+  // applyDOM 会把语言提示条恢复成无参文案, 这里按当前待重启状态重刷一次
+  updateLanguageRestartHint();
 
   // 预览区：示例对话框
   var pvDemo = document.getElementById('pv-demo-dialog');

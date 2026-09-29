@@ -85,6 +85,15 @@ try {
   api.isMaximized = () => ipcRenderer.invoke('window:isMaximized');
   api.appVersion = ipcRenderer.sendSync('app:getVersionSync');
   api.openExternal = (url) => ipcRenderer.invoke('shell:openExternal', url);
+  // 关闭窗口: 主进程先问渲染进程 (未保存确认), 确认后调用 confirmClose。
+  // 只有注册过 onBeforeClose 的页面才会走这套流程 (未注册的窗口照常关闭, 不会被锁死)。
+  api.onBeforeClose = (callback) => {
+    if (api.__beforeCloseListener) ipcRenderer.removeListener('app:beforeClose', api.__beforeCloseListener);
+    api.__beforeCloseListener = function () { callback(); };
+    ipcRenderer.on('app:beforeClose', api.__beforeCloseListener);
+    ipcRenderer.send('app:closeHandlerReady');
+  };
+  api.confirmClose = () => ipcRenderer.send('app:closeConfirmed');
 
   // 远程模式
   api.remote = {

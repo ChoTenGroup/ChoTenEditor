@@ -17,7 +17,7 @@ function isValidFsPath(p) {
 let mainWindow;
 
 function createWindow() {
-  mainWindow = new BrowserWindow({
+  const win = new BrowserWindow({
     width: 1280,
     height: 860,
     frame: false,
@@ -30,13 +30,80 @@ function createWindow() {
       nodeIntegrationInSubFrames: true,
     },
   });
+  mainWindow = win;
 
-  mainWindow.loadFile('index.html');
+  win.loadFile('index.html');
 
-  mainWindow.on('closed', () => {
-    mainWindow = null;
+  // 关闭窗口统一交给渲染进程确认：渲染进程的 beforeunload 会静默取消关闭，
+  // 导致标题栏 ✕ / 任务栏 ✕ / Alt+F4 全都没反应 (只能任务管理器)。
+  // 只有渲染进程注册过 onBeforeClose (app:closeHandlerReady) 时才拦截，
+  // 否则照常关闭，避免页面没有确认逻辑时窗口被锁死。
+  win.on('close', (event) => {
+    if (win.__forceClose) return;
+    const wc = win.webContents;
+    if (!wc || wc.isDestroyed() || wc.isCrashed()) return; // 渲染进程已死: 直接放行
+    if (!win.__closeHandlerReady) return;                  // 该页面没有关闭确认逻辑: 直接放行
+    event.preventDefault();
+    try { wc.send('app:beforeClose'); } catch (e) {}
   });
+
+  // 渲染进程卡死时给出强制关闭出口 (否则用户只能结束进程)
+  // 用异步对话框: showMessageBoxSync 会阻塞主进程事件循环, 反而让窗口更关不掉
+  win.on('unresponsive', () => {
+    if (win.isDestroyed() || win.__forceClose || win.__unresponsivePrompt) return;
+    win.__unresponsivePrompt = true;
+    dialog.showMessageBox(win, {
+      type: 'warning',
+      title: 'ChoTenEditor',
+      message: '编辑器界面无响应\nEditor window is not responding',
+      detail: '可以继续等待它恢复；强制关闭会丢弃未保存的更改。\nYou can keep waiting, or force close and lose unsaved changes.',
+      buttons: ['继续等待 / Wait', '强制关闭 / Force close'],
+      defaultId: 0,
+      cancelId: 0,
+      noLink: true,
+    }).then((res) => {
+      if (win.isDestroyed()) return;
+      win.__unresponsivePrompt = false;
+      if (res && res.response === 1) {
+        win.__forceClose = true;
+        win.destroy();
+      }
+    }).catch(() => {
+      if (!win.isDestroyed()) win.__unresponsivePrompt = false;
+    });
+  });
+
+  // 渲染进程崩溃后窗口已无内容可保存, 不再拦截关闭
+  win.webContents.on('render-process-gone', () => {
+    win.__forceClose = true;
+  });
+
+  win.on('closed', () => {
+    if (mainWindow === win) mainWindow = null;
+  });
+
+  return win;
 }
+
+// 供冒烟测试复用真实窗口逻辑 (非入口脚本 require 本文件时)
+module.exports = {
+  createWindow: createWindow,
+  getMainWindow: () => mainWindow,
+};
+
+// 渲染进程已注册关闭确认流程 (只有这类窗口才拦截关闭)
+ipcMain.on('app:closeHandlerReady', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  if (win) win.__closeHandlerReady = true;
+});
+
+// 渲染进程处理完未保存确认后, 允许真正关闭
+ipcMain.on('app:closeConfirmed', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  if (!win) return;
+  win.__forceClose = true;
+  win.close();
+});
 
 function startApp() {
   app.whenReady().then(() => {

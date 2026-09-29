@@ -699,15 +699,9 @@
 
   document.getElementById('tb-minimize').addEventListener('click', function() { if (window.electronAPI) window.electronAPI.minimize(); });
   document.getElementById('tb-maximize').addEventListener('click', function() { if (window.electronAPI) window.electronAPI.maximize(); });
-  document.getElementById('tb-close').addEventListener('click', async function() {
-    if (window.__hasDirtyTabs && window.__showDirtyConfirm) {
-      var result = await window.__showDirtyConfirm('');
-      if (result === 'cancel') return;
-      if (result === 'save' && window.__saveAllDirtyFiles) {
-        await window.__saveAllDirtyFiles();
-      }
-    }
-    window.__allowUnload = true;
+  document.getElementById('tb-close').addEventListener('click', function() {
+    // 关闭统一走主进程 → app:beforeClose → 渲染进程未保存确认 → confirmClose
+    // (以前在这里自己弹确认框，任务栏 ✕/Alt+F4 却绕过它被静默拦截)
     if (window.electronAPI) window.electronAPI.close();
   });
 
