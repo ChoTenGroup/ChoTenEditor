@@ -748,12 +748,12 @@ function setupEventListeners() {
   // 否则会出现"界面是英文、下拉框却显示简体中文"的错位。
   var langSelect = document.getElementById('language');
   if (langSelect) {
-    langSelect.value = I18N.lang;
+    setSelectValue(langSelect, I18N.lang);
     updateLanguageRestartHint();
     langSelect.addEventListener('change', function() {
       playSound('click');
       var next = this.value;
-      this.value = I18N.lang; // 立即回显当前生效语言
+      setSelectValue(langSelect, I18N.lang); // 立即回显当前生效语言
       if (next === I18N.lang) {
         // 选回当前界面语言 = 取消待重启的更改
         I18N.saveLang(next);
@@ -788,9 +788,21 @@ function setupEventListeners() {
   console.log('[SETTINGS] 事件监听器设置完成?');
 }
 
-// 语言代码 → 选项显示名
+// 语言代码 → 显示名 (按当前界面语言表述, 避免英文界面里冒出"简体中文"这种混排)
 function languageLabel(code) {
-  return code === 'en_us' ? 'English' : '简体中文';
+  var isEn = code === 'en_us';
+  if (I18N.lang === 'en_us') return isEn ? 'English' : 'Chinese (Simplified)';
+  return isEn ? '英语 (English)' : '简体中文';
+}
+
+// 给原生 select 赋值后同步 ce-select 自研控件的显示
+// (原生元素被隐藏替换, 不到达原型钩子时这里兜底)
+function setSelectValue(sel, value) {
+  if (!sel) return;
+  sel.value = value;
+  if (window.CESelect && typeof window.CESelect.sync === 'function') {
+    window.CESelect.sync(sel);
+  }
 }
 
 // 语言设置已保存但当前界面仍是旧语言（即等待重启）时，提示用户需要重启

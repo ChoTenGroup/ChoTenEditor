@@ -30,6 +30,34 @@
 
   /* ─────────────── 下拉选择组件 ─────────────── */
 
+  // 外部用 JS 直接赋值 (el.value = x / el.selectedIndex = n) 时, 原生 select
+  // 既不派发 change 也不改属性, 上面的 MutationObserver 收不到,
+  // 自研控件的显示就会停在旧值 (设置页 loadSettings 回填、语言回显都会踩到)。
+  // 这里给原型 setter 挂一个同步钩子, 补齐 "外部读写与原来完全一致" 的兼容承诺。
+  function patchNativeSetters() {
+    var proto = window.HTMLSelectElement && window.HTMLSelectElement.prototype;
+    if (!proto || proto.__ceSetterPatched) return;
+    ['value', 'selectedIndex'].forEach(function (prop) {
+      var desc = Object.getOwnPropertyDescriptor(proto, prop);
+      if (!desc || typeof desc.get !== 'function' || typeof desc.set !== 'function') return;
+      Object.defineProperty(proto, prop, {
+        configurable: true,
+        enumerable: desc.enumerable,
+        get: function () { return desc.get.call(this); },
+        set: function (v) {
+          desc.set.call(this, v);
+          if (this.__ceSyncValue) this.__ceSyncValue();
+        },
+      });
+    });
+    proto.__ceSetterPatched = true;
+  }
+
+  // 主动同步某个被升级过的 select 的显示 (被替换掉原生元素后仍可调用)
+  function syncSelect(sel) {
+    if (sel && typeof sel.__ceSyncValue === 'function') sel.__ceSyncValue();
+  }
+
   function buildSelect(sel) {
     if (!sel || sel.dataset.ceBuilt) return;
     sel.dataset.ceBuilt = '1';
@@ -38,6 +66,12 @@
     wrap.className = 'ce-select';
     if (sel.id) wrap.dataset.ceFor = sel.id;
     var wrapper = sel.closest('.select-wrapper');
+    // 原生 select 已被自研控件取代: 隐藏配套的 ▼ 图标,
+    // 否则它会脱离文档流浮在控件上方/与控件自带箭头重叠
+    if (wrapper) {
+      var legacyIcon = wrapper.querySelector('.select-icon');
+      if (legacyIcon) legacyIcon.style.display = 'none';
+    }
     // 不在 .select-wrapper 内 = 编辑器/紧凑场景
     if (!wrapper) {
       wrap.classList.add('ce-select-sm');
@@ -193,6 +227,8 @@
     var observer = new MutationObserver(function () { updateValue(); });
     observer.observe(sel, { childList: true, attributes: true, subtree: true });
     sel.__ceObserver = observer;
+    // 供原型 setter 钩子 / CESelect.sync() 调用
+    sel.__ceSyncValue = updateValue;
 
     updateValue();
   }
@@ -350,6 +386,7 @@
   }
 
   function init() {
+    patchNativeSetters();
     document.querySelectorAll('select').forEach(buildSelect);
     document.querySelectorAll('input[data-font-combo]').forEach(buildFontCombo);
     startObserver();
@@ -373,5 +410,7 @@
     init: init,
     buildSelect: buildSelect,
     buildFontCombo: buildFontCombo,
+    sync: syncSelect,
+    patchNativeSetters: patchNativeSetters,
   };
 })();
