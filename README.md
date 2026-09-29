@@ -203,6 +203,9 @@ possible) and the editor indexes it once (about 30 ms for version `26.3`) to pow
 
 ### Development scripts
 
+The `_ce_*.js` scripts below are local regression / probe tooling: they live in the working copy only
+and are ignored by git (see `.gitignore`). The `scripts\*.js` helpers are committed.
+
 | script | what it does |
 |---|---|
 | `node _ce_tools_test.js` (also `_ce_preview_test.js`, `_ce_font_test.js`, `_ce_formtest.js`) | headless regression tests for the tooling, preview renderer, MC font metrics and entry forms. `_ce_font_test.js` also builds a two-pack fixture project (both packs define `assets/minecraft`) and asserts multi-root resource resolution, `height`-driven font image sizing and per-cell sprite selection |

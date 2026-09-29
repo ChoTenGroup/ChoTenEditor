@@ -5,10 +5,12 @@ electron.exe
 
 # Claude Code worktree artifacts
 .claude/worktrees/
+.claude
 
 # Local scratch / debug artifacts
 _ce_tmp/
 _ce_shots/
 debug_*.js
-_ce_v*_smoke.js
-.claude
+
+# Local regression / probe tooling: kept in the working copy, never committed
+_ce_*.js
