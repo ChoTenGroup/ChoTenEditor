@@ -8,6 +8,11 @@ titlebar:
   maximize: "Maximize"
   close: "Close"
 
+windowManager:
+  maxRestore: "Maximize / Restore"
+  close: "Close"
+  resize: "Drag to resize"
+
 common:
   openProject: "📁 Open Project"
   newFile: "📄 New File"
@@ -384,6 +389,8 @@ settings:
   fontComboHint: "Auto-detects installed system fonts, completes as you type"
   sectionLanguage: "🌐 Language"
   language: "Language"
+  languageModalTitle: "Select Language"
+  languagePickerOpen: "Click to choose a language"
   languageRestartHint: "Changing the language takes effect after restarting the app."
   languageRestartPending: "⚠ {lang} selected — restart the app to apply it."
   languageRestartTitle: "Restart required"
@@ -2137,4 +2144,18 @@ preview:
   glyphInline: "inline with text"
   glyphRepeat: "repeated"
   glyphColored: "recoloured"
+  sceneItemModel: "Model"
+  sceneInventory: "Inventory GUI"
+  modelContext: "display context"
+  furnEdit: "Edit"
+  furnEditHint: "Drag hitboxes / seats / element anchors right in the preview (changes write back)"
+  furnPitchUp: "Raise view (pitch +15°)"
+  furnPitchDown: "Lower view (pitch -15°)"
+  furnPitchHint: "30° = isometric, 90° = top-down"
+  invSlotLabel: "Slot"
+  invSlotHotbar: "Hotbar"
+  invSlotMain: "Inventory"
+  invSlotCraft: "Craft"
+  invSlotArmor: "Armor"
+  invSlotResult: "Result"
 

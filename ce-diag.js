@@ -169,8 +169,7 @@
   function labelOf(l) {
     if (l == null) return '';
     if (typeof l === 'string') return l;
-    var lang = (root.I18N && root.I18N.lang) || 'zh_cn';
-    return lang === 'en_us' ? (l.en || l.zh || '') : (l.zh || l.en || '');
+    return (root.I18N && root.I18N.pick) ? root.I18N.pick(l) : (l.zh || l.en || '');
   }
   function isPlainObject(v) { return v !== null && typeof v === 'object' && !Array.isArray(v); }
   function isVersionKey(k) { return /^\$\$[^$]+$/.test(String(k)); }

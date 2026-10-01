@@ -1033,3 +1033,190 @@ body[data-theme="light"] .preview-text p.secondary {
 }
 .path-input-row .input-full { flex: 1 1 auto; min-width: 0; }
 .path-input-row .btn { flex: 0 0 auto; white-space: nowrap; }
+
+/* ============================ 设置页: 语言选择（旗帜弹窗） ============================ */
+
+/* 当前语言按钮（替代原 select） */
+.lang-picker-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 180px;
+  padding: 8px 12px;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.lang-picker-btn:hover {
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 6%, var(--color-bg-tertiary));
+}
+.lang-picker-flags {
+  display: inline-flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.lang-picker-flags img {
+  width: 26px;
+  height: 17px;
+  object-fit: cover;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px rgba(128, 128, 128, 0.35);
+}
+.lang-picker-label { flex: 1 1 auto; }
+.lang-picker-caret {
+  font-size: 10px;
+  color: var(--color-text-tertiary);
+  flex-shrink: 0;
+}
+
+/* 弹窗遮罩 + 容器 */
+.lang-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  animation: stFadeIn 0.15s ease;
+}
+.lang-modal-overlay[hidden] { display: none; }
+
+.lang-modal {
+  width: min(440px, 92vw);
+  max-height: min(600px, 88vh);
+  overflow-y: auto;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  padding: 16px;
+  animation: stPopIn 0.18s ease;
+}
+
+.lang-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.lang-modal-header h3 {
+  margin: 0;
+  font-size: 15px;
+  color: var(--color-text-primary);
+}
+.lang-modal-close {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  line-height: 1;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.lang-modal-close:hover {
+  background: var(--color-bg-hover, var(--color-bg-tertiary));
+  color: var(--color-text-primary);
+}
+
+/* 语言选项行 */
+.lang-modal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.lang-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.lang-option:hover {
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 6%, var(--color-bg-tertiary));
+}
+.lang-option.active {
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 12%, var(--color-bg-tertiary));
+}
+.lang-option.pending {
+  border-style: dashed;
+  border-color: var(--color-warning);
+}
+.lang-option-flags {
+  display: inline-flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.lang-option-flags img {
+  width: 30px;
+  height: 20px;
+  object-fit: cover;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px rgba(128, 128, 128, 0.35);
+}
+.lang-option-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.lang-option-name {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lang-option-alt {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--color-text-tertiary);
+  margin-left: 4px;
+}
+.lang-option-region {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lang-option-check {
+  flex-shrink: 0;
+  color: var(--color-primary);
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.lang-option.active .lang-option-check { opacity: 1; }
+.lang-option.pending .lang-option-check {
+  opacity: 1;
+  color: var(--color-warning);
+}
+
+.lang-modal-footer {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  line-height: 1.5;
+}

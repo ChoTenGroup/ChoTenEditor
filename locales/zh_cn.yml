@@ -8,6 +8,11 @@ titlebar:
   maximize: "最大化"
   close: "关闭"
 
+windowManager:
+  maxRestore: "最大化 / 还原"
+  close: "关闭"
+  resize: "拖动改大小"
+
 common:
   openProject: "📁 打开项目"
   newFile: "📄 新文件"
@@ -384,6 +389,8 @@ settings:
   fontComboHint: "自动检测系统已安装字体，输入时补全"
   sectionLanguage: "🌐 语言"
   language: "语言"
+  languageModalTitle: "选择语言"
+  languagePickerOpen: "点击选择语言"
   languageRestartHint: "更改语言后需要重启软件才能生效。"
   languageRestartPending: "⚠ 已选择 {lang}，重启软件后生效。"
   languageRestartTitle: "需要重启软件"
@@ -1385,3 +1392,17 @@ preview:
   glyphInline: "和文字排在一行"
   glyphRepeat: "连续多次"
   glyphColored: "换颜色"
+  sceneItemModel: "模型"
+  sceneInventory: "背包 GUI"
+  modelContext: "display 上下文"
+  furnEdit: "编辑"
+  furnEditHint: "在预览里直接拖动碰撞箱 / 座位 / 元素锚点 (改动写回编辑器)"
+  furnPitchUp: "抬高视角 (俯仰 +15°)"
+  furnPitchDown: "压低视角 (俯仰 -15°)"
+  furnPitchHint: "30° = 等轴测, 90° = 正俯视"
+  invSlotLabel: "槽位"
+  invSlotHotbar: "快捷栏"
+  invSlotMain: "背包"
+  invSlotCraft: "合成"
+  invSlotArmor: "装备"
+  invSlotResult: "产物"

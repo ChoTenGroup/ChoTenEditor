@@ -1,0 +1,2163 @@
+# ChoTenEditor Español (España)
+app:
+  title: "CHOTEN EDITOR"
+  loading: "Cargando..."
+
+titlebar:
+  minimize: "Minimizar"
+  maximize: "Maximizar"
+  close: "Cerrar"
+
+windowManager:
+  maxRestore: "Maximizar / Restaurar"
+  close: "Cerrar"
+  resize: "Arrastra para cambiar el tamaño"
+
+common:
+  openProject: "📁 Abrir proyecto"
+  newFile: "📄 Nuevo archivo"
+  save: "💾 Guardar"
+  settings: "⚙️ Ajustes"
+  remote: "🌐 Remoto"
+  ai: "✨ IA"
+  ok: "Aceptar"
+  cancel: "Cancelar"
+  delete: "Eliminar"
+  reload: "Recargar"
+  back: "Atrás"
+  close: "Cerrar"
+  approve: "Aprobar"
+  reject: "Rechazar"
+
+minimessage:
+  title: "Editor de MiniMessage"
+  editBtn: "Editor de MiniMessage"
+  preview: "Vista previa"
+  previewEmpty: "(Vista previa vacía)"
+  parseError: "Error de análisis"
+  restrictedTip: "Etiqueta restringida; puede que no funcione en todos los sitios"
+  useColor: "Usar color"
+  previewBg: "Alternar fondo negro/blanco"
+  detailTitle: "Añadir detalle"
+  detailContent: "Contenido del texto"
+  detailType: "Tipo"
+  detailAdd: "Añadir"
+  detailFont: "Fuente"
+  detailNamespace: "Namespace (opcional)"
+  detailColor: "Color (p. ej. #ff0000 o red)"
+  detailGradientA: "Color de degradado 1"
+  detailGradientB: "Color de degradado 2"
+  detailUrl: "URL"
+  detailCommand: "Comando"
+  detailHoverText: "Texto al pasar el cursor"
+  editBtnTip: "Clic izquierdo: añadir detalle · Clic derecho: añadir rápido"
+  tooltipWrap: "Añadir al texto seleccionado"
+  tooltipInsert: "Insertar en el cursor"
+  tag_bold: "Negrita"
+  tag_italic: "Cursiva"
+  tag_underline: "Subrayado"
+  tag_strikethrough: "Tachado"
+  tag_obfuscated: "Ofuscado"
+  tag_reset: "Restablecer formato"
+  tag_newline: "Salto de línea"
+  tag_rainbow: "Arcoíris"
+  tag_gradient: "Degradado"
+  tag_color: "Color"
+  tag_font: "Fuente"
+  tag_open_url: "Clic para abrir URL"
+  tag_run_command: "Clic para ejecutar comando"
+  tag_suggest_command: "Clic para sugerir comando"
+  tag_hover_text: "Texto al pasar el cursor"
+  phFont: "Nombre de la fuente (p. ej. unifont)"
+  phNamespace: "Namespace (p. ej. minecraft)"
+  phColor: "#ff0000 o red"
+  phGradientA: "Color inicial del degradado (p. ej. #ff0000)"
+  phGradientB: "Color final del degradado (p. ej. #ffff00)"
+  phUrl: "https://..."
+  phCommand: "/comando"
+  phHoverText: "Texto al pasar el cursor"
+  color_black: "Negro"
+  color_dark_blue: "Azul oscuro"
+  color_dark_green: "Verde oscuro"
+  color_dark_aqua: "Cian oscuro"
+  color_dark_red: "Rojo oscuro"
+  color_dark_purple: "Morado oscuro"
+  color_gold: "Dorado"
+  color_gray: "Gris"
+  color_dark_gray: "Gris oscuro"
+  color_blue: "Azul"
+  color_green: "Verde"
+  color_aqua: "Cian"
+  color_red: "Rojo"
+  color_light_purple: "Morado claro"
+  color_yellow: "Amarillo"
+  color_white: "Blanco"
+
+ui:
+  ok: "Aceptar"
+  cancel: "Cancelar"
+  confirmTitle: "Confirmar"
+  alertTitle: "Aviso"
+  promptTitle: "Introduce un valor"
+
+sidebar:
+  files: "Archivos del proyecto"
+  previousFile: "Archivo anterior"
+  tabLocal: "Local"
+  tabRemote: "Remoto"
+  loading: "Cargando..."
+  emptyDir: "Vacío"
+  navBack: "Atrás (a la ubicación abierta anteriormente)"
+  navForward: "Adelante"
+  navPrev: "Archivo anterior"
+  navNext: "Archivo siguiente"
+
+menu:
+  file: "Archivo"
+  edit: "Editar"
+  debug: "Depuración"
+  settings: "Ajustes"
+  help: "Ayuda"
+  newFile: "📄 Nuevo archivo"
+  openFile: "📂 Abrir archivo…"
+  openProject: "📁 Abrir proyecto…"
+  recent: "🕘 Reciente"
+  save: "💾 Guardar"
+  closeTab: "Cerrar pestaña"
+  closeAllTabs: "Cerrar todas las pestañas"
+  undo: "Deshacer"
+  redo: "Rehacer"
+  cut: "Cortar"
+  copy: "Copiar"
+  paste: "Pegar"
+  selectAll: "Seleccionar todo"
+  noDebug: "No hay funciones de depuración disponibles"
+  checks: "Comprobaciones"
+  checksDebug: "🐞 Depuración · Todos los problemas de configuración…"
+  settingsItem: "⚙️ Ajustes…"
+  remote: "🌐 Modo remoto…"
+  ai: "✨ AI Studio…"
+  about: "ℹ️ Acerca de ChoTenEditor"
+  recentProjects: "Proyectos recientes"
+  recentFiles: "Archivos recientes"
+  clearRecent: "🗑 Borrar historial"
+  empty: "No hay elementos"
+  allFiles: "Todos los archivos"
+  experimentalRemoteWarning: "El modo remoto es una función extremadamente inestable y sin probar, solo para depuración, ¡y puede suponer un gran riesgo para tus archivos! Para activarlo, actívalo en la sección Experimental de los ajustes. ¡Ya estás advertido!"
+  experimentalAIStudioWarning: "AI Studio es una función extremadamente inestable y sin probar, solo para depuración, ¡y puede suponer un gran riesgo para tus archivos! Para activarlo, actívalo en la sección Experimental de los ajustes. ¡Ya estás advertido!"
+
+editor:
+  sourceMode: "Fuente"
+  visualMode: "Visual"
+  typeAuto: "Detección automática"
+  typeConversation: "Conversación"
+  typeQuest: "Misión"
+  typeCraftEngine: "CraftEngine"
+  visualEmptyTitle: "Edición visual"
+  visualEmptyHint: "Abre un archivo .yml / .yaml para cambiar a la edición visual"
+
+status:
+  ready: "Listo"
+  projectOpened: "Proyecto abierto: {name}"
+  projectTypesConversationQuest: " [Conversación + Misión]"
+  projectTypesConversation: " [Conversación]"
+  projectTypesQuest: " [Misión]"
+  directory: "Directorio: {path}"
+  file: "Archivo: {name}"
+  fileType: "Archivo: {name} [{type}]"
+  interpreterTypeAuto: "Tipo de intérprete: detección automática"
+  interpreterType: "Tipo de intérprete: {type}"
+  noFileOpen: "No hay ningún archivo abierto"
+  visualMode: "Modo del editor visual"
+  sourceMode: "Modo del editor de código fuente"
+  fileModified: "Archivo modificado"
+  fileSaved: "Archivo guardado: {path}"
+  fileCreated: "Archivo creado: {path}"
+  typeOverrideCleared: "Anulación de tipo eliminada"
+  typeOverrideSet: "Tipo de intérprete establecido: {type} (Ámbito: {scope})"
+  ceOwner: " · Proyecto CE: {root} · Pack: {pack}"
+
+typeScope:
+  file: "Archivo"
+  directory: "Directorio"
+  project: "Proyecto"
+
+welcome:
+  title: "¡Bienvenido a ChoTenEditor!"
+  version: "Versión actual: {version}"
+  descPre: "Este editor es un editor de configuración de plugins de Minecraft de propósito general, compatible con "
+  descPost: " misiones y conversaciones, edición básica de CraftEngine (objetos/bloques/mobiliario...) y scripts de Kether."
+  channelsTitle: "Para cualquier duda o comentario, contacta a través de:"
+  channelQq: "📢 Grupo de QQ:"
+  channelDiscord: "🌐 Discord:"
+  channelQqAddPre: "💬 Añade en QQ "
+  channelQqAddPost: " e indica el motivo"
+  settingsHint: "También puedes encontrar los canales de contacto en los ajustes."
+  noTip: "No volver a mostrar"
+  dismissHint: "Tras marcar \"No volver a mostrar\", este diálogo solo volverá a aparecer al actualizar la versión."
+
+remote:
+  title: "🌐 Modo remoto"
+  asServer: "Como servidor"
+  asClient: "Conectar a remoto"
+  serverHost: "Dirección del servidor"
+  port: "Puerto"
+  password: "Contraseña de conexión"
+  setPasswordPlaceholder: "Establece la contraseña de conexión"
+  ipPlaceholder: "Dirección IP"
+  serverPasswordPlaceholder: "Contraseña establecida en el servidor"
+  startServer: "Iniciar servidor"
+  stopServer: "Detener servidor"
+  connect: "Conectar"
+  disconnect: "Desconectar"
+  disconnectAll: "Desconectar todos"
+  clients: "Clientes conectados"
+  securityCode: "Código de seguridad"
+  securityHint: "Comparte este código de seguridad con el administrador del servidor para confirmar la conexión"
+  confirmTitle: "🔌 Nueva solicitud de conexión"
+  clientIp: "IP del cliente:"
+  securityCodeLabel: "Código de seguridad:"
+  confirmWarningPre: "⚠️ Asegúrate de que el código de seguridad proporcionado coincida con el de arriba; de lo contrario, la conexión podría fallar. Confirmar sin comprobar puede provocar fugas o pérdidas de datos, "
+  confirmWarningStrong: "comprueba el código de seguridad detenidamente"
+  confirmWarningPost: ". El software no se hace responsable de ninguna pérdida que esto provoque."
+  confirmAccept: "Aceptar conexión"
+  fileChangeTitle: "📝 Solicitud de cambio de archivo"
+  client: "Cliente:"
+  filePath: "Ruta del archivo:"
+  fileDeleteTitle: "🗑️ Solicitud de eliminación de archivo"
+  approveDelete: "Aprobar eliminación"
+  invalidMessageFormat: "Formato de mensaje no válido"
+  wrongPassword: "Contraseña incorrecta"
+  versionMismatch: "La versión del cliente ({client}) no coincide con la del servidor ({server}). Activa \"Permitir versiones distintas\" en los ajustes"
+  authenticateFirst: "Autentícate primero"
+  connectionRejectedByAdmin: "El administrador rechazó la solicitud de conexión"
+  disconnectedByAdmin: "El administrador cerró la conexión"
+  unknownMessageType: "Tipo de mensaje desconocido: {type}"
+  noReadPermission: "Sin permiso para leer este archivo"
+  noEditPermission: "Sin permiso para editar este archivo"
+  guestNoEditPermission: "Modo invitado: sin permiso de edición"
+  noPathSpecified: "No se ha especificado ninguna ruta"
+  noDeletePermission: "Sin permiso para eliminar este archivo"
+  guestNoDeletePermission: "Modo invitado: sin permiso de eliminación"
+  deleteRejectedByAdmin: "El administrador rechazó la solicitud de eliminación"
+  authTimeout: "Tiempo de espera de autenticación agotado"
+  authRejected: "Autenticación rechazada"
+  changeRejectedByAdmin: "El administrador rechazó el cambio"
+
+dialog:
+  apiInitFailed: "Error al inicializar la API"
+  apiInitFailedMsg: "La API de Electron no se ha inicializado correctamente. Consulta la consola para ver los errores."
+  apiError: "Error de API"
+  deleteFailed: "Error al eliminar"
+  openProjectFailed: "Error al abrir el proyecto"
+  loadDirFailed: "Error al leer el directorio"
+  loadDirError: "Error al cargar el directorio"
+  openFileFailed: "Error al abrir el archivo"
+  readFailed: "Error al leer"
+  error: "Error"
+  createFileFailed: "Error al crear el archivo"
+  invalidFileName: "El nombre del archivo no puede contener separadores de ruta ni rutas relativas"
+  saveFileFailed: "Error al guardar el archivo"
+
+error:
+  openDirectoryApi: "API openDirectory no disponible"
+  readdirApi: "API readdir no disponible"
+  readFileApi: "API readFile no disponible"
+  remoteApiUnavailable: "API remota no disponible"
+  cannotReadFile: "No se puede leer el archivo"
+  cannotReadRemote: "No se puede leer el archivo del servidor remoto"
+  codemirrorMissing: "codeMirrorEditor no existe"
+  unknown: "Error desconocido"
+
+tabs:
+  unsaved: "Cambios sin guardar"
+  unsavedMsg: "El archivo <strong>{name}</strong> tiene cambios sin guardar.<br>¿Guardar?"
+  unsavedMsgNoName: "¿Guardar?"
+  unsynced: "Cambios sin sincronizar"
+  unsyncedMsg: "El archivo <strong>{name}</strong> tiene ediciones visuales aún sin sincronizar con el código fuente.<br>Sincroniza antes de cambiar para conservarlas."
+  unsyncedMsgNoName: "Las ediciones visuales aún no se han sincronizado con el código fuente.<br>Sincroniza antes de cambiar para conservarlas."
+  syncAndContinue: "Sincronizar y continuar"
+  save: "Guardar"
+  discard: "No guardar"
+  cancel: "Cancelar"
+
+unsupported:
+  title: "Formato no compatible"
+  msg: "El formato {ext} no es compatible. ¿Cargar de todos modos?"
+  forceLoad: "Cargar de todos modos"
+
+confirm:
+  deleteFile: "¿Eliminar \"{name}\"?"
+
+prompt:
+  newFileName: "Introduce un nombre de archivo (p. ej. config.yml):"
+
+alert:
+  openProjectFirst: "Abre primero un proyecto"
+  noFileOpen: "No hay ningún archivo abierto"
+
+tab:
+  unsavedTitle: "{name} (sin guardar)"
+
+tabMenu:
+  closeCurrent: "Cerrar la actual"
+  closeSaved: "Cerrar las guardadas"
+  closeLeft: "Cerrar las de la izquierda"
+  closeRight: "Cerrar las de la derecha"
+  closeAll: "Cerrar todas"
+
+breadcrumb:
+  root: "Raíz"
+
+visual:
+  onlyYaml: "La edición visual solo admite archivos .yml / .yaml."
+  interpreterMissing: "Intérprete sin cargar"
+  interpreterMissingMsg: "El módulo ChemdahInterpreter no se ha cargado correctamente. Consulta la consola para ver los errores."
+  renderFailed: "Error de renderizado visual"
+  editInSource: "Edita en modo fuente."
+
+rm:
+  apiError: "Error: API remota no disponible"
+  errorPrefix: "Error: {msg}"
+  startingServer: "Iniciando servidor..."
+  serverStarted: "Servidor iniciado en el puerto {port}"
+  startFailed: "Error al iniciar: {msg}"
+  serverStopped: "Servidor detenido"
+  connecting: "Conectando..."
+  sendCodeToAdmin: "Conectado. Comparte el código de seguridad con el administrador"
+  connected: "✅ Conectado al servidor"
+  connectFailed: "Error de conexión: {msg}"
+  disconnected: "Desconectado"
+  newClient: "Nuevo cliente conectado: {ip}"
+  requestingDelete: "Solicitando eliminación del archivo..."
+  loadingRemoteDir: "Cargando directorio remoto..."
+  readingRemoteFile: "Leyendo archivo remoto..."
+  savingRemoteFile: "Guardando archivo remoto..."
+  fileUpdated: "Archivo actualizado: {path}"
+  fileDeleted: "Archivo eliminado: {path}"
+  fileSavedOk: "Archivo guardado: {path}"
+  fileSaveFailed: "Error al guardar el archivo: {msg}"
+  saveTimeout: "El servidor no confirmó el guardado en 10 segundos; inténtalo de nuevo"
+  waitingApproveWrite: "Esperando la aprobación del administrador para el cambio del archivo..."
+  fileReadOk: "Archivo remoto leído"
+  fileReadFailed: "Error al leer el archivo remoto: {msg}"
+  listLoaded: "Lista de archivos remotos cargada"
+  listLoadFailed: "Error al cargar la lista de archivos remotos: {msg}"
+  deleteFailed: "Error al eliminar: {msg}"
+  waitingApproveDelete: "Esperando la aprobación del administrador para la eliminación..."
+  serverClosed: "Servidor cerrado"
+  permUpdated: "Permiso actualizado: {level}"
+  securityCode: "Código de seguridad: {code}"
+  disconnect: "Desconectar"
+
+perm:
+  guest: "Invitado"
+  confirm: "Pedir confirmación"
+  full: "Control total"
+
+settings:
+  cePreview: "Activar vista previa de escenas de MC"
+  cePreviewHint: "Muestra un botón de vista previa en la parte superior de los formularios de objetos / bloques / muebles / imágenes de fuente, renderizando imágenes de fuente y etiquetas de texto dentro de escenas simuladas del juego (chat, lore de objetos, GUI de 9x1~9x6)"
+  ceDiagnostics: "Activar inspección de configuraciones"
+  ceDiagnosticsHint: "Comprueba las configuraciones de CraftEngine como un IDE y reporta claves desconocidas, errores de tipo, enumeraciones ilegales y referencias fuera de rango como ERROR / WARN / WEAK_WARN / INFO"
+  mcAssetsPath: "Directorio de assets de Minecraft"
+  mcAssetsPathPlaceholder: "E:/MC/Windose/.minecraft/versions/26.3/26.3/assets"
+  mcAssetsPathHint: "La carpeta de assets vanilla (la que contiene la subcarpeta minecraft). Se usa para completar IDs vanilla de objetos/bloques/texturas/modelos/sonidos/partículas/encantamientos y para renderizar vistas previas con fuentes y texturas de GUI vanilla reales."
+  browse: "Examinar…"
+  detect: "Detectar automáticamente"
+  mcAssetsSet: "Directorio de assets de Minecraft establecido"
+  mcAssetsBrowseFailed: "Error al elegir el directorio"
+  mcAssetsUnavailable: "Esta versión no admite la indexación de assets"
+  mcAssetsNotFound: "No se encontró ningún directorio de assets de Minecraft — introdúcelo manualmente"
+  mcAssetsScanning: "Indexando assets…"
+  mcAssetsInvalid: "Directorio de assets no válido: {err}"
+  mcAssetsStatus: "Espacios de nombres indexados {ns}: objetos {items} · texturas {tex} · modelos {models}"
+  title: "Ajustes"
+  titlePage: "⚙️ Ajustes"
+  backToEditor: "Volver al editor"
+  tabGeneral: "General"
+  tabAppearance: "Apariencia"
+  tabEditor: "Editor"
+  tabAI: "AI Studio"
+  tabRemote: "Remoto"
+  tabShortcuts: "Atajos"
+  tabExperimental: "Experimental"
+  aboutAuthor: "🎨 Sobre el autor"
+  ceSearch: "Buscar…"
+  ceNoMatch: "Sin coincidencias"
+  fontSearchPlaceholder: "Escribe o busca una fuente…"
+  fontComboHint: "Detecta automáticamente las fuentes instaladas del sistema y completa mientras escribes"
+  sectionLanguage: "🌐 Idioma"
+  language: "Idioma"
+  languageModalTitle: "Seleccionar idioma"
+  languagePickerOpen: "Haz clic para elegir un idioma"
+  languageRestartHint: "El cambio de idioma surte efecto tras reiniciar la aplicación."
+  languageRestartPending: "⚠ {lang} seleccionado — reinicia la aplicación para aplicarlo."
+  languageRestartTitle: "Reinicio necesario"
+  languageRestartMessage: "Idioma guardado como {lang}. Reinicia Choten Editor para ver la nueva interfaz."
+  languageCancelPending: "Cancelar cambio"
+  languageReverted: "Se ha vuelto al idioma de interfaz actual."
+  sectionItemKeyStyle: "📦 Estilo de claves de objetos"
+  itemKeyStyle: "Estilo de clave raíz de los objetos"
+  itemKeyStyleSnake: "Nuevo (guión bajo) - custom_model_data"
+  itemKeyStyleKebab: "Antiguo (guión) - custom-model-data"
+  itemKeyStyleHint: "Estilo de clave para los nuevos objetos; los archivos existentes siguen automáticamente su propio estilo."
+  sectionTheme: "🎨 Tema"
+  themeSelect: "Seleccionar tema"
+  themeDark: "Oscuro"
+  themeLight: "Claro"
+  themeAuto: "Automático"
+  sectionBackground: "🖼️ Imagen de fondo"
+  sectionFonts: "🔤 Fuentes"
+  uiFont: "Fuente de la interfaz"
+  editorFontFamily: "Fuente del editor"
+  fontSystemDefault: "Predeterminada del sistema"
+  editorFontDefault: "Predeterminada (Fira Code)"
+  bgDisclaimer: "Las imágenes de fondo provienen de la web y son solo para vista previa. Contáctanos para eliminarlas si infringen derechos."
+  bgSelect: "Seleccionar fondo"
+  bgNoneThumb: "Ninguno"
+  bgNoneName: "Sin fondo"
+  bgOpacity: "Opacidad del fondo"
+  bgUpload: "📤 Subir fondo"
+  sectionColors: "🎭 Colores personalizados"
+  colorGroupMain: "Colores principales"
+  colorPrimary: "Principal"
+  colorSuccess: "Éxito"
+  colorWarning: "Advertencia"
+  colorError: "Error"
+  colorGroupBg: "Colores de fondo"
+  colorBgPrimary: "Fondo principal"
+  colorBgSecondary: "Fondo secundario"
+  colorGroupText: "Colores de texto"
+  colorTextPrimary: "Texto principal"
+  colorTextSecondary: "Texto secundario"
+  sectionCheckbox: "☑️ Ajustes de casillas"
+  checkboxColorTitle: "Colores de las casillas (siguen el tema por defecto)"
+  checkboxColorOff: "Color sin marcar"
+  checkboxColorOn: "Color marcado"
+  checkboxMarkOn: "Mostrar marca ✓ al marcar"
+  checkboxMarkOff: "Mostrar marca ✕ al desmarcar"
+  hidePremiumHints: "Ocultar avisos de funciones premium"
+  hideVersionHints: "Ocultar avisos de requisitos de versión"
+  sectionSyntax: "📝 Colores de resaltado de sintaxis"
+  syntaxGroup: "Colores de tokens de sintaxis"
+  syntaxKeyword: "Palabra clave"
+  syntaxString: "Cadena"
+  syntaxNumber: "Número"
+  syntaxComment: "Comentario"
+  syntaxFunction: "Función"
+  syntaxOperator: "Operador"
+  syntaxPunctuation: "Puntuación"
+  syntaxProperty: "Nombre de propiedad"
+  sectionCategories: "🎯 Colores de categorías"
+  categoriesGroup: "Colores de categorías de bloques Kether"
+  sectionPresets: "🎪 Temas predefinidos"
+  presetDarkDefault: "Clásico oscuro"
+  presetLightClean: "Fresco claro"
+  sectionEditor: "📝 Ajustes del editor"
+  editorFontSize: "Tamaño de fuente (px)"
+  editorTabSize: "Tamaño de tabulación"
+  tabSize2: "2 espacios"
+  tabSize4: "4 espacios"
+  tabSize8: "8 espacios"
+  editorLineNumbers: "Mostrar números de línea"
+  show: "Mostrar"
+  hide: "Ocultar"
+  editorLineWrapping: "Ajuste de línea"
+  enable: "Activar"
+  disable: "Desactivar"
+  editorTheme: "Tema del editor"
+  themeDefault: "Predeterminado"
+  editorAutoSync: "Sincronizar cambios automáticamente"
+  off: "Desactivado"
+  on: "Activado"
+  autoSyncHint: "Si se activa, el contenido del editor se guarda automáticamente tras cada modificación"
+  editorDevtools: "Abrir las DevTools (F12) al iniciar"
+  prewarmTitle: "Precalentado al inicio"
+  prewarmFiles: "Precalentar los últimos archivos de proyecto abiertos"
+  prewarmMax: "Máx."
+  prewarmHint: "Al iniciar, carga los últimos archivos abiertos en la caché de memoria para cambiar de pestaña al instante"
+  prewarmKether: "Precalentar las acciones de Kether"
+  prewarmKetherHint: "Carga las definiciones de acciones de Kether al iniciar para que el editor de bloques se abra al instante"
+  elementPickerTitle: "Precarga de elementos CE"
+  elementPicker: "Precargar los elementos CE detectados"
+  elementPickerHint: "Al abrir un archivo de CraftEngine, escanea automáticamente la carpeta de configuración del proyecto (objetos/bloques/muebles/categorías/plantillas) y muestra un botón de autorrelleno junto a los campos coincidentes"
+  aiTitle: "Generación con IA"
+  aiEndpoint: "Endpoint de la API"
+  aiEndpointHint: "Endpoint de API compatible con el formato de OpenAI"
+  aiModel: "Modelo"
+  aiModelCustom: "Personalizado"
+  aiCustomModel: "Nombre de modelo personalizado"
+  aiCustomModelPlaceholder: "Introduce el nombre del modelo"
+  aiApiKey: "Clave de API"
+  aiNewKeyPlaceholder: "Introduce una nueva clave"
+  aiAddKey: "Añadir"
+  aiSystemPrompt: "Prompt del sistema"
+  aiPromptDefault: "Predeterminado"
+  aiPromptCustom: "Personalizado"
+  aiCustomPrompt: "Contenido del prompt personalizado"
+  aiCustomPromptPlaceholder: "Introduce un prompt de sistema personalizado..."
+  aiSavePrompt: "Guardar como prompt personalizado"
+  aiManagePrompts: "Gestionar prompts"
+  aiNewPromptNamePlaceholder: "Nombre del nuevo prompt"
+  aiNewPromptDescPlaceholder: "Descripción"
+  aiMaxTokens: "Tokens de salida máximos"
+  aiTemperature: "Temperatura"
+  remoteTitle: "Modo remoto"
+  remotePassword: "Contraseña de conexión remota"
+  remotePasswordPlaceholder: "Establece la contraseña de conexión remota"
+  remotePasswordHint: "Contraseña predeterminada al iniciar el servidor en modo remoto"
+  remoteAllowDifferentVersions: "Permitir que se conecten clientes de otras versiones"
+  remoteAllowDifferentVersionsHint: "Si se desactiva, solo los clientes con la misma versión podrán conectarse al servidor"
+  sectionExperimental: "🧪 Funciones experimentales"
+  experimentalWarning: "⚠️ Las funciones experimentales son solo para desarrolladores. Son extremadamente inestables, no están probadas y son solo para depuración, ¡y pueden suponer un gran riesgo para tus archivos! ¡Has sido advertido!"
+  experimentalRemote: "Activar el modo remoto"
+  experimentalRemoteHint: "Si se activa, accede desde la barra de menús → Ajustes → Modo remoto…"
+  experimentalAIStudio: "Activar AI Studio"
+  experimentalAIStudioHint: "Si se activa, accede desde la barra de menús → Ajustes → AI Studio…"
+  blockTitle: "Visualización de bloques"
+  blockFontSize: "Tamaño de fuente de los bloques (px)"
+  sectionShortcuts: "⌨️ Atajos de teclado"
+  shortcutSave: "Guardar archivo"
+  shortcutNewFile: "Nuevo archivo"
+  shortcutOpenProject: "Abrir proyecto"
+  shortcutToggleMode: "Cambiar modo de edición"
+  resetShortcuts: "Restablecer atajos"
+  editShortcuts: "Editar atajos"
+  editShortcutDone: "Hecho"
+  shortcutHint: "Pulsa la nueva combinación de teclas (Esc para cancelar)"
+  shortcutConflict: "En conflicto con \"{{name}}\""
+  sectionFeedback: "💬 Canales de comentarios"
+  feedbackIntro: "Si tienes dudas o sugerencias, contacta a través de:"
+  feedbackQqGroup: "📢 Grupo de QQ: "
+  feedbackQq: "💬 QQ: "
+  feedbackJoinQq: "Unirse al grupo"
+  feedbackJoinDiscord: "Unirse a Discord"
+  feedbackAddFriend: "Añadir amigo"
+  sectionSave: "💾 Guardar y restablecer"
+  saveSettings: "✓ Guardar ajustes"
+  resetSettings: "↻ Restablecer valores"
+  exportSettings: "⬇ Exportar ajustes"
+  importSettings: "⬆ Importar ajustes"
+  sectionPreview: "👁️ Vista previa de componentes"
+  previewPrimary: "Botón principal"
+  previewSecondary: "Botón secundario"
+  previewDanger: "Botón de peligro"
+  previewAccent: "Botón de acento"
+  previewCheckbox: "Casilla"
+  previewInputPlaceholder: "Ejemplo de entrada…"
+  previewSelect1: "Opción 1"
+  previewSelect2: "Opción 2"
+  previewSelect3: "Opción 3"
+  previewMainText: "Así se ve el texto principal"
+  previewSecondaryText: "Así se ve el texto secundario"
+  previewDemoDialog: "📦 Mostrar diálogo de ejemplo"
+  previewDialogTitle: "Diálogo de ejemplo"
+  previewDialogBody: "Este diálogo lo dibuja la propia aplicación, siguiendo el tema y los colores personalizados en tiempo real."
+  previewDialogInput: "Escribe algo para probar el campo de entrada:"
+  previewDialogResult: "Has introducido: {value}"
+  loading: "Cargando..."
+  noPrompts: "Aún no hay prompts"
+  aiNoKeys: "Aún no se han añadido claves"
+  badgeBuiltIn: "Integrado"
+  badgeUser: "Usuario"
+  badgeOverridden: "(Sustituido)"
+  badgeLocal: "Local"
+  promptNameRequired: "Introduce un nombre para el prompt"
+  promptContentRequired: "Introduce el contenido del prompt"
+  promptSaved: "Prompt guardado"
+  promptSaveFailed: "Error al guardar: {msg}"
+  promptSavedLocal: "Prompt guardado (local)"
+  promptDeleted: "Prompt eliminado"
+  promptDeleteFailed: "Error al eliminar: {msg}"
+  deletePromptConfirm: "¿Eliminar el prompt \"{name}\"?"
+  promptInfoCustom: "Usa el contenido del campo personalizado de abajo como prompt del sistema"
+  promptInfoBuiltin: "Prompt integrado"
+  promptInfoUser: "Prompt personalizado del usuario"
+  promptInfoOverridden: " (sustituido por la versión del usuario)"
+  promptInfoLocal: "Prompt personalizado local"
+  promptNameUser: "{name} (Usuario)"
+  promptNameLocal: "{name} (Local)"
+  keyRequired: "Introduce una clave"
+  keyExists: "La clave ya existe"
+  keyAdded: "Clave añadida"
+  keyDeleted: "Clave eliminada"
+  bgUploadSuccess: "Fondo subido"
+  bgUploadFailed: "Error al subir: {msg}"
+  bgUploadError: "Error al subir el fondo"
+  saved: "Ajustes guardados"
+  resetConfirm: "¿Restablecer los ajustes predeterminados?"
+  resetDone: "Ajustes restablecidos"
+  exportDone: "Ajustes exportados"
+  invalidConfig: "Archivo de configuración no válido"
+  importDone: "Ajustes importados"
+  importFailed: "Error al importar: {msg}"
+  imageFilter: "Archivos de imagen"
+  remotePasswordSet: "Contraseña establecida"
+
+ai:
+  title: "Generación con IA"
+  followSettings: "Usar los ajustes"
+  customModel: "Modelo personalizado"
+  settings: "Ajustes"
+  clearChat: "Limpiar chat"
+  currentFile: "Archivo actual: {name}"
+  noContextFile: "Sin archivo de contexto"
+  inputPlaceholder: "Escribe tu solicitud... (Enter para enviar, Shift+Enter para nueva línea)"
+  send: "Enviar"
+  stop: "Detener"
+  needApiKey: "Configura antes una clave de API en Ajustes."
+  thinking: "Pensando..."
+  error: "Error"
+  regenerate: "Regenerar"
+  requestFailed: "Error en la solicitud: {msg}"
+  apiError: "Error de API {status}: {body}"
+  apiUnavailable: "Función de IA no disponible (electronAPI no cargada)"
+  stopped: "Detenido"
+  pendingOps: "Operaciones de archivo pendientes ({count})"
+  opCreate: "Crear"
+  opEdit: "Editar"
+  opDelete: "Eliminar"
+  view: "Ver"
+  accept: "✓ Aplicar"
+  reject: "✕ Rechazar"
+  original: "Contenido original"
+  updated: "Actualizado"
+  willDelete: "Este archivo se eliminará"
+  opFailedNoApi: "❌ Error en la operación de archivo: electronAPI no disponible"
+  openFileFirst: "⚠️ Abre primero un archivo para determinar el directorio del proyecto"
+  created: "✅ Creado: {path}"
+  edited: "✅ Editado: {path}"
+  deleted: "✅ Eliminado: {path}"
+  createFailed: "❌ Error al crear: {msg}"
+  editFailed: "❌ Error al editar: {msg}"
+  editOriginalNotFound: "⚠️ No se encontró el contenido original en {path}, edición cancelada"
+  deleteFailed: "❌ Error al eliminar: {msg}"
+  emptyHint: "💡 Describe lo que necesitas y la IA te ayudará a escribir y modificar código"
+  clearConfirm: "¿Borrar todo el historial del chat?"
+  cleared: "Chat borrado"
+
+kether:
+  builtinText: "Valor de texto"
+  builtinList: "Lista"
+  builtinBrace: "Grupo de bloques"
+  slotHelp: "Haz clic o arrastra aquí para añadir una acción<br>CTRL+clic: añadir texto rápidamente<br>SHIFT+clic: añadir grupo de acciones rápidamente<br>CTRL+SHIFT+clic: añadir lista rápidamente"
+  back: "← Volver"
+  title: "Editor de bloques Kether"
+  actionCount: "{count} acciones"
+  blocks: "🧊 Bloques"
+  code: "📝 Código"
+  confirm: "✓ Confirmar"
+  undo: "Deshacer (Ctrl+Z)"
+  redo: "Rehacer (Ctrl+Shift+Z)"
+  autoSync: "Sincronizar bloques con el código Kether automáticamente"
+  minimize: "Minimizar"
+  maximize: "Maximizar"
+  close: "Cerrar"
+  searchActions: "Buscar acciones..."
+  workspaceInfo: "Entradas ({entries}) · Bloques ({blocks})"
+  blockColor: "Color del bloque"
+  provider: "Proveedor"
+  category: "Categoría"
+  displayName: "Nombre visible"
+  nameCnEn: "Chino + inglés"
+  nameCn: "Solo chino"
+  nameEn: "Solo inglés"
+  quoteBtn: "Botón de comillas"
+  semanticDisplay: "Visualización semántica"
+  on: "Activado"
+  off: "Desactivado"
+  addBlock: "+ Añadir bloque"
+  newEntry: "📥 Nueva entrada"
+  newDef: "📦 Nueva definición"
+  clear: "🗑 Vaciar"
+  codePreview: "▶ Vista previa del código"
+  codePreviewOpen: "▼ Vista previa del código"
+  empty: "(vacío)"
+  stash: "Almacén"
+  stashArea: "📦 Almacén"
+  stashDrop: "Arrastra bloques aquí para almacenarlos"
+  saved: "💾 Guardado"
+  common: "Frecuentes"
+  custom: "Personalizado"
+  catCommon: "⭐ Frecuentes"
+  catAll: "Todos"
+  deleteCommonConfirm: "¿Eliminar el bloque frecuente \"{name}\"?"
+  noCommonBlocks: "Aún no hay bloques frecuentes<br><small>Haz clic derecho en un bloque para añadirlo como frecuente</small>"
+  cancel: "Cancelar"
+  insert: "Insertar"
+  copyBlock: "📋 Copiar bloque"
+  viewDetail: "📖 Ver descripción"
+  addFavorite: "⭐ Añadir como bloque frecuente"
+  noMatchActions: "No hay acciones coincidentes"
+  customSymbol: "✎ Personalizado"
+  customSymbolPlaceholder: "Símbolo personalizado"
+  itemEdit: "Editor visual de objetos"
+  posEdit: "Editor visual de posiciones"
+  emptyState: "Haz clic en <strong>+ Añadir bloque</strong> para empezar"
+  emptyStateHint: "o cambia al modo código para escribir directamente"
+  then: "Entonces"
+  else: "Si no"
+  addCondition: "+ Añadir condición"
+  deleteBranch: "Eliminar esta rama"
+  addWhenBranch: "+ Añadir rama when"
+  customBlock: "⧉ Personalizado"
+  ketherCode: "Código Kether..."
+  removeQuote: "Clic para quitar las comillas"
+  addQuote: "Clic para añadir comillas"
+  textValue: "Valor de texto..."
+  unquoted: "# Sin comillas"
+  value: "Valor..."
+  list: "[ ] Lista"
+  actionGroup: "{ } Grupo de acciones"
+  entry: "Entrada"
+  normal: "Normal"
+  entrySlotHint: "+ Arrastra o haz clic para añadir bloques"
+  blockDetail: "Detalles del bloque"
+  fieldName: "Nombre"
+  fieldProvider: "Proveedor"
+  fieldType: "Tipo"
+  private: "Privado"
+  public: "Público"
+  fieldCategory: "Categoría"
+  fieldSyntax: "Sintaxis"
+  fieldExample: "Ejemplo"
+  fieldSemantic: "Semántica"
+  fieldDescription: "Descripción"
+  selectAction: "Seleccionar acción"
+  search: "Buscar..."
+  noMatch: "Sin coincidencias"
+  ctxDetail: "📋 Ver descripción"
+  ctxCopy: "📋 Copiar"
+  ctxPaste: "📄 Pegar"
+  ctxSave: "💾 Guardar sentencia"
+  ctxDelete: "🗑 Eliminar"
+  saveStmtPrompt: "Nombre de la sentencia a guardar:"
+  saveStmtDefault: "Bloque"
+  codeTitle: "Código Kether"
+  parseToBlocks: "🔄 Convertir en bloques"
+
+chemdah:
+  noDialogues: "No hay entradas de diálogo"
+  dialoguesHeader: "Entradas de diálogo"
+  addDialogue: "+ Añadir diálogo"
+  cardView: "📋 Vista de tarjetas"
+  mindmapView: "🌐 Mapa mental"
+  syncToSource: "Sincronizar con el código"
+  autoSync: "Sincronización automática"
+  syncHint: "Los cambios se aplicarán al editor tras pulsar \"Sincronizar con el código\""
+  dialogueNav: "Navegación de diálogos"
+  fileOptions: "Opciones de archivo"
+  theme: "Tema"
+  customTheme: "Personalizado..."
+  customThemePlaceholder: "Introduce el nombre del tema personalizado"
+  title: "Título"
+  optionalTitle: "Título opcional"
+  flags: "Etiquetas (Flags)"
+  addFlag: "+ Añadir etiqueta"
+  custom: "Personalizado..."
+  switch: "SWITCH"
+  dialogue: "Diálogo"
+  noCondition: "Sin condición"
+  optionCount: "{count} opciones"
+  deleteDialogue: "Eliminar este diálogo"
+  dialogueIdPrefix: "ID del diálogo: {id}"
+  npcId: "ID del NPC"
+  npcIdPlaceholder: "p. ej. adyeshach BoFeng"
+  whenBranches: "Ramas condicionales (When)"
+  addBranch: "+ Añadir rama"
+  noWhenBranches: "No hay ramas condicionales (se usará el salto predeterminado)"
+  npcText: "Texto del diálogo del NPC"
+  npcTextPlaceholder: "Contenido del diálogo del NPC..."
+  format: "Formato"
+  tags: "Etiquetas"
+  ifCondition: "Si (if)"
+  conditionPlaceholder: "Expresión de condición o true"
+  openJump: "Salto (open)"
+  targetDialoguePlaceholder: "Nombre del diálogo de destino"
+  deleteBranch: "Eliminar rama"
+  playerOptions: "Opciones del jugador"
+  addOption: "+ Añadir opción"
+  noOptions: "No hay opciones del jugador"
+  condition: "Condición"
+  optionTextPlaceholder: "Texto de la opción"
+  thenScript: "Ejecutar script (KETHER)"
+  ketherScriptPlaceholder: "Contenido del script KETHER..."
+  deleteOption: "Eliminar opción"
+  newDialoguePrefix: "Nuevo diálogo_{count}"
+  newQuestPrefix: "Nueva misión_{count}"
+  defaultReply: "De acuerdo"
+  customTagPrompt: "Introduce el nombre de la etiqueta personalizada:"
+  syncedToSource: "Sincronizado del editor visual al código"
+  empty: "(vacío)"
+  entryNode: "Nodo de entrada"
+  orphanNode: "Nodo huérfano"
+  nodeCount: "{count} nodos"
+  edgeCount: "{count} conexiones"
+  entryCount: "{count} entradas"
+  mindmapHint: "🔄 Rueda para zoom · Arrastra para desplazar · Clic en un nodo para saltar · Doble clic para restablecer"
+  emptyObject: "Objeto vacío"
+  yamlError: "Error de análisis de YAML"
+  yamlErrorHint: "Corrige el error de sintaxis en el modo código fuente e inténtalo de nuevo."
+  questList: "Lista de misiones"
+  addQuest: "+ Añadir misión"
+  noQuests: "No hay datos de misiones"
+  questNav: "Navegación de misiones"
+  subtaskCount: "{count} subtareas"
+  deleteQuest: "Eliminar esta misión"
+  basicInfo: "Información básica"
+  questId: "ID de la misión"
+  questIdPlaceholder: "ID único de la misión"
+  displayName: "Nombre visible"
+  questNamePlaceholder: "Nombre visible de la misión"
+  type: "Tipo"
+  description: "Descripción"
+  questDescPlaceholder: "Descripción de la misión..."
+  depend: "Misiones previas (depend)"
+  dependPlaceholder: "IDs de misiones separados por comas"
+  statsVisible: "Progreso de Stats visible"
+  show: "Mostrar"
+  hide: "Ocultar"
+  optional: "Entrada opcional"
+  yes: "Sí"
+  no: "No"
+  subtasks: "Subtareas"
+  noSubtasks: "No hay subtareas"
+  agentScripts: "Scripts del ciclo de vida de la misión (Agent)"
+  addHook: "+ Añadir hook"
+  noHooks: "No hay hooks de Agent configurados"
+  ketherScript: "Script KETHER..."
+  deleteHook: "Eliminar este hook"
+  addons: "Addons"
+  noAddons: "No hay componentes Addon configurados"
+  search: "Buscar..."
+  addSelected: "Añadir seleccionados"
+  select: "Seleccionar"
+  addSelectedCount: "Añadir seleccionados ({count})"
+  cancel: "Cancelar"
+  itemEditor: "Editor visual de objetos"
+  namespaceNotice: "⚠ Este espacio de nombres depende de addons; puede que algunos servidores no lo admitan"
+  namespace: "Espacio de nombres"
+  itemId: "ID del objeto"
+  itemIdPlaceholder: "p. ej. diamond, diamond_sword o *"
+  wildcard: "Comodín"
+  display: "Visualización"
+  nameField: "Nombre (name)"
+  exact: "= (Exacto)"
+  notEqual: "!= (Distinto)"
+  ignoreColor: "# (Ignorar color)"
+  contains: "( ) (Contiene)"
+  namePlaceholder: "Texto del nombre"
+  lore: "Lore (una por línea)"
+  attributes: "Atributos"
+  amountPlaceholder: "Cantidad"
+  damagePlaceholder: "Valor de durabilidad/daño"
+  valuePlaceholder: "Valor"
+  enchants: "Encantamientos"
+  add: "+ Añadir"
+  noEnchants: "No se han añadido encantamientos"
+  nbt: "NBT"
+  noNbt: "No se ha añadido NBT"
+  preview: "Vista previa"
+  confirm: "Confirmar"
+  enchantIdPlaceholder: "ID del encantamiento (p. ej. damage_all)"
+  level: "Nivel"
+  nbtPathPlaceholder: "Ruta NBT (p. ej. craftengine:id)"
+  value: "Valor"
+  minecraftVanilla: "minecraft (vanilla)"
+  nativeSupport: "Soporte nativo"
+  addonSupport: "Soporte por addon (muestra un aviso al usarlo)"
+  taskManager: "Gestor de subtareas — {name}"
+  totalSubtasks: "{count} subtareas en total"
+  subtaskTab: "Subtarea {index}"
+  subtaskPrefix: "Subtarea {count}"
+  addSubtask: "+ Añadir subtarea"
+  addSubtaskHint: "Pulsa el botón \"Añadir subtarea\" de la izquierda para añadir"
+  close: "Cerrar"
+  selectObjectiveType: "Selecciona el tipo de objetivo de la subtarea"
+  selectTaskObjectiveType: "Selecciona el tipo de objetivo"
+  searchObjectivePlaceholder: "Buscar tipos de objetivo..."
+  noSubtaskSelected: "No hay ninguna subtarea seleccionada"
+  selectType: "Selecciona el tipo..."
+  delete: "Eliminar"
+  subtaskId: "ID de la subtarea"
+  name: "Nombre"
+  objectiveType: "Tipo de objetivo"
+  customObjectivePlaceholder: "Tipo de objetivo personalizado"
+  objectiveCondition: "Condición"
+  position: "Posición"
+  posEdit: "Editor visual de posiciones"
+  itemEdit: "Editor visual de objetos"
+  ketherScriptField: "Script KETHER ($)"
+  goal: "Objetivo (goal)"
+  amountField: "Cantidad (amount)"
+  subtaskAgentScripts: "Scripts Agent de la subtarea"
+  addonManager: "Gestor de addons — {name}"
+  totalAddons: "{count} addons en total"
+  addAddon: "+ Añadir addon"
+  addAddonHint: "Pulsa el botón \"Añadir addon\" de la izquierda para añadir"
+  noAddonComponents: "No hay addons"
+  selectAddon: "Seleccionar addon"
+  searchAddonPlaceholder: "Buscar nombres de addons..."
+  customKeyValues: "Pares clave-valor personalizados"
+  enabled: "Activado"
+  deleteItem: "Eliminar este elemento"
+  addNode: "+ Añadir nodo"
+  noConfigurableFields: "Este addon no tiene campos configurables"
+  selectAgentHook: "Seleccionar hook de Agent"
+  searchHookPlaceholder: "Buscar nombres de hooks..."
+  customScopePrompt: "Introduce el ámbito personalizado:"
+  customScopeLabel: "@ Personalizado"
+  selectScopeForHook: "Selecciona el ámbito para {hook}"
+  searchScopePlaceholder: "Buscar ámbitos..."
+  customHookPrompt: "Introduce nombre del hook + ámbito (p. ej. completed @ all):"
+  scopeGroup: "Ámbito"
+  posEditor: "Editor de expresiones de posición"
+  world: "Mundo"
+  required: "Obligatorio"
+  xyz: "Posición X Y Z"
+  mode: "Modo"
+  exactPos: "Posición exacta"
+  radiusPos: "Dentro del rango (~ radio)"
+  areaPos: "Dentro de la región (> posición)"
+  multiPos: "Varias posiciones (&)"
+  radius: "Radio"
+  radiusPlaceholder: "p. ej. 10"
+  areaTo: "Región hasta X Y Z"
+  toX: "Hasta X"
+  toY: "Hasta Y"
+  toZ: "Hasta Z"
+  multiCoords: "Varias posiciones"
+  addCoord: "+ Añadir posición"
+  ok: "Aceptar"
+  worldRequired: "Introduce un nombre de mundo"
+  selectTypeTitle: "Selecciona el tipo de intérprete de Chemdah"
+  typeUnknownMsg: "No se pudo detectar automáticamente el tipo de archivo{detected}. Selecciona manualmente el tipo de intérprete:"
+  detectedAs: " (detectado como {type})"
+  interpreterType: "Tipo de intérprete"
+  typeConversation: "Conversación"
+  typeQuest: "Misión"
+  scopeLabel: "Ámbito"
+  scopeFile: "Solo este archivo"
+  scopeDirectory: "Todos los archivos de la carpeta actual"
+  scopeProject: "Todo el proyecto"
+  typeUnknown: "Desconocido"
+  typeConversationFull: "Archivo de conversación"
+  typeQuestFull: "Archivo de misiones"
+  unknownTypeTitle: "Tipo de archivo no reconocido"
+  unknownTypeMsg: "Este archivo no es ni de conversación ni de misiones."
+  unknownTypeHint: "Edítalo en el modo código fuente, o"
+  manualSelect: "selecciona el tipo manualmente"
+  rendering: "Renderizando..."
+  visualEditTitle: "Edición visual"
+  visualEditHint: "Selecciona un tipo de intérprete e inténtalo de nuevo, o edita en el modo código fuente."
+
+craftengine:
+  premiumHint: "Esta función es exclusiva de la versión premium del plugin CraftEngine: si usas la edición community, esta configuración puede no tener efecto."
+  versionHint: "Esta función tiene un requisito de versión: {versions}"
+  hintDetail: "Detalles de la nota"
+  hintModeEditor: "Vista de editor"
+  hintModeWiki: "Fuente de la wiki"
+  yvObject: "Objeto"
+  yvList: "Lista"
+  yvEmpty: "vacío"
+  yvOf: " es "
+  yvCase: "Caso"
+  syncedToSource: "Sincronizado con el código"
+  fieldEmpty: "(vacío)"
+  type_config: "Configuración del plugin"
+  listEmpty: "No hay entradas: pulsa el botón de abajo para añadir"
+  listAdd: "Añadir"
+  mapAdd: "+ Añadir clave"
+  unionEmpty: "Sin especificar"
+  unionClear: "Limpiar"
+  customValue: "Valor simple…"
+  componentAdd: "Añadir componente…"
+  componentCustom: "Personalizado (clave-valor)"
+  componentsEmpty: "Aún no hay componentes de datos: elige uno en el desplegable de abajo"
+  componentConditionTitle: "Condiciones"
+  condAdd: "Añadir condición"
+  modelSimplified: "Modelo simplificado"
+  modelTree: "Árbol del modelo"
+  modelPath: "Ruta del modelo"
+  popupEdit: "Editar"
+  popupEmpty: "Sin establecer"
+  popupDetailed: "Detallado"
+  popupOk: "Aceptar"
+  popupCancel: "Cancelar"
+  jsonEditor: "Editor JSON"
+  jsonEditorHint: "Edita este campo como JSON; los cambios se aplican al instante"
+  material: "Material (material)"
+  customModelData: "Custom Model Data (custom-model-data)"
+  texture: "Textura (texture)"
+  category: "Categoría (category)"
+  dataLabel: "Datos del objeto (data)"
+  displayName: "Nombre visible (item-name)"
+  itemName: "Nombre del objeto (display-name)"
+  lore: "Líneas de lore (lore)"
+  dataJsonHint: "Edición JSON completa de los datos del objeto"
+  model: "Modelo (model)"
+  modelJsonHint: "Edición JSON completa del modelo"
+  behaviorType: "Tipo de comportamiento (behavior.type)"
+  behavior: "Comportamiento (behavior)"
+  settings: "Ajustes (settings)"
+  events: "Eventos (events)"
+  updater: "Actualizador (updater)"
+  state: "Estado del bloque (state)"
+  states: "Estados (states)"
+  statesHint: "Mapeo multiestado, editado como JSON"
+  hardness: "Dureza (hardness)"
+  resistance: "Resistencia (resistance)"
+  behaviors: "Comportamientos (behaviors)"
+  loot: "Botín (loot)"
+  variants: "Variantes (variants)"
+  variantsHint: "Elementos de variante / hitboxes / asientos"
+  settingsItem: "Objeto (item)"
+  hitTimes: "Golpes (hit-times)"
+  settingsSounds: "Sonidos (sounds)"
+  recipeType: "Tipo de receta (type)"
+  pattern: "Patrón (pattern)"
+  patternHint: "Una cadena de patrón por línea"
+  ingredients: "Ingredientes (ingredients)"
+  ingredientsHint: "Pares clave-valor: carácter = objeto"
+  result: "Resultado (result)"
+  resultId: "Objeto (id)"
+  resultCount: "Cantidad (count)"
+  experience: "Experiencia (experience)"
+  time: "Tiempo (time)"
+  base: "Objeto base (base)"
+  addition: "Objeto adicional (addition)"
+  templateType: "Plantilla de herrería (template_type)"
+  group: "Grupo (group)"
+  unlockOnIngredient: "Desbloqueo al obtener ingrediente (unlock_on_ingredient_obtained)"
+  unlockOnJoin: "Desbloqueo al entrar (unlock_on_join)"
+  otherFields: "Otros campos"
+  customTabWarning: "La pestaña Personalizado solo debe usarse al editar archivos del plugin, para opciones no cubiertas por las demás pestañas."
+  type_item: "Objeto"
+  type_block: "Bloque"
+  type_furniture: "Mobiliario"
+  type_recipe: "Receta"
+  type_generic: "Genérico"
+  yamlError: "No se pudo analizar el YAML"
+  yamlErrorHint: "El archivo contiene un error de sintaxis y no puede editarse visualmente. Corrígelo en el modo código fuente e inténtalo de nuevo."
+  noSections: "No se han encontrado secciones editables"
+  noEntries: "No hay entradas en esta sección"
+  addEntry: "+ Añadir entrada"
+  emptySection: "Sección vacía"
+  selectEntry: "Selecciona una entrada a la izquierda para editarla"
+  ownerLoading: "Localizando el proyecto propietario..."
+  syncToSource: "Sincronizar con el código"
+  autoSync: "Sincronización automática"
+  ownerBadge: "Proyecto: {root} · Pack: {pack}"
+  ownerNone: "No se ha encontrado un proyecto CE propietario"
+  pickerBtn: "Relleno rápido"
+  pickerSearch: "Buscar..."
+  pickerEmpty: "Aún no hay entradas. Pulsa ⟳ para reescanear"
+  pickerNoMatch: "Sin coincidencias"
+  pickerScanning: "Escaneando los elementos del proyecto..."
+  pickerRescan: "Reescanear"
+  pickerCount: "{n} entradas · clic para rellenar · las entradas multilínea pueden añadirse varias veces"
+  newEntryTitle: "Nueva entrada"
+  section: "Sección"
+  entryNamespace: "Espacio de nombres (namespace)"
+  entryPath: "Ruta (path)"
+  confirmAdd: "Añadir"
+  confirmDelete: "Eliminar"
+  deleteEntry: "Eliminar entrada"
+  deleteConfirmTitle: "Confirmar eliminación"
+  deleteConfirmMsg: "¿Eliminar la entrada {key}? Esta acción no se puede deshacer."
+  entryNamespaceInvalid: "El espacio de nombres solo puede contener letras minúsculas, dígitos y guiones bajos"
+  entryPathInvalid: "La ruta solo puede contener letras, dígitos, guiones bajos, puntos, barras y guiones"
+  entryExists: "La entrada {key} ya existe"
+  entryId: "ID de la entrada"
+  entryIdInvalid: "El ID solo puede contener letras, dígitos, guiones bajos, puntos y guiones"
+  keyOnlyHint: "Las entradas de esta sección no llevan el prefijo namespace:path; escribe el ID directamente"
+  type_equipment: "Equipo"
+  type_image: "Imagen"
+  type_category: "Categoría"
+  type_sound: "Sonido"
+  type_emoji: "Emoji"
+  type_jukeboxSong: "Canción de tocadiscos"
+  type_painting: "Cuadro"
+  type_globalVariable: "Variable global"
+  type_translation: "Traducción"
+  type_lang: "Idioma"
+  type_lootSource: "Fuente de botín"
+  type_placedFeature: "Estructura generada"
+  type_template: "Plantilla"
+  type: "Tipo (type)"
+  allItems: "Todos los objetos (all_items)"
+  arguments: "Argumentos (arguments)"
+  ascent: "Elevación (ascent)"
+  assetId: "ID del recurso (asset_id)"
+  author: "Autor (author)"
+  biome: "Bioma (biome)"
+  char: "Carácter (char)"
+  chars: "Caracteres (chars)"
+  chatCompletion: "Autocompletado de chat (chat_completion)"
+  clientBoundMaterial: "Material del cliente (client-bound-material)"
+  column: "Columna (column)"
+  comparatorOutput: "Salida del comparador (comparator_output)"
+  conditions: "Condiciones (conditions)"
+  content: "Contenido (content)"
+  description: "Descripción (description)"
+  dimension: "Dimensión (dimension)"
+  dimensionType: "Tipo de dimensión (dimension_type)"
+  equipment: "Equipo (equipment)"
+  equipmentType: "Tipo (type)"
+  feature: "Estructura (feature)"
+  featureHint: "Cadena u objeto, p. ej. default:tree o {type: ...}"
+  file: "Archivo (file)"
+  font: "Fuente (font)"
+  food: "Comida (food)"
+  globalVariableMap: "Variable global (clave-valor)"
+  gridSize: "Tamaño de cuadrícula (grid_size)"
+  height: "Altura (height)"
+  hidden: "Oculto (hidden)"
+  icon: "Icono (icon)"
+  image: "Imagen (image)"
+  keywords: "Palabras clave (keywords)"
+  kvWholeHint: "La entrada entera es un mapa clave-valor; los valores JSON se analizan automáticamente"
+  templateContent: "Contenido de la plantilla (YAML)"
+  templateContentHint: "Una plantilla es un mapa arbitrario clave-valor: se admiten estructuras anidadas, claves de versión $$ y etiquetas !!type"
+  layers: "Capas (layers)"
+  layersHint: "Capas disponibles: {names}; el valor puede ser una ruta de textura o un objeto JSON"
+  length: "Duración (length)"
+  list: "Lista de objetos (list)"
+  lootSourceType: "Tipo de fuente (type)"
+  mapColor: "Color de mapa (map-color)"
+  merges: "Fusiones (merges)"
+  name: "Nombre (name)"
+  overrides: "Sustituciones (overrides)"
+  overwrite: "Sobrescribir (overwrite)"
+  permission: "Permiso (permission)"
+  placement: "Colocación (placement)"
+  priority: "Prioridad (priority)"
+  range: "Rango (range)"
+  ref: "Referencia (ref)"
+  replace: "Reemplazar (replace)"
+  row: "Fila (row)"
+  showInOpTab: "Mostrar en la pestaña OP (show_in_op_tab)"
+  sound: "Sonido (sound)"
+  sounds: "Sonidos (sounds)"
+  soundsHint: "Uno por línea: cadena simple u objeto JSON"
+  subtitle: "Subtítulo (subtitle)"
+  tags: "Etiquetas (tags)"
+  target: "Objetivo (target)"
+  targets: "Objetivos (targets)"
+  template: "Plantilla (template)"
+  title: "Título (title)"
+  translationMap: "Tabla de traducción (clave-valor)"
+  width: "Anchura (width)"
+  world: "Mundo (world)"
+  entryKey: "Clave de la entrada (namespace:path)"
+  entryKeyHint: "Surte efecto al instante; las secciones global_variables / translations / lang no llevan prefijo"
+  tabBasic: "Básico"
+  tabModel: "Modelo"
+  tabItemData: "Datos del objeto"
+  tabBehavior: "Comportamiento"
+  tabEvents: "Eventos"
+  eventsAdd: "+ Añadir evento"
+  eventsBack: "← Volver a la lista"
+  eventsTrigger: "Desencadenante (on)"
+  eventsTriggerRequired: "Introduce un nombre de desencadenante"
+  eventsTriggerHint: "Varios desencadenantes separados por espacio o coma, p. ej. attack left_click"
+  eventsTriggerPh: "attack right_click…"
+  eventsFunctions: "Funciones (functions)"
+  eventsFunctionsHint: "Se ejecutan en orden; las funciones pueden anidar condiciones y eventos"
+  eventsScalarPh: "Cadena en bruto (personalizada/avanzada)"
+  eventsContent: "Contenido del evento"
+  eventsCount: "{count} eventos"
+  eventsEmpty: "Aún no hay eventos; pulsa Añadir evento en la esquina superior derecha"
+  newEventTitle: "Nuevo evento"
+  newEventHint: "Varios desencadenantes separados por espacio o coma, p. ej. attack left_click"
+  eventExists: "El evento {name} ya existe"
+  eventDeleteMsg: "¿Eliminar el evento {name}? Esta acción no se puede deshacer."
+  specTitle: "Configuración especial"
+  specHasVersions: "{n} condición(es) de versión"
+  specHasType: "Tipo {type}"
+  specLoc: "Ubicación"
+  specVersions: "Condiciones de versión"
+  specVersionsDesc: "Valores según la versión de Minecraft: $1.21.4 fijo · $1.20.1~1.21.4 rango · $>=1.21.4 comparación · $fallback alternativa"
+  specNoVersions: "No hay condiciones de versión; añade una abajo"
+  specFixed: "Fijo"
+  specRange: "Rango"
+  specCompare: "Comparación"
+  specFallback: "Alternativa"
+  specAdd: "Añadir"
+  specKeyPh: "Versión, p. ej. 1.21.4"
+  specValPh: "Valor"
+  specEmptyVal: "Un valor vacío elimina la condición"
+  specDel: "Eliminar"
+  specType: "Tipo de valor (!!type)"
+  specTypeNone: "Sin tipo"
+  specTypeHint: "Marca el valor con un tipo; el prefijo !!type se conserva al escribir en el código"
+  specCurVal: "Valor actual"
+
+content:
+  categories:
+    实体操作: "Operaciones con entidades"
+    数据与变量: "Datos y variables"
+    文本与运算: "Texto y operaciones"
+    游戏机制: "Mecánicas del juego"
+    系统管理: "Administración del sistema"
+    逻辑判断: "Lógica"
+    世界与坐标: "Mundo y coordenadas"
+    物品管理: "Gestión de objetos"
+    脚本控制: "Control de scripts"
+    界面与显示: "Interfaz y visualización"
+    时间与日期: "Fecha y hora"
+    基本: "Básico"
+  param:
+    symbol: "Símbolo"
+    action: "Acción"
+    int: "Entero"
+    double: "Decimal"
+    number: "Número"
+    string: "Texto"
+    token: "Parámetro"
+    player: "Jugador"
+    item: "Objeto"
+    location: "Ubicación"
+    world: "Mundo"
+    time: "Tiempo"
+    message: "Mensaje"
+    permission: "Permiso"
+    list: "Lista"
+    条件: "Condición"
+    执行: "Entonces"
+    否则: "Si no"
+    次数: "Veces"
+    变量: "Variable"
+    条件列表: "Lista de condiciones"
+
+  kether:
+    all: 'Comprueba si todos los {valores devueltos} de la lista de acciones son {sí}.'
+    any: 'Comprueba si algún {valor devuelto} de la lista de acciones coincide con {sí}.'
+    async: 'Ejecuta acciones en una programación {asíncrona} no vinculada al ciclo de vida.<br>Cuando el programa termina, todas las acciones {#Async} sin finalizar se cierran inmediatamente.'
+    await: Espera a que la acción se complete.
+    await_all: 'Espera a que se completen {todas las acciones} de la {lista de acciones}.'
+    await_any: 'Espera a que se complete {alguna acción} de la {lista de acciones}.'
+    call: '{Esta declaración no hace nada en modo Shell.}<br>Llama a cualquier función declarada, incluida la función {main}.'
+    exit: Sale del programa.
+    goto: '{Esta declaración no hace nada en modo Shell.}<br>Salta a cualquier función declarada, incluida la función {main}, o a una estructura de conversación específica.'
+    if_else: 'Declaración lógica básica.<br>Cuando el {valor devuelto} de una acción es {sí}, ejecuta la segunda acción; en caso contrario, ejecuta la tercera.'
+    literal: 'Crea y devuelve una {cadena de texto}.<br>Cuando la cadena contiene espacios, rodéala con {comillas dobles} o {comillas simples}; las comillas pueden omitirse si no hay espacios.<br><br>{Nota:}<br>Incluso {literal 100} no es un entero; usa la acción {#Type} si lo necesitas.'
+    not: 'Comprueba si el {valor devuelto} de la acción es {falso}, es decir, niega el resultado.'
+    repeat: Repite una acción varias veces.
+    sleep: Bloquea el hilo de trabajo durante un período de tiempo.
+    variable_get: Obtiene una variable.
+    variable_set: 'Establece una variable con un {tipo primitivo} o el {valor devuelto} de una acción.'
+    while: 'Declaración lógica básica.<br>Mientras el {valor devuelto} de la primera acción sea {sí}, repite la segunda acción hasta que se convierta en {falso}.'
+    absorption_amount: 'Obtiene o establece la salud de absorción del jugador.'
+    action_bar: 'Envía el {valor devuelto} de la acción al {ejecutor} como un mensaje de {barra de acciones}.'
+    address: 'Obtiene la dirección IP del jugador.'
+    allow_flight: Comprueba o cambia si el jugador puede volar.
+    array: 'Devuelve todos los {valores devueltos} de la lista de acciones como una {colección}.'
+    attack_cooldown: 'Obtiene el tiempo de recuperación de ataque del jugador.'
+    bed_spawn: 'Obtiene o cambia el punto de aparición de la cama del jugador; el bloque debe ser una cama.'
+    'bed_spawn_x,y,z': 'Obtiene un eje del punto de aparición de la cama del jugador.'
+    blocking: Comprueba si el jugador está bloqueando.
+    break: 'Finaliza el cuerpo del bucle cuando se usa dentro de declaraciones de bucle ({ForEach, Join, Map, While}).'
+    'case & when': 'Una declaración de selección compleja con más funciones que #IF.<br>Una declaración de selección completa necesita al menos una rama, es decir, un {bloque when}.<br><br>Cada rama estándar consiste en {when} {{condición}} -> {{expresión}}.<br>También puedes usar {else} {{expresión}} como rama predeterminada.<br><br>{Aquí tienes un ejemplo:}<br>set number to 3<br>set numberProvided to case &number [<br>&nbsp;&nbsp;&nbsp;&nbsp;when 1 -> "One"<br>&nbsp;&nbsp;&nbsp;&nbsp;when 2 -> "Two"<br>&nbsp;&nbsp;&nbsp;&nbsp;when 3 -> "Three"<br>&nbsp;&nbsp;&nbsp;&nbsp;else "One"<br>]<br>log inline "You provide {{ &numberProvided }}"<br><br>{El resultado es:}<br>You provide Three<br><br>{También se puede usar como otras declaraciones:}<br>set number to 3<br>case &number [<br>&nbsp;&nbsp;&nbsp;&nbsp;when 1 -> log "One"<br>&nbsp;&nbsp;&nbsp;&nbsp;when 2 -> log "Two"<br>&nbsp;&nbsp;&nbsp;&nbsp;when 3 -> log "Three"<br>&nbsp;&nbsp;&nbsp;&nbsp;else log "One"<br>]<br><br>{O con múltiples declaraciones:}<br>set number to 1<br>case &number [<br>&nbsp;&nbsp;&nbsp;&nbsp;when 1 -> {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;log "Monday"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;log "First day of the week"<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;when [ 2 3 4 5 6 7 ] -> {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;log "Sunday"<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;else log "Other days"<br>]<br><br>{O para comprobaciones lógicas:}<br>set number to 1<br>case &number [<br>&nbsp;&nbsp;&nbsp;&nbsp;when < 10 -> {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;log "Small"<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;when > 10 -> {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;log "Big"<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;else log "Other"<br>]'
+    check: 'Compara los {valores devueltos} de dos acciones con múltiples modos de comparación.<br><br>1. Igual ({==}, {is}): los dos valores son el mismo {literalmente}.<br>2. Distinto ({!=}, {not}): los dos valores difieren {literalmente}.<br>3. Igualdad similar ({=?}, {is?}): los dos valores son el mismo {literalmente} cuando {se ignoran mayúsculas y minúsculas}.<br>4. Igualdad absoluta ({=!}, {is!}): los dos valores son el mismo en {memoria}.<br>5. Mayor que ({>}, {gt}): el primer valor es {mayor que} el segundo.<br>6. Mayor o igual ({>=}): el primer valor es {mayor que} o {igual a} el segundo.<br>7. Menor que ({<}, {lt}): el primer valor es {menor que} el segundo.<br>8. Menor o igual ({<=}): el primer valor es {menor que} o {igual a} el segundo.<br>9. La derecha contiene a la izquierda (in): si el segundo valor contiene al primero.<br>10. La izquierda contiene a la derecha (has): si el primer valor contiene al segundo.<br><br>{Nota:}<br>Al comparar con una condición de {igualdad}, las acciones de inferencia {#Type} se añaden automáticamente a ambos argumentos.'
+    color: 'Reemplaza todos los {códigos de color} en el {valor devuelto} de la acción.<br>Se admiten los códigos de color avanzados proporcionados por {TabooLib}.'
+    command: 'Ejecuta el {valor devuelto} de la acción como un comando, usando por defecto al {jugador} como ejecutor.'
+    compass_target: 'Obtiene o cambia el objetivo de la brújula del jugador.'
+    'compass_x,y,z': 'Obtiene un eje del objetivo de la brújula del jugador.'
+    conversing: 'Comprueba si un objeto Conversable está participando activamente en una conversación.<br><br>{Devuelve:}<br>True si hay una conversación en curso'
+    date_day: 'El día del año, del mes o de la semana.<br>Año: ({1} ~ {365})<br>Mes: ({1} ~ {31})<br>Semana: ({1} ~ {7})'
+    date_hour: 'La hora actual ({0} ~ {23}).'
+    date_minute: 'El minuto actual ({0} ~ {59}).'
+    date_month: 'El mes actual ({1} ~ {12}).'
+    date_second: 'El segundo actual ({0} ~ {59}).'
+    date_year: 'El año actual ({MIN_YEAR} ~ {MAX_YEAR}).'
+    dead: Comprueba si el jugador está muerto.
+    element: 'Obtiene el elemento en el índice indicado del {valor devuelto} de la acción como una {lista}.'
+    exhaustion: 'Obtiene o cambia el agotamiento del jugador.'
+    exp: 'Obtiene o cambia los datos de experiencia del jugador; solo la {experiencia del jugador} es modificable.'
+    first_played: Devuelve cuándo jugó el jugador por primera vez.
+    fly___walk_speed: 'Obtiene o cambia la velocidad de vuelo o de caminar del jugador.'
+    flying: Comprueba o cambia si el jugador está volando.
+    food_level: 'Obtiene o cambia el nivel de comida del jugador.'
+    foreach: 'Itera sobre todos los {miembros} del {valor devuelto} de la primera acción, pasando cada uno como {variable temporal} a la segunda acción.'
+    format_time: 'Formatea un tiempo específico usando un {formato} específico.<br><br>'
+    gamemode: 'Obtiene o cambia el modo de juego del jugador.<br><br>Modos disponibles:<br>{Supervivencia}: SURVIVAL, 0<br>{Creativo}: CREATIVE, 1<br>{Aventura}: ADVENTURE, 2<br>{Espectador}: SPECTATOR, 3'
+    gliding: Comprueba o cambia si el jugador está planeando.
+    glowing: Comprueba o cambia si el jugador está brillando.
+    gravity: Comprueba o cambia si el jugador tiene gravedad.
+    health: 'Obtiene o cambia la salud o la salud máxima del jugador.'
+    inline: 'Reemplaza todos los {scripts en línea} en el {valor devuelto} de la acción. <br>Un script en línea inserta código de script en una cadena usando {{{} ... {}}}.'
+    inside_vehicle: Comprueba si el jugador está dentro de un vehículo.
+    javascript: 'Ejecuta código {JavaScript} y {devuelve} el resultado.<br>Se pasan todas las variables del programa actual, junto con el evento ({event}), el remitente ({sender}) y el servidor ({server}).'
+    join: 'Une todos los {valores devueltos} de la lista de acciones en una {cadena de texto}, usando un {espacio} como separador por defecto.'
+    jumping: Comprueba o cambia si el jugador está saltando.
+    last_played: 'Devuelve la última vez que el jugador jugó o inició sesión.'
+    leashed: Devuelve si la entidad está actualmente atada con una correa.
+    level: 'Obtiene o cambia el nivel del jugador.'
+    locale: 'Obtiene el idioma del cliente del jugador.'
+    location: Construye una ubicación.
+    location1: 'Obtiene o cambia la ubicación del jugador.'
+    location_angle: 'Obtiene o cambia el ángulo del jugador.'
+    'location_x,y,z': 'Obtiene o modifica la X, Y, Z, Yaw o Pitch de una ubicación.'
+    map: 'Itera sobre todos los {miembros} del {valor devuelto} de la primera acción, pasando cada uno como {variable temporal} a la segunda acción.<br>Finalmente, devuelve todos los {valores devueltos} de la segunda acción como una {colección}.<br><br>A diferencia de {#ForEach}, {#Map} recopila cada resultado no vacío.<br><br>Devuelve una lista que contiene los resultados de aplicar la función de transformación dada a cada elemento de la colección original.'
+    math: 'Procesa todos los {valores devueltos} de la lista de acciones con un {operador matemático}.<br><br>Operadores admitidos:<br>{Sumar}: +, add, plus<br>{Restar}: -, sub, minus<br>{Multiplicar}: *, mul, times<br>{Dividir}: /, div, divided<br>'
+    name: 'Obtiene el nombre del juego, el nombre visible o el nombre de lista del jugador.'
+    no_damage_tick: 'Obtiene o cambia los ticks de invulnerabilidad del jugador.'
+    null: 'Devuelve un valor {nulo}.'
+    on_guard: Comprueba si el jugador está en el suelo; estos datos provienen del cliente y pueden ser manipulados.
+    op: Comprueba o cambia si el jugador tiene OP.
+    optional: 'Comprueba si el {valor devuelto} de la acción no es nulo.'
+    pass: 'Devuelve una {cadena vacía}.'
+    pause: 'Pausa forzosamente el {ciclo de vida} del programa; esto no se puede deshacer hasta que el programa se cierre.'
+    permission: 'Comprueba si el {ejecutor} posee el {valor devuelto} de la acción como un permiso.'
+    placeholderapi: 'Reemplaza todos los placeholders de {PlaceholderAPI} en el {valor devuelto} de la acción.'
+    print: 'Envía el {valor devuelto} de la acción a la {consola} como un mensaje.'
+    random: 'Devuelve aleatoriamente un {decimal} dentro de un rango, o devuelve aleatoriamente un {miembro} del {valor devuelto} de la acción.<br>Al definir un rango, el segundo argumento puede omitirse para seleccionar de 0 al rango.'
+    random2: 'Devuelve aleatoriamente un {decimal} o un {entero} dentro de un rango; a diferencia de #{random}, el rango lo proporciona el valor devuelto de una acción.'
+    range: 'Crea una {colección} numérica; si se omite el {paso} o se usa un paso {entero}, se crea una colección de enteros; en caso contrario, una colección de decimales.<br>El tipo de colección depende del tipo del paso, no del tipo de los números del rango.'
+    remaining_air: 'Obtiene o cambia el aire restante del jugador.'
+    riptiding: Comprueba si el jugador está haciendo propulsión (tridente).
+    round: 'Redondea el {valor devuelto} de la acción como {decimal} al {entero} más cercano.'
+    saturation: 'Obtiene o cambia la saturación del jugador.'
+    scale: 'Formatea el {valor devuelto} de la acción como un {decimal} con dos cifras decimales.'
+    size: 'Obtiene la longitud del {valor devuelto} de la acción como una {lista}.'
+    sleep_ignored: 'Devuelve si el jugador es ignorado como no dormido. Si todos están durmiendo o tienen esta marca, el tiempo avanzará al día siguiente. Si todos tienen esta marca pero nadie está realmente en la cama, no ocurrirá nada.'
+    sleep_ticks: 'Devuelve los ticks de sueño del jugador.'
+    sleeping: Comprueba si el jugador está durmiendo.
+    sneaking: Comprueba si el jugador está agachado.
+    sound: 'Reproduce el texto como un sonido; el volumen y el tono predeterminados son {1.0}.<br>Usa "{resource:}" como prefijo para reproducir un sonido desde un {paquete de recursos}.'
+    split: 'Divide el {valor devuelto} de la acción como una cadena y devuelve las partes.'
+    sprinting: Comprueba si el jugador está corriendo.
+    subtitle: 'Envía el {valor devuelto} de la acción al {ejecutor} como un {subtítulo}; los tiempos predeterminados de aparición, permanencia y desaparición son {0}, {20}, {0}.'
+    swimming: Comprueba o cambia si el jugador está nadando.
+    switch: 'Cambia el {observador} actual a un jugador específico.'
+    tell: 'Envía el {valor devuelto} de la acción al {ejecutor} como un mensaje.'
+    time: 'La hora actual del sistema.<br><br>Devuelve la hora actual en milisegundos. Ten en cuenta que, aunque la unidad de tiempo del valor devuelto es el milisegundo, la granularidad del valor depende del sistema operativo subyacente y puede ser mayor. Por ejemplo, muchos sistemas operativos miden el tiempo en unidades de decenas de milisegundos.<br>Consulta la descripción de la clase Date para ver una explicación de las pequeñas discrepancias que pueden surgir entre "computer time" y el tiempo universal coordinado (UTC).<br><br>{Devuelve: }la diferencia, medida en milisegundos, entre la hora actual y la medianoche del 1 de enero de 1970 UTC.'
+    time_format: 'Formatea la hora actual del sistema con un {formato} específico.<br><br>'
+    title: 'Envía el {valor devuelto} de la acción al {ejecutor} como un {título}; los tiempos predeterminados de aparición, permanencia y desaparición son {0}, {20}, {0}.'
+    toast: 'Envía el {valor devuelto} de la acción al {ejecutor} como una {notificación de logro}.<br>Se admite una {lista} como valor devuelto.<br><br>Requiere una versión del servidor superior a 1.13'
+    type: 'Crea y devuelve la {cadena de texto}, {entero}, {long}, {decimal} o {booleano} que mejor coincida.<br>Cuando la cadena contiene espacios, rodéala con {comillas dobles} o {comillas simples}; las comillas pueden omitirse si no hay espacios.<br><br>O formatea con un {tipo específico} (pasando una acción como argumento):<br>int, long, float, double, boolean'
+    variable: 'Modifica u obtiene variables globales.<br>Consulta la documentación de {Chemdah} para obtener ayuda sobre las variables globales.<br><br>Usar {default} después de una sintaxis de lectura devuelve el valor predeterminado cuando faltan los datos; usar {default} después de una sintaxis de adición (add) basa la adición en esos datos cuando faltan.'
+    variables: 'Devuelve los {nodos} de todas las variables combinados en una {lista} de cadenas.'
+    warning: 'Envía el {valor devuelto} de la acción a la {consola} como una advertencia.'
+    whitelist: Comprueba o cambia si el jugador está en la lista blanca.
+    world: Obtiene el nombre del mundo en el que se encuentra actualmente el jugador.
+    import: Importa un espacio de nombres.
+    release: Libera un espacio de nombres.
+    block: 'Obtiene los valores enteros X, Y, Z de una ubicación.'
+    cancel: 'Se usa en los proxies de script al inicio de una {misión} o {conversación} para cancelar el comportamiento.'
+    ceil: Redondea hacia arriba
+    close: Se usa en los proxies de script de conversación para terminar la conversación.
+    distance: Obtiene la distancia entre dos ubicaciones; devuelve -1 si están en mundos diferentes.
+    equipment_check: 'Comprueba si el equipo del jugador es un objeto específico usando las expresiones de objetos de {Chemdah}.<br>Consulta la documentación de {Chemdah} para obtener ayuda sobre las expresiones.<br><br>Ranuras disponibles:<br>{Mano principal}: hand, mainhand<br>{Mano secundaria}: offhand<br>{Casco}: head, helmet<br>{Peto}: chest, chestplate<br>{Grebas}: legs, leggings<br>{Botas}: boots, feet'
+    floor: Redondea hacia abajo
+    inventory_count: 'Cuenta un objeto específico en el inventario del jugador usando las expresiones de objetos de {Chemdah}.<br>Consulta la documentación de {Chemdah} para obtener ayuda sobre las expresiones.'
+    inventory_check: 'Comprueba si el inventario del jugador contiene un objeto específico usando las expresiones de objetos de {Chemdah}. Consulta la documentación de {Chemdah} para obtener ayuda sobre las expresiones.'
+    inventory_close: 'Cierra el inventario actual del jugador.'
+    inventory_slot_check: 'Comprueba si una ranura específica del inventario del jugador es un objeto concreto usando las expresiones de objetos de {Chemdah}.<br>Consulta la documentación de {Chemdah} para obtener ayuda sobre las expresiones.'
+    inventory_take: 'Comprueba si el inventario del jugador contiene un objeto específico y lo retira, usando las expresiones de objetos de {Chemdah}.<br>Consulta la documentación de {Chemdah} para obtener ayuda sobre las expresiones.'
+    max: El máximo de dos o más valores
+    min: El mínimo de dos o más valores
+    mmocore_attribute_point: 'Obtiene los puntos de atributo de {MMOCore} del jugador.'
+    mmocore_class: 'Obtiene los datos de clase de {MMOCore} del jugador.'
+    mmocore_level___exp: 'Obtiene el nivel o la experiencia de {MMOCore} del jugador.'
+    mmocore_mana: 'Obtiene el maná de {MMOCore} del jugador.'
+    mmocore_skill_point: 'Obtiene los puntos de habilidad de {MMOCore} del jugador.'
+    mmocore_stamina: 'Obtiene la resistencia de {MMOCore} del jugador.'
+    mythicmobs_cast: 'Hace que el jugador lance una habilidad de {MythicMobs}.<br><br>Tipos de {Trigger} disponibles:<br>DEFAULT, API, ATTACK, BOW_HIT, BLOCK, BLOCK_PLACE, BLOCK_BREAK, <br>COMBAT, CONSUME, CROUCH, UNCROUCH, DAMAGED, DROPCOMBAT, DEATH, <br>DESPAWNED, ENTERCOMBAT, EXPLODE, INTERACT, KILL, KILLPLAYER, <br>PLAYERDEATH, SHOOT, SIGNAL, SPAWN, SPLASH_POTION, SWING, TARGETCHANGE, <br>TARGETED, TELEPORT, TIMER, USE, RIGHTCLICK, READY, CAST, FISH, <br>FISH_BITE, FISH_CATCH_FISH, FISH_CATCH_ENTITY, FISH_GROUND, FISH_REEL, <br>FISH_FAIL, TAME, TAME_FAIL, TRIDENT_THROW, TRIDENT_HIT, CUSTOM'
+    origin: 'Se usa en los proxies de script de conversación para obtener la ubicación sobre la cabeza del NPC.'
+    particle_normal: 'Reproduce un efecto de partículas en la ubicación especificada; añade {@self} al final para mostrártelo solo a ti.<br><br>{Sintaxis de expresión de partículas:}<br>https://wiki.ptms.ink/index.php?title=Chemdah_通用粒子表达式'
+    position: Obtiene la ubicación de los NPCs seleccionados; devuelve una lista si hay varios seleccionados.
+    profile_data: 'Modifica u obtiene las variables del jugador.<br>Consulta la documentación de {Chemdah} para obtener ayuda sobre las variables del jugador.<br><br>Usar {default} después de una sintaxis de lectura devuelve el valor predeterminado cuando faltan los datos; usar {default} después de una sintaxis de adición (add) basa la adición en esos datos cuando faltan.'
+    profile_level: 'Modifica u obtiene el nivel o la experiencia del jugador en {niveles personalizados}.<br>Consulta la documentación de {Chemdah} para obtener ayuda sobre los niveles personalizados.'
+    quest_group_check: Comprueba si el jugador ha aceptado o completado un grupo de misiones.
+    quest_check: 'Comprueba las misiones en curso o aún no aceptadas del jugador (seleccionadas).<br><br>Comportamientos disponibles:<br>accept-check (si se permite aceptar) accepted (si se ha aceptado) completed (si se ha completado)'
+    quest_control: 'Controla las misiones en curso o aún no aceptadas del jugador (seleccionadas).<br><br>Comportamientos disponibles:<br>accept (aceptar la misión) complete (completar la misión) fail (abandonar la misión) restart (restablecer la misión) stop (terminar la misión)'
+    quest_progress: 'Obtiene el progreso de la misión actual (seleccionada) del jugador o de una entrada específica de la misión (seleccionada).'
+    quest_select: Selecciona cualquier misión válida del servidor para operaciones posteriores.
+    quest_data: 'Modifica u obtiene variables de la misión actual (seleccionada) del jugador.<br>Consulta la documentación de {Chemdah} para obtener ayuda sobre las variables de misión.<br><br>Usar {default} después de una sintaxis de lectura devuelve el valor predeterminado cuando faltan los datos; usar {default} después de una sintaxis de adición (add) basa la adición en esos datos cuando faltan.'
+    quest_stats: 'Oculta o actualiza la visualización del progreso de la misión (seleccionada) o de una entrada específica de la misión (seleccionada).<br>Usa un {} independiente para representar todas las entradas.'
+    quest_tasks: Obtiene los índices de las entradas de una misión (seleccionada).
+    quest_this: 'En los proxies de script de misiones de {Chemdah}, devuelve la misión actual o el índice de la entrada.'
+    quest_track: Hace que el jugador siga la misión (seleccionada).
+    quest_tracking: Obtiene el nombre de la misión que el jugador está siguiendo.
+    quests: 'Obtiene todas las misiones que el jugador está realizando actualmente; usa {self} para ignorar las misiones compartidas (multijugador).'
+    schematic: 'Genera un esquema de {WorldEdit} específico en la ubicación construida por {#Location}. Admite rotación e ignorar el aire.'
+    script: Ejecuta o detiene un archivo de script.
+    skillapi_attribute_point: 'Obtiene los atributos o los puntos de atributo de {SkillAPI} del jugador.'
+    skillapi_cast: 'Hace que el jugador lance una habilidad de {SkillAPI}.<br>'
+    skillapi_class: 'Obtiene los datos de clase de {SkillAPI} del jugador.'
+    skillapi_exp: 'Obtiene la experiencia actual de {SkillAPI} del jugador o la experiencia necesaria para subir de nivel.'
+    skillapi_level: 'Obtiene el nivel de {SkillAPI} del jugador o si está al máximo.'
+    skillapi_mana: 'Obtiene el maná de {SkillAPI} del jugador.'
+    skillapi_skill_point: 'Obtiene los puntos de habilidad de {SkillAPI} del jugador.'
+    talk: 'Cuando se usa en {agent:begin}:<br>añade contenido que el NPC está a punto de enviar.<br><br>Cuando se usa en {agent:refuse}, {agent:end}, {then}:<br>hace que el NPC envíe contenido específico de inmediato; se suele usar para cerrar una conversación.'
+    trigger: 'Activa la misión de {Trigger} del jugador.<br>Consulta la documentación de {Chemdah} para obtener ayuda sobre este tipo de misión.'
+    ui: 'Solo funciona en las configuraciones del módulo {UI}; se usa para construir el progreso de la misión.<br>Consulta la documentación de {Chemdah} para obtener ayuda sobre el módulo de UI.'
+    wizard: Inicia o detiene la guía Wizard.
+    workflow_fetch: 'Define una compensación por desconexión: si el jugador sale del juego antes de que se ejecute la declaración {fetch reset}, las declaraciones de {fetch mark} se ejecutarán cuando vuelva a entrar.'
+    animation: 'Hace que todos los NPCs seleccionados actualmente reproduzcan una animación.<br><br>{Animaciones conocidas:}<br>SWING_MAIN_HAND, TAKE_DAMAGE, LEAVE_BED, SWING_OFFHAND<br>CRITICAL_EFFECT, MAGIC_CRITICAL_EFFECT'
+    controller: 'Asigna un controlador a todos los NPCs seleccionados actualmente, o los elimina o limpia.<br><br>{Controladores conocidos:}<br>Move, Gravity, SmoothLook, LookAtPlayer, LookAtPlayerAlways<br>RandomLookGround, RandomStrollLand'
+    create: Crea un NPC en una ubicación específica.
+    delete: Elimina y destruye todos los NPCs seleccionados.
+    destroy: Destruye todos los NPCs seleccionados actualmente.
+    look: 'Hace que todos los NPCs seleccionados miren hacia una ubicación, opcionalmente con rotación suave.'
+    meta: 'Modifica los metadatos de todos los NPCs seleccionados, o los restablece.<br><br>{Ver también:}<br>https://wiki.ptms.ink/index.php?title=AdyeshachPremium:开始:附录:第二节'
+    move: 'Hace que todos los NPCs seleccionados caminen hacia una ubicación, opcionalmente usando coordenadas relativas.'
+    passenger: 'Añade un pasajero a todos los NPCs seleccionados, o los elimina o limpia.'
+    remove: 'Elimina todos los NPCs seleccionados. Se retiran del gestor y dejan de estar gestionados, pero las entidades no se destruyen.'
+    respawn: Reaparece todos los NPCs seleccionados actualmente.
+    select: 'Usa el {valor devuelto} de la acción como {ID} o {UUID} de un NPC para seleccionarlo.'
+    still: 'Hace que todos los NPCs seleccionados dejen de moverse; lo contrario de {#Move}.'
+    freeze: Congela o reanuda todos los comportamientos de los NPCs seleccionados actualmente.
+    tag: 'Modifica las etiquetas de todos los NPCs seleccionados, o las elimina, limpia o comprueba.<br>Usa la palabra clave {persistent} para manipular etiquetas persistentes.<br>Ten en cuenta que las etiquetas persistentes requieren Adyeshach 1.4.21 o superior.'
+    teleport: 'Teletransporta todos los NPCs seleccionados a la ubicación especificada, usando la misma sintaxis de ubicación que {#Create}.'
+    use: 'Usa un gestor de NPCs específico, o uno temporal.<br><br>{Gestores conocidos:}<br>public, private'
+    viewer: 'Añade el {valor devuelto} de la acción como un jugador en línea a la lista de espectadores de todos los NPCs seleccionados, o los elimina o limpia.'
+    modelengine_animation_add: Reproduce una animación de ModelEngine; el NPC debe tener un modelo vinculado.
+    modelengine_animation_remove: Elimina una animación de ModelEngine; el NPC debe tener un modelo vinculado.
+    germengine_animation_add: Reproduce una animación de GermEngine; el NPC debe tener un modelo vinculado.
+    germengine_animation_remove: Elimina una animación de GermEngine; el NPC debe tener un modelo vinculado.
+    arr-clear: Borra todos los elementos de la lista.
+    map-size: 'Obtiene el número de entradas de un Map, o la longitud de la cadena si no es un Map.'
+    map-mutable: Convierte en un mapa mutable.
+    map-shuffle: Baraja el mapa.
+    map-reverse: Invierte el mapa.
+    map-get: Obtiene un elemento del mapa.
+    map-put: Añade un par clave-valor al mapa.
+    map-remove: Elimina un par clave-valor del mapa.
+    map-keys: Obtiene la lista de claves del mapa.
+    a-wait: Espera el tiempo especificado (en segundos) en el script. El script se termina si el jugador se desconecta mientras espera.
+    instance-of: Comprueba si un objeto es una instancia del tipo especificado. Devuelve false si el tipo no existe.
+    cast: Convierte un objeto al tipo especificado. Devuelve el objeto original si la conversión falla.
+    get-block-drops: Obtiene la lista de drops del bloque especificado. Se pueden especificar una herramienta y la entidad que rompe.
+    a-cd: 'Comprueba o añade un tiempo de recuperación de encantamiento.<br>check: comprueba el tiempo de recuperación, notificando opcionalmente al jugador y enviándolo mediante la barra de acciones<br>add: añade tiempo de recuperación'
+    spawn-entity: Genera una entidad en la ubicación especificada.
+    real-damage: Inflige daño real a una entidad.
+    entity-name: 'Obtiene el nombre de la entidad. Devuelve el nombre del jugador para jugadores; en caso contrario, el nombre personalizado o localizado.'
+    remove-entity: Elimina la entidad especificada.
+    add-potion-effect: Añade un efecto de poción a una entidad.
+    near-by-entities: Obtiene la lista de entidades cercanas a una entidad.
+    a-vec-add: Añade una velocidad a una entidad. Se pueden activar el modo seguro y las comprobaciones de retroceso.
+    entity-is-behind: Comprueba si una entidad está detrás de otra entidad.
+    launch-arrow: Lanza una flecha.
+    equip-set-item: 'Establece el objeto de equipo de una entidad.'
+    equip-get-item: 'Obtiene el objeto de equipo de una entidad.'
+    build-firework: 'Genera un fuego artificial en la ubicación especificada. Se pueden especificar el tipo (BALL, BALL_LARGE, BURST, CREEPER, STAR), la potencia, el parpadeo, el rastro, el color principal y el color de desvanecimiento. Los colores aceptan nombres comunes en inglés y pueden ser uno solo o una lista.'
+    detonate-firework: Detona inmediatamente la entidad de fuego artificial especificada.
+    send-lang: 'Envía un mensaje localizado a una entidad, opcionalmente con un array de parámetros.'
+    mark: Añade una marca de metadatos a un objeto.
+    unmark: 'Elimina la marca de metadatos de un objeto.'
+    has-mark: Comprueba si un objeto tiene la marca de metadatos especificada.
+    set-metadata: Establece metadatos en un objeto.
+    remove-metadata: 'Elimina los metadatos de un objeto.'
+    has-metadata: Comprueba si un objeto tiene los metadatos especificados.
+    get-metadata: 'Obtiene los metadatos de un objeto en el índice especificado.'
+    give-exp: Da experiencia al jugador. Opcionalmente aplica Reparación (mending).
+    a-money: 'Obtiene el saldo económico del jugador.'
+    take-money: Quita dinero al jugador.
+    give-money: Da dinero al jugador.
+    has-money: Comprueba si el jugador tiene suficiente dinero.
+    get-vein: Obtiene la veta de mineral alrededor del bloque especificado.
+    strike-lightning: Lanza un rayo en la ubicación especificada.
+    create-explosion: 'Crea una explosión en la ubicación especificada. Se pueden configurar la entidad de origen, si provoca fuego y si rompe bloques.'
+    drop-item: 'Suelta un objeto en la ubicación especificada, opcionalmente como un drop natural.'
+    operation: Ejecuta una operación registrada.
+    modifiable-var: 'Obtiene el valor de la variable modificable de un encantamiento.'
+    modifiable-var-set: 'Establece el valor de la variable modificable de un encantamiento.'
+    arim-weight: Aleatorio ponderado.
+    arim-inv: Comprobación de objetos del inventario.
+    dungeon: 'Ejecuta un script de DungeonPlus.<br>Más detalles: https://ersha.gitbook.io/dungeonplus/di-lao/untitled/kether'
+    dungeon-data-area: Obtiene el número de jugadores en un área de la mazmorra.
+    dungeon-data-players: Obtiene todos los jugadores de la mazmorra.
+    dungeon-data-data: Obtiene un valor de datos de la mazmorra.
+    dungeon-data-mob: Obtiene el contador de muertes de un mob o comprueba si fue eliminado.
+    dungeon-data-world: 'Obtiene el nombre del mundo de la mazmorra.'
+    dungeon-data-name: Obtiene el nombre de la mazmorra.
+    dungeon-data-options: 'Obtiene las opciones de inicio de la mazmorra.'
+    message: Envía un mensaje al jugador con soporte de formato de Invero.
+    invero_money: Controla la economía de Vault.
+    invero_points: Controla la economía de PlayerPoints.
+    connect: Conexión entre servidores.
+    depend: 'Comprueba si el servidor tiene la dependencia especificada. Devuelve: true/false'
+    context: 'context /ctx — con un contexto de menú activo (es decir, con un menú abierto), opera sobre los datos de variables del contexto del menú.'
+    persist: Opera sobre datos persistentes de forma independiente del contexto del menú.
+    menu: Operaciones relacionadas con el menú.
+    icon: 'Operaciones de iconos:<br>relocate<br>update<br>refresh<br>index | sub_index<br>pause_update<br>pause_relocate<br>pause_frames<br>resume_update<br>resume_relocate<br>resume_frames<br>refresh = update (actualizar variables) + relocate (redireccionar subiconos)'
+    page: Operación del panel de páginas (requiere un contexto de panel paginado).
+    scroll: Operación del panel de desplazamiento (requiere un contexto de panel desplazable).
+    regenerate: Operación del panel generador de elementos.
+    storage: Operación de ranura interactiva (requiere un panel interactivo).
+    node: Nodo
+    item: Construye un objeto.
+    item_match: 'Usa el {valor devuelto} de la acción como un {patrón de objeto} para comprobar si el jugador lo lleva.<br>Consulta la documentación de {TrMenu} para ver los patrones de objetos.'
+    metadata: 'Obtiene o establece los {metadatos} del jugador.<br><br>{meta} se almacena temporalmente en la memoria del servidor,<br>mientras que {data} usa {LocalPlayer} de TabooLib para almacenarse en el propio archivo de datos del jugador.'
+    trmenu_money: 'Usa el {valor devuelto} de la acción como moneda de {Vault} para comprobar si el jugador la tiene.'
+    trmenu_playerpoints: 'Usa el {valor devuelto} de la acción como moneda de {PlayerPoints} para comprobar si el jugador la tiene.'
+    event_cancel: Cancela el evento actual o establece si está cancelado.
+    event_wait: 'Espera el evento especificado y gestióralo de forma personalizada.<br>{Consulta la sintaxis aquí:}<br>https://www.yuque.com/lanscarlos/vulpecula-doc/action-event#x7y9W'
+    entity_damage: Inflige daño a una entidad.
+    entity_potion: 'Da o elimina un efecto de poción en una entidad.<br>{Consulta la sintaxis aquí:}<br>https://www.yuque.com/lanscarlos/vulpecula-doc/action-entity#ZzVee'
+    entity_teleport: Teletransporta una entidad a la ubicación especificada.
+    regex: 'Busca o reemplaza texto usando expresiones regulares.<br>{Consulta la sintaxis aquí:}<br>https://www.yuque.com/lanscarlos/vulpecula-doc/action-regex'
+    function_call: '{Esta declaración no hace nada en modo Shell.}<br>Llama a cualquier función declarada, incluida la función main. Se admiten argumentos.'
+    get_cooldown: 'En los comportamientos de objetos de {Zaphkiel}:<br>obtiene el tiempo de recuperación del {objeto actual} o del {jugador actual} (en ticks del juego).'
+    update_cooldown: 'En los comportamientos de objetos de {Zaphkiel}:<br>escribe el {valor devuelto} de la acción como tiempo de recuperación (en ticks del juego) del {objeto actual} o del {jugador actual}.'
+    check_cooldown: 'En los comportamientos de objetos de {Zaphkiel}:<br>comprueba si el {objeto actual} o el {jugador actual} están en tiempo de recuperación.'
+    effect: 'En los comportamientos de objetos de {Zaphkiel}:<br>aplica el {valor devuelto} de la acción como un efecto de poción de Bukkit al jugador, o lo elimina o limpia.'
+    item_durability: 'En los comportamientos de objetos de {Zaphkiel}:<br>obtiene la durabilidad actual del objeto; puede sustituirse por {item data durability_current}.'
+    item_durability_operate: 'En los comportamientos de objetos de {Zaphkiel}:<br>usa el {valor devuelto} de la acción como durabilidad para deducir o reparar.'
+    item_consume: 'En los comportamientos de objetos de {Zaphkiel}: consume 1 objeto del comportamiento.'
+    item_data: 'En los comportamientos de objetos de {Zaphkiel}:<br>obtiene o establece los datos activos del objeto.'
+    save: 'En los comportamientos de objetos de {Zaphkiel}:<br>escribe la caché en el flujo del objeto.'
+    build_1: 'Durante la construcción de objetos de {Zaphkiel}:<br>modifica las variables del nombre o la descripción.'
+    build_2: 'Durante la construcción de objetos de {Zaphkiel}:<br>modifica el material o el valor de datos; aquí {data} significa el valor de datos del objeto, no los datos activos.'
+
+  ketherSem:
+    all: 'Todas las condiciones {0}'
+    any: 'Cualquiera de las condiciones {0}'
+    async: 'Ejecutar de forma asíncrona {0}'
+    await: 'Esperar a {0}'
+    await_all: 'Esperar a todas las acciones {0}'
+    await_any: 'Esperar a cualquier acción {0}'
+    call: 'Llamar a {0}'
+    exit: 'Salir de {0}'
+    goto: 'Saltar a {0}'
+    if_else: 'Si {0} entonces {1}, si no {2}'
+    not: 'No {0}'
+    repeat: 'Repetir {0} veces {1}'
+    sleep: 'Esperar {0}'
+    while: 'Mientras {0}, repetir {1}'
+    absorption_amount: 'Absorción del jugador {0} {1}'
+    action_bar: 'Enviar la barra de acción {0}'
+    address: 'Obtener la IP del jugador'
+    allow_flight: 'El jugador puede volar {0}'
+    array: 'Crear el array {0}'
+    attack_cooldown: 'Obtener el enfriamiento de ataque del jugador'
+    bed_spawn: 'Spawn en cama del jugador {0}'
+    'bed_spawn_x,y,z': 'Eje {0} del spawn en cama del jugador'
+    blocking: '¿El jugador está bloqueando con el escudo?'
+    break: 'Romper el bucle'
+    'case & when': 'Caso {0} coincide con {1}'
+    check: 'Comprobar {0} {1} {2}'
+    color: 'Formatear los colores {0}'
+    command: 'Ejecutar el comando {0} como {1}'
+    compass_target: 'Objetivo de la brújula del jugador {0}'
+    'compass_x,y,z': 'Eje {0} de la brújula del jugador'
+    conversing: '¿El jugador está conversando?'
+    date_day: 'Obtener el día de {0}'
+    date_hour: 'Hora actual'
+    date_minute: 'Minuto actual'
+    date_month: 'Mes actual'
+    date_second: 'Segundo actual'
+    date_year: 'Año actual'
+    dead: '¿El jugador está muerto?'
+    element: 'Obtener el elemento {1} de {0}'
+    exhaustion: 'Agotamiento del jugador {0} {1}'
+    exp: 'Experiencia del jugador {0} {1}'
+    first_played: 'Hora de la primera conexión del jugador'
+    fly___walk_speed: 'Velocidad {0} del jugador {1} {2}'
+    flying: 'Vuelo del jugador {0}'
+    food_level: 'Nivel de comida del jugador {0} {1}'
+    foreach: 'Para cada {0} en {1} hacer {2}'
+    format_time: 'Formatear la hora {0} con {1}'
+    gamemode: 'Modo de juego del jugador {0}'
+    gliding: 'Planeo del jugador {0}'
+    glowing: 'Resplandor del jugador {0}'
+    gravity: 'Gravedad del jugador {0} {1}'
+    health: 'Salud {0} del jugador {1} {2}'
+    inside_vehicle: '¿El jugador está en un vehículo?'
+    javascript: 'Ejecutar el JS {0}'
+    join: 'Unir la lista {0} con {1}'
+    jumping: 'Salto del jugador {0}'
+    last_played: 'Última hora de {0} del jugador'
+    leashed: '¿La entidad está atada con correa?'
+    level: 'Nivel del jugador {0} {1}'
+    locale: 'Idioma del cliente del jugador'
+    location: 'Construir la ubicación {0} {1} {2} {3} yaw {4} pitch {5}'
+    location1: 'Ubicación del jugador {0}'
+    location_angle: 'Ángulo {0} del jugador {1} {2}'
+    'location_x,y,z': '{0} del jugador {1}'
+    map: 'Mapear {0} de {1} aplicando {2}'
+    math: 'Cálculo matemático {0} {1}'
+    name: 'Nombre {0} del jugador'
+    no_damage_tick: 'Ticks de invulnerabilidad del jugador {0} {1}'
+    null: 'Nulo'
+    on_guard: '¿El jugador está en el suelo?'
+    op: 'OP del jugador {0}'
+    optional: 'Opcional {0}, si no {1}'
+    pass: 'Cadena vacía'
+    pause: 'Pausar el programa'
+    permission: 'Comprobar el permiso {0}'
+    random2: 'Aleatorio entre {0} y {1}'
+    range: 'Rango de {0} a {1} con paso {2}'
+    remaining_air: 'Aire restante del jugador {0} {1}'
+    riptiding: '¿El jugador está usando Impulso (riptide)?'
+    round: 'Redondear {0}'
+    saturation: 'Saturación del jugador {0} {1}'
+    scale: 'Redondear a 2 decimales {0}'
+    size: 'Obtener el tamaño de {0}'
+    sleep_ignored: 'Sueño ignorado del jugador {0}'
+    sleep_ticks: 'Ticks de sueño del jugador'
+    sleeping: '¿El jugador está durmiendo?'
+    sneaking: '¿El jugador está agachado?'
+    sound: 'Reproducir el sonido {0} volumen {1} tono {2}'
+    split: 'Dividir {0} por {1}'
+    sprinting: '¿El jugador está esprintando?'
+    subtitle: 'Enviar el subtítulo {0} fundido de entrada {1} permanencia {2} fundido de salida {3}'
+    swimming: 'Natación del jugador {0} {1}'
+    switch: 'Evaluar {0} con switch'
+    title: 'Enviar el título {0} subtítulo {1} fundido de entrada {2} permanencia {3} fundido de salida {4}'
+    toast: 'Enviar la notificación {0} {1} tipo {2}'
+    warning: 'Aviso de consola {0}'
+    whitelist: 'El jugador está en la lista blanca {0}'
+    world: 'Mundo actual del jugador'
+    import: 'Importar el espacio de nombres {0}'
+    release: 'Liberar el espacio de nombres {0}'
+    block: 'Obtener la ubicación del bloque {0} de {1}'
+    cancel: 'Cancelar la acción actual'
+    ceil: 'Redondear hacia arriba {0}'
+    close: 'Cerrar la conversación'
+    distance: 'Distancia de {0} a {1}'
+    equipment_check: 'Comprobar que el equipo {0} sea {1} cantidad {2}'
+    floor: 'Redondear hacia abajo {0}'
+    inventory_count: 'Contar el objeto {0} del inventario'
+    inventory_check: 'Comprobar el inventario {0} cantidad {1}'
+    inventory_close: 'Cerrar el inventario del jugador'
+    inventory_slot_check: 'Comprobar que la ranura {0} del inventario sea {1} cantidad {2}'
+    inventory_take: 'Quitar del inventario el objeto {0} cantidad {1}'
+    max: 'Máximo {0} {1}'
+    min: 'Mínimo {0} {1}'
+    mmocore_attribute_point: 'Obtener los puntos de atributo de MMOCore'
+    mmocore_class: 'Obtener la clase de MMOCore {0}'
+    mmocore_level___exp: 'Obtener {0} de MMOCore'
+    mmocore_mana: 'Obtener el maná de MMOCore'
+    mmocore_skill_point: 'Obtener los puntos de habilidad de MMOCore'
+    mmocore_stamina: 'Obtener la resistencia de MMOCore'
+    mythicmobs_cast: 'Lanzar la habilidad de MythicMobs {0} disparador {1}'
+    origin: 'Obtener la ubicación de origen del NPC'
+    particle_normal: 'Reproducir la partícula {0} {1} {2} solo para el propio jugador {3}'
+    position: 'Comprobar la posición en la región {0}'
+    profile_level: 'Nivel de perfil del jugador {0} {1} {2} {3}'
+    quest_group_check: 'Comprobar el grupo de misiones {0} {1}'
+    quest_check: 'Comprobar la misión {0}'
+    quest_control: 'Controlar la misión {0}'
+    quest_progress: 'Obtener el progreso {0} de la misión {1}'
+    quest_select: 'Seleccionar la misión {0}'
+    quest_stats: 'Estadística de misión {0} misión {1}'
+    quest_tasks: 'Obtener todas las entradas de misión'
+    quest_this: 'Obtener la misión/entrada actual'
+    quest_track: 'Rastrear la misión actual'
+    quest_tracking: 'Obtener la misión rastreada'
+    quests: 'Obtener la lista de misiones activas'
+    schematic: 'Pegar el esquema {0} {1} {2} rotación {3} ignorar aire {4}'
+    script: 'Script {0} {1}'
+    skillapi_attribute_point: 'Obtener los atributos de SkillAPI {0}'
+    skillapi_cast: 'Lanzar la habilidad de SkillAPI {0}'
+    skillapi_class: 'Obtener la clase de SkillAPI {0}'
+    skillapi_exp: 'Obtener la experiencia de SkillAPI {0}'
+    skillapi_level: 'Obtener el nivel de SkillAPI'
+    skillapi_mana: 'Obtener el maná de SkillAPI'
+    skillapi_skill_point: 'Obtener los puntos de habilidad de SkillAPI'
+    talk: 'El NPC habla {0}'
+    trigger: 'Activar la misión {0}'
+    ui: 'Progreso de la interfaz {0} {1} excluir {2}'
+    wizard: 'Asistente {0}'
+    workflow_fetch: 'Compensación por tiempo fuera de línea {0} {1}'
+    animation: 'Reproducir la animación {0}'
+    controller: 'Controlador {0} {1}'
+    create: 'Crear el NPC {0} {1} en {2}'
+    delete: 'Eliminar y destruir los NPC'
+    destroy: 'Destruir los NPC'
+    look: 'El NPC mira a X {0} Y {1} Z {2} suavizado {3}'
+    move: 'Mover el NPC a X {0} Y {1} Z {2} relativo {3}'
+    passenger: 'Pasajero {0} {1}'
+    remove: 'Eliminar los NPC'
+    respawn: 'Reaparecer los NPC'
+    select: 'Seleccionar el NPC {0} por {1}'
+    still: 'Detener el movimiento'
+    freeze: 'Congelar los NPC {0}'
+    tag: 'Etiquetar {0} {1} como {2}'
+    teleport: 'Teletransportar los NPC a {0}'
+    use: 'Usar el gestor de NPC {0} temporal {1}'
+    viewer: 'Visor {0} {1}'
+    modelengine_animation_add: 'Añadir la animación de ModelEngine {0} {1} {2} asíncrono {3}'
+    modelengine_animation_remove: 'Quitar la animación de ModelEngine {0} ignorar interpolación {1}'
+    germengine_animation_add: 'Enviar la animación de GermEngine {0}'
+    germengine_animation_remove: 'Quitar la animación de GermEngine {0}'
+    arr-clear: 'Vaciar el array {0}'
+    map-mutable: 'Convertir en mapa mutable {0}'
+    map-shuffle: 'Barajar el mapa {0}'
+    map-reverse: 'Invertir el mapa {0}'
+    map-get: 'Obtener la clave {0} del mapa {1}'
+    map-put: 'Insertar en el mapa {2} el par {0} con valor {1}'
+    map-remove: 'Eliminar la clave {0} del mapa {1}'
+    map-keys: 'Obtener todas las claves del mapa {0}'
+    instance-of: 'Comprobar si {0} es una instancia de {1}'
+    cast: 'Convertir {0} a {1}'
+    get-block-drops: 'Obtener los drops del bloque {0} herramienta {1} quien lo rompe {2}'
+    spawn-entity: 'Generar la entidad {0} en {1}'
+    real-damage: 'Daño real {0} cantidad {1} fuente {2}'
+    entity-name: 'Obtener el nombre de la entidad {0}'
+    remove-entity: 'Eliminar la entidad {0}'
+    add-potion-effect: 'Añadir el efecto de poción {0} a {1} duración {2} nivel {3} ambiental {4} partículas {5} icono {6}'
+    near-by-entities: 'Entidades cercanas {0} radio {1} {2} {3}'
+    a-vec-add: 'Añadir la velocidad {0} a {1} seguro {2} comprobación de retroceso {3}'
+    entity-is-behind: '¿La entidad {0} está detrás de {1}?'
+    launch-arrow: 'Disparar la flecha {0} velocidad {1}'
+    equip-set-item: 'Establecer el equipo {0} en la ranura {1} para {2}'
+    equip-get-item: 'Obtener la ranura de equipo {0} de {1}'
+    build-firework: 'Generar el fuego artificial {0} tipo {1} potencia {2} parpadeo {3} estela {4} color principal {5} desvanecimiento {6}'
+    detonate-firework: 'Detonar el fuego artificial {0}'
+    send-lang: 'Enviar el mensaje localizado {0} a {1} argumentos {2}'
+    mark: 'Añadir la marca {0} a {1}'
+    unmark: 'Quitar la marca {0} de {1}'
+    give-exp: 'Dar la experiencia {0} a {1} reparación {2}'
+    take-money: 'Quitar dinero {0} {1}'
+    give-money: 'Dar dinero {0} {1}'
+    has-money: 'Tiene dinero {0} {1}'
+    get-vein: 'Obtener la veta {0} cantidad máxima {1}'
+    create-explosion: 'Crear la explosión {0} potencia {1} fuente {2} fuego {3} romper bloques {4}'
+    drop-item: 'Tirar el objeto {0} en {1} natural {2}'
+    operation: 'Ejecutar la operación {0} argumentos {1}'
+    modifiable-var: 'Obtener el nombre de objeto de la variable modificable {0}'
+    modifiable-var-set: 'Establecer el nombre de objeto de la variable modificable {0} con el valor {1}'
+    dungeon: 'Script de mazmorra {0} {1} argumentos {2} área {3}'
+    dungeon-data-area: 'Área de la mazmorra {0} {1}'
+    dungeon-data-players: 'Jugadores en la mazmorra'
+    dungeon-data-data: 'Datos de la mazmorra {0}'
+    dungeon-data-mob: 'Mob de la mazmorra {0} {1}'
+    dungeon-data-world: 'Nombre del mundo de la mazmorra'
+    dungeon-data-name: 'Nombre de la mazmorra'
+    dungeon-data-options: 'Opciones de la mazmorra {0}'
+    message: 'Enviar el mensaje de Invero {0}'
+    invero_money: 'Economía {0} {1}'
+    invero_points: 'Puntos {0} {1}'
+    connect: 'Conexión cruzada entre servidores {0} jugador {1}'
+    depend: 'Comprobar la dependencia {0}'
+    context: 'Contexto del menú {0} {1}'
+    persist: 'Datos persistentes {0} {1} ámbito {2}'
+    menu: 'Operación de menú {0} {1}'
+    icon: 'Operación de icono {0} {1}'
+    page: 'Operación de página {0}'
+    scroll: 'Operación de desplazamiento {0}'
+    regenerate: 'Regenerar {0} filtro {1} orden {2}'
+    storage: 'Ranura interactiva {0} {1}'
+    node: 'Nodo {0} argumentos {1}'
+    item: 'Construir el objeto {0} a partir de {1} cantidad {2}'
+    item_match: 'Comparar el objeto {0}'
+    trmenu_money: 'Comprobar el dinero {0}'
+    trmenu_playerpoints: 'Comprobar los puntos {0}'
+    variable: 'Analizar las variables de TrMenu {0}'
+    event_cancel: 'Cancelar el evento {0}'
+    event_wait: 'Esperar el evento {0} {1} {2}'
+    entity_damage: 'Daño de entidad {0} cantidad {1} fuente {2}'
+    entity_potion: 'Poción de la entidad {0} {1} {2}'
+    entity_teleport: 'Teletransportar la entidad {0} a {1}'
+    regex: 'Expresión regular {0} {1} {2}'
+    function_call: 'Llamar a la función {0} argumentos {1}'
+    get_cooldown: 'Obtener el enfriamiento de ZAP {0}'
+    update_cooldown: 'Establecer el enfriamiento de ZAP {0} objetivo {1}'
+    check_cooldown: 'Comprobar el enfriamiento de ZAP {0}'
+    effect: 'Efecto de poción de ZAP {0} {1} {2} {3}'
+    item_durability: 'Obtener la durabilidad del objeto de ZAP'
+    item_durability_operate: 'Objeto de ZAP {0} {1}'
+    item_consume: 'Consumir el objeto de ZAP'
+    item_data: 'Datos del objeto de ZAP {0} como {1}'
+    save: 'Guardar el objeto de ZAP'
+    build_1: 'Construir el nombre/descripción del objeto de ZAP {0} {1} como {2}'
+    build_2: 'Construir el icono/datos del objeto de ZAP {0} {1}'
+  objective:
+    'player fish': 'Pesca del jugador / Admite condiciones sobre el estado del pez, el tipo de objeto, la experiencia, etc. / Cuenta los intentos de pesca'
+    'player chat': 'El jugador envía un mensaje de chat / Admite condiciones sobre el contenido del mensaje, la ubicación, etc. / Cuenta los mensajes de chat'
+    'change world': 'El jugador cambia de mundo / Admite condiciones sobre el mundo de origen, el mundo de destino, la ubicación, etc. / Cuenta los cambios'
+    'player kill': 'El jugador mata a una entidad / Admite condiciones sobre el arma, el tipo de víctima, etc. / Cuenta las eliminaciones'
+    'food change': 'Se activa cuando cambia el hambre del jugador / Admite condiciones sobre el valor de hambre, el tipo de comida, etc. / Cuenta el cambio total de hambre'
+    'item break': 'Se activa cuando se agota la durabilidad de la herramienta o de la armadura del jugador / Admite condiciones sobre el tipo de objeto, la ubicación, etc. / Cuenta los objetos rotos'
+    'custom level': 'Comprueba si el nivel personalizado del jugador cumple el requisito / Admite condiciones sobre la ubicación, el ID del nivel, el valor del nivel, etc. / Para el sistema de niveles de Chemdah'
+    'player move': 'El jugador se mueve / Admite condiciones sobre la ubicación de inicio, la ubicación de destino, etc. / Cuenta los movimientos'
+    'block interact': 'El jugador interactúa con un bloque / Admite condiciones sobre el material, el tipo de interacción, la dirección, el objeto en la mano, etc. / Cuenta las interacciones'
+    'entity tame': 'El jugador domestica a una entidad / Admite condiciones sobre el tipo de entidad, la ubicación, etc. / Cuenta las entidades domesticadas'
+    'horse jump': 'Se activa cuando el jugador salta montando a caballo / Admite condiciones sobre la fuerza del salto, el tipo de caballo, etc. / Cuenta los saltos'
+    'block break': 'El jugador rompe un bloque / Admite condiciones sobre el material, la ubicación, los drops, etc. / Cuenta los bloques rotos'
+    'bucket fill': 'El jugador llena un cubo con fluido / Admite condiciones sobre la ubicación, el material, el objeto, etc. / Cuenta los llenados'
+    'bucket empty': 'El jugador vacía el fluido de un cubo / Admite condiciones sobre la ubicación, el material, el objeto, etc. / Cuenta los vaciados'
+    'item consume': 'Se activa cuando el jugador consume un objeto / Admite consumibles como comida y pociones / Cuenta los objetos consumidos'
+    'pickup exp': 'Se activa cuando el jugador recoge un orbe de experiencia / Admite condiciones sobre la cantidad de experiencia, el motivo, etc. / Cuenta la experiencia total recogida'
+    'player teleport': 'El jugador se teletransporta / Admite condiciones sobre la ubicación de inicio, la ubicación de destino, el motivo del teletransporte, etc. / Cuenta los teletransportes'
+    always: 'Comprueba la condición en cada tick del juego / Para casos que requieren una condición siempre cumplida / Sin evento que lo active, comprobación periódica automática'
+    'shoot bow': 'El jugador dispara un arco / Admite condiciones sobre el tipo de arco, la fuerza de tensión, el objeto consumido, etc. / Cuenta los disparos'
+    'player animation': 'Se activa cuando el jugador realiza una animación / Admite condiciones sobre el tipo de animación, etc. / Cuenta las animaciones'
+    'player attack': 'El jugador ataca a una entidad / Admite condiciones sobre la entidad objetivo, el arma, el daño, etc. / Cuenta los ataques'
+    'player damage by entity': 'El jugador recibe daño del ataque de una entidad / Admite condiciones sobre la entidad atacante, el arma, el daño, etc. / Cuenta los golpes recibidos'
+    'entity interact': 'El jugador hace clic derecho sobre una entidad / Admite condiciones sobre el tipo de entidad, la ubicación, el objeto en la mano, etc. / Cuenta las interacciones'
+    'bed enter': 'El jugador entra en una cama / Admite condiciones sobre la ubicación de la cama, el material, el motivo, etc. / Cuenta las entradas'
+    'player anvil': 'Se activa cuando el jugador usa un yunque / Admite condiciones sobre el texto renombrado, el coste de reparación, el objeto resultante, etc. / Cuenta los usos'
+    'portal exit': 'Se activa cuando el jugador sale de un portal / Admite condiciones sobre las ubicaciones de destino y de origen, etc. / Cuenta las salidas'
+    never: 'Un objetivo que nunca puede completarse / Para marcadores de posición o lógica especial / Siempre devuelve false'
+    'pickup arrow': 'Se activa cuando el jugador recoge una flecha / Admite condiciones sobre el tipo de flecha, la cantidad, etc. / Cuenta el total recogido'
+    'entity breed': 'El jugador cría animales / Admite condiciones sobre el tipo de animal, los progenitores, el objeto de cría, etc. / Cuenta las crías'
+    'player jump': 'El jugador salta / Admite condiciones sobre la ubicación, etc. / Cuenta los saltos'
+    'player permission': 'Comprueba si el jugador tiene un permiso concreto / Comprueba periódicamente el estado del permiso / Para casos en los que los permisos cambian dinámicamente'
+    'player statistic': 'Se activa cuando cambia una estadística del jugador / Admite condiciones sobre el tipo de estadística, el tipo de entidad, el tipo de material, el valor, etc. / Cuenta los incrementos'
+    'entity combust': 'El jugador prende fuego a una entidad / Admite condiciones sobre el tipo de entidad, la ubicación, etc. / Cuenta las combustiones'
+    'player damage by block': 'El jugador recibe daño de un bloque / Admite condiciones sobre el tipo de bloque, el daño, la ubicación, etc. / Cuenta los golpes recibidos'
+    'pickup item': 'Se activa cuando el jugador recoge un objeto del suelo / Cuenta automáticamente el tamaño de la pila de los objetos recogidos / Admite condiciones sobre el objeto, la cantidad, la ubicación, etc.'
+    'criterion grant': 'Se activa cuando el jugador completa un criterio de progreso (requiere un servidor Paper) / Admite condiciones sobre el ID del progreso, el nombre del criterio, etc. / Cuenta las concesiones'
+    'entity dismount': 'El jugador se baja de una entidad / Admite condiciones sobre el tipo de entidad, la ubicación, etc. / Cuenta las bajadas'
+    'player data': 'Comprueba los valores de datos persistentes del jugador / Admite tanto el modo por eventos como la comprobación periódica / Para compartir y comprobar datos entre misiones'
+    'exp change': 'El jugador gana experiencia / Admite condiciones sobre la cantidad de experiencia, la entidad de origen, la ubicación, etc. / Cuenta la experiencia total'
+    'player shear': 'El jugador esquila ovejas / Admite condiciones sobre el tipo de entidad, el tipo de tijeras, la mano usada, etc. / Cuenta los esquilados'
+    'block ignite': 'El jugador prende fuego a un bloque / Admite condiciones sobre el material, el motivo de la ignición, la ubicación, etc. / Cuenta las igniciones'
+    'item held': 'Se activa cuando el jugador cambia el objeto seleccionado de la barra rápida / Admite condiciones sobre los objetos anterior y nuevo, las ranuras anterior y nueva, etc. / Cuenta los cambios'
+    'entity mount': 'El jugador monta una entidad / Admite condiciones sobre el tipo de entidad, la ubicación, etc. / Cuenta las veces que monta'
+    'craft item': 'El jugador fabrica objetos en una mesa de trabajo / Admite condiciones sobre el objeto, los materiales de la receta, la ubicación, etc. / Admite el conteo de fabricaciones por lotes'
+    'drop item': 'Se activa cuando el jugador tira un objeto / Admite condiciones sobre el objeto, la cantidad, la ubicación, etc. / Cuenta los objetos tirados'
+    'armor change': 'El jugador cambia su equipamiento de armadura (requiere un servidor Paper) / Admite condiciones sobre la ranura de equipamiento, el objeto, etc. / Cuenta los cambios'
+    'portal enter': 'Se activa cuando el jugador entra en un portal / Admite condiciones sobre la ubicación del portal, etc. / Cuenta las entradas'
+    'enchant item': 'Se activa cuando el jugador encanta un objeto en una mesa de encantamientos / Admite condiciones sobre el objeto, el tipo de encantamiento, el coste de experiencia, etc. / Cuenta los encantamientos'
+    'block place': 'El jugador coloca un bloque / Admite condiciones sobre el material, la ubicación, el objeto en la mano, etc. / Cuenta las colocaciones'
+    'player damage': 'El jugador recibe daño / Admite condiciones sobre el tipo de daño, el valor del daño, la ubicación, etc. / Cuenta los golpes recibidos'
+    'player respawn': 'El jugador reaparece / Admite condiciones sobre la ubicación de reaparición, el tipo de reaparición (cama/ancla de reaparición), etc. / Cuenta las reapariciones'
+    'player real move': 'Se activa cuando el jugador se mueve realmente un bloque / Admite condiciones sobre las ubicaciones de destino y de inicio, etc. / Cuenta los movimientos'
+    'player inventory': 'Comprueba o consume objetos del inventario del jugador / Admite condiciones sobre la ubicación, el tipo de objeto, la cantidad, el consumo, etc. / Para misiones de recolección o consumo de objetos'
+    'block farm': 'El jugador ara tierra de cultivo con una azada / Admite condiciones sobre el material, la ubicación, el tipo de azada, etc. / Cuenta los labrados'
+    'player conversation': 'El jugador termina una conversación respondiendo con una opción / Admite condiciones sobre la ubicación, el ID de la conversación, etc. / Para el sistema de conversaciones interno de Chemdah'
+    'item mend': 'Se activa cuando se repara un objeto del jugador / Admite condiciones sobre el tipo de objeto reparado, la cantidad de reparación, etc. / Cuenta el total reparado'
+    'player conversation refused': 'El jugador abandona o rechaza una conversación / Admite condiciones sobre la ubicación, el ID de la conversación, etc. / Para el sistema de conversaciones interno de Chemdah'
+    'player toggle flight': 'Se activa cuando el jugador activa o desactiva el vuelo / Admite condiciones sobre el estado de vuelo, etc. / Cuenta los cambios de vuelo'
+    'furnace extract': 'Se activa cuando el jugador extrae objetos de un horno / Cuenta automáticamente la cantidad extraída / Admite condiciones sobre el objeto, la experiencia, la ubicación, etc.'
+    'player conversation closed': 'El jugador termina una conversación de forma normal / Admite condiciones sobre la ubicación, el ID de la conversación, etc. / Para el sistema de conversaciones interno de Chemdah'
+    'item interact': 'Se activa cuando el jugador interactúa usando un objeto / Admite clic derecho, clic izquierdo, etc. / Puede comprobar la ranura seleccionada y el tipo de interacción'
+    trigger: 'Activado manualmente por comandos o scripts externos / Admite la comparación de un valor de activación personalizado / Para enlazar con otros sistemas'
+    'bed leave': 'El jugador sale de una cama / Admite condiciones sobre la ubicación de la cama, el material, etc. / Cuenta las salidas'
+    'level change': 'El nivel del jugador cambia / Admite condiciones sobre la diferencia de nivel, el nivel nuevo, el nivel anterior, etc. / Cuenta las subidas de nivel'
+    'player swap hand': 'Se activa cuando el jugador pulsa F para intercambiar los objetos de la mano principal y la secundaria / Admite condiciones sobre los objetos de ambas manos, etc. / Cuenta los intercambios'
+    'pressure plate': 'Se activa cuando el jugador pisa una placa de presión / Admite condiciones sobre la ubicación y el tipo de placa, etc. / Cuenta las pisadas'
+    'quest data': 'Comprueba los valores de datos persistentes de la misión / Admite tanto el modo por eventos como la comprobación periódica / Para compartir y comprobar datos dentro de la misión'
+    'health regain': 'Se activa cuando se regenera la salud del jugador / Admite condiciones sobre la cantidad recuperada, el motivo, etc. / Cuenta el total recuperado'
+    'player resurrect': 'Se activa cuando el jugador revive con un tótem de inmortalidad / Admite condiciones sobre el tipo de objeto usado, etc. / Cuenta las resurrecciones'
+    'player advancement': 'El jugador completa un progreso / Admite condiciones sobre el ID del progreso, la ubicación, etc. / Cuenta los progresos completados'
+    'player command': 'El jugador ejecuta un comando / Admite condiciones sobre el contenido del comando, la ubicación, etc. / Cuenta las ejecuciones de comandos'
+    'edit book': 'Se activa cuando el jugador edita o firma un libro / Admite condiciones sobre el estado de firma, las páginas, el título, el contenido, etc. / Cuenta las ediciones'
+    'player death': 'El jugador muere / Admite condiciones sobre el atacante, el arma, el mensaje de muerte, etc. / Cuenta las muertes'
+    'anpc interact': 'Interactúa con un NPC de Adyeshach / Admite condiciones sobre el ID del NPC, el tipo, la ubicación, el objeto en la mano, la mano principal/secundaria, etc. / Requiere el plugin Adyeshach'
+    'anpc damage': 'Ataca a un NPC de Adyeshach / Admite condiciones sobre el ID del NPC, el tipo, la ubicación, el objeto usado, etc. / Requiere el plugin Adyeshach'
+    'mythicmobs kill': 'Mata a un monstruo de MythicMobs / Admite condiciones sobre el nombre del mob, el nivel, la ubicación, etc. / Requiere el plugin MythicMobs'
+    'placeholder api': 'Obtiene los valores de las variables de PlaceholderAPI / Admite todas las variables de PAPI / Requiere el plugin PlaceholderAPI'
+  objectiveLabel:
+    'player fish': 'Pesca del jugador'
+    'player chat': 'Chat del jugador'
+    'change world': 'Cambio de mundo'
+    'player kill': 'Eliminación del jugador'
+    'food change': 'Cambio de hambre'
+    'item break': 'Romper objeto'
+    'custom level': 'Nivel personalizado'
+    'player move': 'Movimiento del jugador'
+    'block interact': 'Interacción con bloque'
+    'entity tame': 'Domar entidad'
+    'horse jump': 'Salto de caballo'
+    'block break': 'Romper bloque'
+    'bucket fill': 'Llenar cubo'
+    'bucket empty': 'Vaciar cubo'
+    'item consume': 'Consumir objeto'
+    'pickup exp': 'Recoger experiencia'
+    'player teleport': 'Teletransporte del jugador'
+    always: 'Siempre'
+    'shoot bow': 'Disparar arco'
+    'player animation': 'Animación del jugador'
+    'player attack': 'Ataque del jugador'
+    'player damage by entity': 'Daño de entidad al jugador'
+    'entity interact': 'Interacción con entidad'
+    'bed enter': 'Entrar en cama'
+    'player anvil': 'Yunque del jugador'
+    'portal exit': 'Salida de portal'
+    never: 'Nunca'
+    'pickup arrow': 'Recoger flecha'
+    'entity breed': 'Criar entidades'
+    'player jump': 'Salto del jugador'
+    'player permission': 'Permiso del jugador'
+    'player statistic': 'Estadística del jugador'
+    'entity combust': 'Combustión de entidad'
+    'player damage by block': 'Daño de bloque al jugador'
+    'pickup item': 'Recoger objeto'
+    'criterion grant': 'Concesión de criterio'
+    'entity dismount': 'Bajarse de entidad'
+    'player data': 'Datos del jugador'
+    'exp change': 'Cambio de experiencia'
+    'player shear': 'Esquilar'
+    'block ignite': 'Prender fuego a bloque'
+    'item held': 'Objeto en mano'
+    'entity mount': 'Montar entidad'
+    'craft item': 'Fabricar objeto'
+    'drop item': 'Tirar objeto'
+    'armor change': 'Cambio de armadura'
+    'portal enter': 'Entrar en portal'
+    'enchant item': 'Encantar objeto'
+    'block place': 'Colocar bloque'
+    'player damage': 'Daño al jugador'
+    'player respawn': 'Reaparición del jugador'
+    'player real move': 'Movimiento real del jugador'
+    'player inventory': 'Inventario del jugador'
+    'block farm': 'Labrar tierra'
+    'player conversation': 'Conversación del jugador'
+    'item mend': 'Reparar objeto'
+    'player conversation refused': 'Conversación rechazada'
+    'player toggle flight': 'Alternar vuelo'
+    'furnace extract': 'Extraer del horno'
+    'player conversation closed': 'Conversación cerrada'
+    'item interact': 'Interacción con objeto'
+    trigger: 'Activador'
+    'bed leave': 'Salir de cama'
+    'level change': 'Cambio de nivel'
+    'player swap hand': 'Intercambiar manos'
+    'pressure plate': 'Placa de presión'
+    'quest data': 'Datos de misión'
+    'health regain': 'Regeneración de salud'
+    'player resurrect': 'Resurrección del jugador'
+    'player advancement': 'Progreso del jugador'
+    'player command': 'Comando del jugador'
+    'edit book': 'Editar libro'
+    'player death': 'Muerte del jugador'
+    'anpc interact': 'Interacción con NPC de Adyeshach'
+    'anpc damage': 'Daño a NPC de Adyeshach'
+    'mythicmobs kill': 'Matar mob de MythicMobs'
+    'placeholder api': 'PlaceholderAPI'
+  addon:
+    automation: 'Automatiza el inicio de los flujos de misiones / Comprueba los jugadores en línea cada 40 ticks para gestionar las misiones de aceptación automática y las programadas'
+    ui: 'Configura cómo aparecen las misiones en la interfaz / Controla la visibilidad, el icono y la descripción de las misiones'
+    depend: 'Define los requisitos previos de la misión / Admite dependencias de una sola misión y de grupos de misiones / Admite dependencias entre entradas / Puede ser una cadena, una lista o una cadena separada por comas o punto y coma'
+    stats: 'Muestra el progreso de la misión y de las entradas / Admite la barra de progreso BossBar, estilos personalizados y cálculos por script / Se puede configurar como visualización temporal o persistente'
+    restart: 'Controla si una misión puede reiniciarse / Define las condiciones de reinicio mediante scripts Kether'
+    track: 'Rastrea las ubicaciones de los objetivos de la misión y ofrece guía de ruta / Admite la visualización mediante baliza, punto de referencia, navegación y marcador / Un jugador solo puede rastrear una misión a la vez'
+    party: 'Gestiona las funciones de grupo para las misiones / Admite compartir misiones, finalización cooperativa y límites de jugadores / Para mazmorras en equipo, cooperación multijugador, etc.'
+    timeout: 'Define un tiempo límite para las misiones / Admite duración fija y puntos de tiempo periódicos'
+    reset-data-on-accepted: 'Controla si se restablecen datos concretos al aceptar una misión / Solo afecta a las entradas que implementan la interfaz IPlayerData / Para restablecer datos de conteo, progreso y estado'
+    optional: 'Marca una entrada de misión como opcional / Las entradas opcionales no afectan a la finalización de la misión / Para recompensas extra, misiones secundarias, etc.'
+    control: 'Gestiona varias restricciones de misiones / Admite límites de coexistencia, repetición y tiempo de espera, y proxies por script / Se configura como una lista de Map, donde cada Map representa una regla de control'
+  addonLabel:
+    automation: 'Automatización de misiones'
+    ui: 'Interfaz de misiones'
+    depend: 'Dependencia de misiones'
+    stats: 'Estadísticas de misiones'
+    restart: 'Reinicio de misiones'
+    track: 'Seguimiento de misiones'
+    party: 'Grupo de misiones'
+    timeout: 'Tiempo límite de misión'
+    reset-data-on-accepted: 'Restablecer datos al aceptar'
+    optional: 'Entrada opcional'
+    control: 'Control de misiones'
+  hook:
+    accepted: 'Se ejecuta después de aceptar la misión'
+    accept: 'Se ejecuta antes de aceptar la misión (devuelve false para cancelar)'
+    accept_cancelled: 'Se ejecuta después de cancelar la aceptación de la misión'
+    complete: 'Se ejecuta antes de completar la misión (devuelve false para cancelar)'
+    completed: 'Se ejecuta después de completar la misión'
+    fail: 'Se ejecuta antes de que la misión falle'
+    failed: 'Se ejecuta después de que la misión falle'
+    restart: 'Se ejecuta antes de restablecer la misión'
+    restarted: 'Se ejecuta después de restablecer la misión'
+    continued: 'Se ejecuta después de continuar una entrada de misión'
+  scope:
+    '@ all': 'Todos los tipos de ámbito'
+    '@ party': 'Ámbito de grupo'
+    '@ custom': 'Ámbito personalizado'
+
+tips:
+  - "Cocinando un buen estofado de ternera..."
+  - "Volando el avión de ocho centavos..."
+  - "Preparando Escape To Blockov..."
+  - "Escribiendo misiones..."
+  - "✶ Pensando..."
+  - "Preparando el directo de un millón de fans..."
+  - "Yendo a la playa con AmeChan..."
+  - "Shock de dolor..."
+  - "Diciéndole adiós a zero..."
+  - "Enderezando lo torcido y avanzando juntos..."
+  - "Bebiendo Japan Raw-Cola..."
+  - "Resolviendo el motín de Buriatia..."
+  - "Unidos como uno..."
+  - "Lanzando la gran guerra asiática..."
+  - "Usando pastillas LithiumCarbon..."
+  - "Sonriendo como un ángel..."
+  - "Creando la Organización de Servidores Libres..."
+  - "Con 锟斤拷 en la mano mientras gritas 烫烫烫..."
+
+checks:
+  title: "Comprobaciones de configuración"
+  subtitle: "Debug · todos los problemas de configuración del proyecto"
+  scan: "Reescanear"
+  scanning: "Escaneando…"
+  search: "Buscar mensaje / archivo / entrada / clave…"
+  noProject: "Abre primero una carpeta de proyecto (o un archivo de configuración) en el editor y después abre esta ventana."
+  empty: "No se han encontrado problemas."
+  emptyFiltered: "Ningún problema coincide con el filtro actual."
+  stats: "{files} archivos de configuración escaneados · {total} problemas"
+  statsProgress: "Escaneando {done}/{files}…"
+  groupBy: "Agrupar por archivo"
+  expandAll: "Expandir todo"
+  collapseAll: "Contraer todo"
+  openInEditor: "Abrir en el editor"
+  copyAll: "Copiar todo"
+  copied: "Copiado al portapapeles"
+  close: "Cerrar"
+  colMessage: "Problema"
+  colLocation: "Ubicación"
+  severity: "Severidad"
+  line: "línea {n}"
+  notCE: "No es un archivo de CraftEngine (solo comprobación de sintaxis YAML)"
+  assetsIndex: "Índice de recursos: {state}"
+  assetsReady: "listo · {ns} espacios de nombres"
+  assetsOff: "desactivado"
+
+diagnostics:
+  title: "Inspecciones de configuración"
+  openPanel: "Abrir el panel de inspecciones"
+  summary: "ERROR {e} · WARN {w} · WEAK {k} · INFO {i}"
+  noIssues: "No se han encontrado problemas ✓"
+  allFiltered: "Ningún problema coincide con el filtro actual"
+  yamlSyntax: "Error de sintaxis YAML: {msg}"
+  yamlTab: "YAML no permite indentación con tabuladores: usa espacios"
+  strippedTags: "Se ignoraron {n} etiquetas de tipo !! desconocidas (CraftEngine no las admite)"
+  unknownSection: "La sección \"{key}\" no está en la lista conocida; CraftEngine puede ignorarla"
+  aliasSection: "La sección \"{key}\" es un alias. CraftEngine la acepta, pero la forma canónica es \"{canon}\""
+  badEntryId: "El id de entrada \"{id}\" contiene caracteres no válidos (solo letras/dígitos/guion bajo/guion/punto)"
+  badEntryIdNs: "El id de entrada \"{id}\" no es un namespace:path válido"
+  unknownNamespace: "El namespace \"{ns}\" no está presente en ningún resource pack escaneado"
+  entryNotMap: "El cuerpo de la entrada no es un mapeo; CraftEngine espera un objeto de configuración"
+  emptySection: "La sección \"{key}\" está vacía"
+  unknownKey: "Clave \"{key}\" no reconocida: no está en el registro de claves de CraftEngine ni en el esquema del editor; ignórala si es un campo personalizado/de extensión"
+  unknownType: "Tipo \"{type}\" no reconocido: no está en el registro de tipos de CraftEngine"
+  notNumber: "\"{label}\" espera un número, se ha recibido {value}"
+  notBool: "\"{label}\" debería ser true/false, se ha recibido {value}"
+  notInOptions: "El valor {value} de \"{label}\" no está entre las opciones que lista el editor (CraftEngine acepta otras)"
+  expectList: "\"{label}\" suele ser una lista de cadenas, actualmente es un mapeo"
+  expectMap: "\"{label}\" suele ser un mapeo clave/valor, actualmente es {actual}"
+  expectScalar: "\"{label}\" es texto según el esquema del editor, actualmente es {actual}"
+  premium: "\"{key}\" es una función exclusiva de la versión premium"
+  legacyKey: "\"{key}\" es una clave antigua; la nueva forma es \"{new}\" y tener ambas puede causar conflictos"
+  emptyValue: "\"{key}\" es una cadena vacía, lo que equivale a no establecerla"
+  cmdDuplicate: "custom_model_data {n} duplica la entrada \"{other}\": ambas renderizan el mismo modelo"
+  unknownRef: "Id de {label} desconocido: {id} (no se ha encontrado en el registro vanilla)"
+  unknownGlobal: "Variable global no definida <global:{id}>"
+  unknownImage: "Imagen no definida <image:{id}> (no existe esa entrada en la sección images)"
+  imageCellOutOfRange: "Celda de imagen fuera de rango: {id} tiene una cuadrícula de {rows}×{cols}, pero se ha referenciado la fila {row} columna {col}"
+  materialDefault: "No hay material establecido: se usará el material por defecto de config.yml"
+  imageFileRequired: "La entrada images no tiene file (o usa ref para apuntar a una imagen existente)"
+  imageHeightAscent: "height({h}) debe ser ≥ ascent({a}); de lo contrario Minecraft rechaza la definición de fuente"
+  badGridSize: "grid_size debe ser \"filas,cols\" (p. ej. 2,3)"
+  charsRowMismatch: "Cada fila de chars debe tener la misma longitud (la fila 1 tiene {n} caracteres, la fila {row} tiene {m})"
+  imageFileExt: "file no tiene extensión .png; el plugin la añade automáticamente"
+  emojiKeywords: "Este emoji no tiene keywords, así que los jugadores no pueden activarlo"
+  emojiContent: "Este emoji no tiene image ni content/template, así que no renderizará nada"
+  emojiScene: "La escena \"{scene}\" no está en la lista del editor (habituales: chat/book/anvil/sign/command)"
+  badAutoState: "El grupo auto_state \"{name}\" no existe (CraftEngine ignora el grupo de estado)"
+  autoStateId: "La forma expandida de auto_state debería incluir también un id; si no, cada bloque obtiene su propio grupo de estado"
+  propTypeMissing: "Una propiedad de estado de bloque carece de type (CraftEngine lanza unknown_type)"
+  propTypeUnknown: "Tipo de propiedad de estado de bloque desconocido \"{type}\" (disponibles: {list})"
+  propStringValues: "Una propiedad string necesita una lista values"
+  propIntRange: "Una propiedad int debería incluir range (p. ej. 0~15)"
+  rotationStep: "rotation {v} no es múltiplo de 90 (CraftEngine solo acepta 90/180/270)"
+  patternRowMismatch: "Cada fila de pattern debe tener la misma longitud (la fila 1 tiene {n} columnas, la fila {row} tiene {m})"
+  ingredientUnused: "La clave de ingrediente \"{key}\" nunca aparece en el pattern, así que no se usa"
+  recipeTypeMissing: "La receta no tiene type"
+  recipeResultMissing: "La receta no tiene result"
+  categoryIcon: "Esta categoría no tiene icon y no mostrará ninguno en el menú"
+  equipmentType: "Este equipo no tiene type (component / trim)"
+  brightnessIncomplete: "brightness requiere block_light y sky_light a la vez; de lo contrario no tiene efecto"
+  typeMissing: "Falta el campo \"type\" (CraftEngine normalmente necesita un identificador de tipo)"
+  vanillaRefNotFound: "{id} no está en el índice de recursos vanilla (ignóralo si otro resource pack lo proporciona)"
+  someField: "este campo"
+  shapeList: "una lista"
+  shapeMap: "un mapeo clave/valor"
+  shapeText: "texto"
+  shapeNumber: "un número"
+  shapeBool: "un booleano"
+
+preview:
+  title: "Vista previa"
+  windowTitle: "Vista previa de escena MC"
+  windowMax: "Maximizar / restaurar"
+  windowResize: "Arrastra para cambiar el tamaño"
+  open: "Vista previa dentro de una escena simulada del juego"
+  unavailable: "El módulo de vista previa no está cargado"
+  sceneAuto: "Auto"
+  sceneChat: "Chat"
+  sceneLore: "Lore del objeto"
+  sceneGui: "GUI"
+  sceneImage: "Imágenes de fuente"
+  sceneFurniture: "Mobiliario"
+  furnitureVariant: "Variante"
+  furnitureElements: "Elementos"
+  furnitureHitboxes: "Cajas de colisión"
+  furnitureBoxConfig: "{n} entr. de config."
+  furnitureSeats: "Asientos"
+  furnitureBlueprint: "Modelo externo"
+  furnitureNoVariants: "<red>Este mobiliario no tiene variants (se necesita al menos una)</red>"
+  furnYaw: "Vista"
+  furnYawLeft: "Girar la vista 45° a la izquierda (Q)"
+  furnYawRight: "Girar la vista 45° a la derecha (E)"
+  furnYawDrag: "Arrastra a izquierda/derecha en el lienzo para rotar la vista (mantén Shift para ajustar a 15°)"
+  furnReset: "Restablecer"
+  furnZoom: "Zoom"
+  furnZoomIn: "Acercar (+)"
+  furnZoomOut: "Alejar (-)"
+  furnFill: "Rellenar"
+  furnLabels: "Etiquetas"
+  furnGrid: "Cuadrícula"
+  furnSelected: "Caja de colisión seleccionada"
+  hbTypeInteraction: "Interacción"
+  hbTypeShulker: "Shulker"
+  hbTypeHappyGhast: "Happy Ghast"
+  hbTypeCustom: "Personalizada"
+  rows: "Filas"
+  scale: "Escala"
+  guiScale: "Escala de la GUI"
+  scaleAuto: "Auto"
+  customText: "Texto personalizado"
+  customTextHint: "Se admiten MiniMessage y <image:ns:id>, p. ej. <image:internal:item_browser>"
+  shift: "Desplazamiento"
+  shiftInsert: "Insertar <shift:N>"
+  shiftInsertHint: "Inserta <shift:N> en el cursor y ajusta con -10/-1/+1/+10 (o Alt+←/→ = ∓1, Alt+Shift+←/→ = ∓10)"
+  resolveTags: "Resolver etiquetas de texto CE"
+  resolveMiniMessage: "Resolver etiquetas MiniMessage"
+  resolveCeTags: "Resolver etiquetas CE"
+  resolveGlobals: "Resolver variables globales"
+  resolveImages: "Renderizar imágenes de fuente"
+  shadow: "Sombra del texto"
+  darkBg: "Fondo oscuro"
+  copyImage: "Copiar imagen"
+  showSource: "Mostrar texto"
+  copied: "Copiado al portapapeles"
+  copyFailed: "Error al copiar: {msg}"
+  reloading: "Reescaneando recursos…"
+  renderFailed: "Error de renderizado: {msg}"
+  sceneLabel: "Escena"
+  assetsOk: "Recursos indexados ({n} entradas)"
+  assetsLoading: "Indexando recursos…"
+  assetsMissing: "No hay directorio de recursos de Minecraft configurado: se usan los glifos de respaldo integrados"
+  imageGallery: "Galería de imágenes de fuente"
+  noImages: "No se han encontrado entradas images en este proyecto"
+  sourceHint: "Texto en bruto usado por esta vista previa (sin resolver)"
+  globalsHint: "Variables globales del proyecto"
+  sceneItem: "Hotbar"
+  sceneGlyphGui: "GUI de cofre"
+  glyphChatIntro: "Imagen de fuente dentro del chat"
+  glyphInline: "en línea con el texto"
+  glyphRepeat: "repetida"
+  glyphColored: "recolorada"
+  sceneItemModel: "Modelo"
+  sceneInventory: "GUI de inventario"
+  modelContext: "contexto de display"
+  furnEdit: "Editar"
+  furnEditHint: "Arrastra cajas de colisión / asientos / anclas de elementos directamente en la vista previa (los cambios se guardan en el editor)"
+  furnPitchUp: "Elevar la vista (pitch +15°)"
+  furnPitchDown: "Bajar la vista (pitch -15°)"
+  furnPitchHint: "30° = isométrica, 90° = vista cenital"
+  invSlotLabel: "Ranura"
+  invSlotHotbar: "Hotbar"
+  invSlotMain: "Inventario"
+  invSlotCraft: "Fabricación"
+  invSlotArmor: "Armadura"
+  invSlotResult: "Resultado"

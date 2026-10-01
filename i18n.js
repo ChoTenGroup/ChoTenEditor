@@ -1,11 +1,34 @@
 /* ChoTenEditor 本地化核心模块
  * 依赖: js-yaml (全局 jsyaml)。在 index.html / settings.html 中紧随 js-yaml 加载。
- * 字典: locales/zh_cn.yml, locales/en_us.yml。语言持久化: localStorage.editorConfig.language
+ * 字典: locales/<lang>.yml (zh_cn 为源语言)。语言持久化: localStorage.editorConfig.language
+ * 支持语言: zh_cn / zh_tw / en_us / de_de / es_es / ko_kr / ru_ru
+ * 回退链: 新语言缺失词条 → en_us → zh_cn; zh_tw 缺失词条 → en_us → zh_cn
  */
 (function () {
+  var SUPPORTED = ['zh_cn', 'zh_tw', 'en_us', 'de_de', 'es_es', 'ko_kr', 'ru_ru'];
+  // 查值回退链 (不含 zh_cn; zh_cn 作为最终兜底在 init 时总是加载)
+  var FALLBACK = {
+    zh_cn: [],
+    zh_tw: ['en_us'],
+    en_us: [],
+    de_de: ['en_us'],
+    es_es: ['en_us'],
+    ko_kr: ['en_us'],
+    ru_ru: ['en_us'],
+  };
+  // <html lang> 属性映射
+  var HTML_LANG = {
+    zh_cn: 'zh-CN', zh_tw: 'zh-TW',
+    en_us: 'en', de_de: 'de', es_es: 'es', ko_kr: 'ko', ru_ru: 'ru',
+  };
+
   var current = 'zh_cn';
   var dicts = {}; // lang -> dict object
   var initPromise = null;
+
+  function isSupported(lang) {
+    return SUPPORTED.indexOf(lang) !== -1;
+  }
 
   function getConfig() {
     try { return JSON.parse(localStorage.getItem('editorConfig') || '{}'); } catch (e) { return {}; }
@@ -19,7 +42,15 @@
 
   function getLang() {
     var cfg = getConfig();
-    return cfg.language === 'en_us' ? 'en_us' : 'zh_cn';
+    return isSupported(cfg.language) ? cfg.language : 'zh_cn';
+  }
+
+  // 当前语言的完整回退链 (自身优先, 最终总是落到 zh_cn 源语言)
+  function fallbackChain(lang) {
+    var chain = (FALLBACK[lang] || []).slice();
+    chain.unshift(lang);
+    chain.push('zh_cn');
+    return chain;
   }
 
   function lookup(dict, key) {
@@ -32,10 +63,13 @@
     return o;
   }
 
-  // 当前语言 → zh_cn → 原样返回 key
+  // 按回退链取词条: 当前语言 → 回退语言 → zh_cn → 原样返回 key
   function t(key, params) {
-    var v = lookup(dicts[current], key);
-    if (v == null && current !== 'zh_cn') v = lookup(dicts['zh_cn'], key);
+    var v;
+    var chain = fallbackChain(current);
+    for (var i = 0; i < chain.length && v == null; i++) {
+      v = lookup(dicts[chain[i]], key);
+    }
     if (v == null) v = key;
     if (params) {
       v = String(v).replace(/\{(\w+)\}/g, function (m, name) {
@@ -45,10 +79,37 @@
     return v;
   }
 
-  // 扫描 [data-i18n](textContent) / [data-i18n-placeholder] / [data-i18n-title]
+  // 双语字段取值: {zh, en} / {zh_cn, en_us} 对象按当前语言与回退链挑选。
+  // zh_tw 时简中字段排在英文之后 (繁中用户宁可看英文也不看简中)。
+  function pick(obj) {
+    if (obj == null) return '';
+    if (typeof obj === 'string') return obj;
+    if (typeof obj !== 'object') return String(obj);
+    var chain = fallbackChain(current);
+    for (var i = 0; i < chain.length; i++) {
+      var lang = chain[i];
+      var v = obj[lang];
+      // 泛化短键: zh 覆盖 zh_cn/zh_tw, en 覆盖 en_us
+      if (v == null || v === '') {
+        if (lang === 'zh_cn' || lang === 'zh_tw') v = obj.zh;
+        else if (lang === 'en_us') v = obj.en;
+      }
+      if (v != null && v !== '') return v;
+    }
+    // 兜底: 任意一个非空值
+    for (var k in obj) {
+      var v2 = obj[k];
+      if (typeof v2 === 'string' && v2) return v2;
+    }
+    return '';
+  }
+
+  // 扫描 [data-i18n](textContent) / [data-i18n-placeholder] / [data-i18n-title] / [data-i18n-tip]
+  // data-i18n-tip: 本应用自定义 tooltip (tooltip.js 读 data-tip, 替代原生 title) ——
+  // HTML 里的 data-tip 是源语言兜底, 应用时按 key 覆盖, 让悬浮提示跟随语言设置。
   function applyDOM(root) {
     root = root || document;
-    var els = root.querySelectorAll('[data-i18n], [data-i18n-placeholder], [data-i18n-title]');
+    var els = root.querySelectorAll('[data-i18n], [data-i18n-placeholder], [data-i18n-title], [data-i18n-tip]');
     for (var i = 0; i < els.length; i++) {
       var el = els[i];
       var key = el.getAttribute('data-i18n');
@@ -57,8 +118,14 @@
       if (key) el.setAttribute('placeholder', t(key));
       key = el.getAttribute('data-i18n-title');
       if (key) el.setAttribute('title', t(key));
+      key = el.getAttribute('data-i18n-tip');
+      if (key) {
+        // 键未收录时保留 HTML 里的源语言兜底, 不用 key 本身覆盖
+        var tv = t(key);
+        if (tv && tv !== key) el.setAttribute('data-tip', tv);
+      }
     }
-    document.documentElement.lang = current === 'zh_cn' ? 'zh-CN' : 'en';
+    document.documentElement.lang = HTML_LANG[current] || 'en';
     var titleKey = (document.body && document.body.getAttribute('data-title-key'));
     document.title = titleKey ? t(titleKey) : t('app.title');
   }
@@ -79,7 +146,7 @@
   // 而不是刚保存但尚未生效的语言（否则设置面板会和编辑器界面语言不一致）。
   function getForcedLang() {
     try {
-      var m = /[?&]lang=(en_us|zh_cn)(?:&|$)/.exec(window.location.search || '');
+      var m = /[?&]lang=(zh_cn|zh_tw|en_us|de_de|es_es|ko_kr|ru_ru)(?:&|$)/.exec(window.location.search || '');
       return m ? m[1] : null;
     } catch (e) {
       return null;
@@ -87,10 +154,16 @@
   }
 
   function init(lang) {
+    if (!isSupported(lang)) lang = 'zh_cn';
     current = lang;
+    // 回退链上的所有字典 + 源语言 zh_cn 都要加载
+    var langs = fallbackChain(lang);
     var chain = Promise.resolve();
-    if (lang !== 'zh_cn') chain = chain.then(function () { return load('zh_cn'); });
-    chain = chain.then(function () { return load(lang); });
+    for (var i = 0; i < langs.length; i++) {
+      (function (l) {
+        chain = chain.then(function () { return load(l); });
+      })(langs[i]);
+    }
     return chain.then(function () {
       applyDOM();
       return current;
@@ -110,20 +183,27 @@
   // 语言热切换会让已生成的界面文本、提示/补全缓存与其它窗口状态不一致
   // (混合语言、旧缓存失效)，因此设置页统一改为"保存 + 重启后生效"。
   function persistLang(lang) {
-    saveLang(lang === 'en_us' ? 'en_us' : 'zh_cn');
+    saveLang(isSupported(lang) ? lang : 'zh_cn');
   }
 
   // 启动加载提示列表（替代 loadingtips.txt）
   function tips() {
-    var arr = lookup(dicts[current], 'tips');
-    if (!Array.isArray(arr) || !arr.length) arr = lookup(dicts['zh_cn'], 'tips');
+    var arr;
+    var chain = fallbackChain(current);
+    for (var i = 0; i < chain.length && (!Array.isArray(arr) || !arr.length); i++) {
+      arr = lookup(dicts[chain[i]], 'tips');
+    }
     return Array.isArray(arr) ? arr : [];
   }
 
   // 内容描述覆盖: content.<section>.<id>，无翻译则返回 fallback（zh 原文）
   function desc(section, id, fallback) {
-    var v = lookup(dicts[current], 'content.' + section + '.' + id);
-    if (v == null && current !== 'zh_cn') v = lookup(dicts['zh_cn'], 'content.' + section + '.' + id);
+    var key = 'content.' + section + '.' + id;
+    var v;
+    var chain = fallbackChain(current);
+    for (var i = 0; i < chain.length && v == null; i++) {
+      v = lookup(dicts[chain[i]], key);
+    }
     return v != null ? v : (fallback != null ? fallback : '');
   }
 
@@ -138,7 +218,10 @@
   window.I18N = {
     get lang() { return current; },
     get ready() { return initPromise; },
+    SUPPORTED: SUPPORTED,
+    isSupported: isSupported,
     t: t,
+    pick: pick,
     applyDOM: applyDOM,
     setLang: setLang,
     saveLang: persistLang,

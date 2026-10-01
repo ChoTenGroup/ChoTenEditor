@@ -55,7 +55,7 @@ A plugin editor that isn't very easy to use. Currently, supports the following f
 - [X] Config error inspection (ERROR / WARN / WEAK_WARN / INFO, IDE-style)
 - [X] Whole-project problem list in a separate window (检查 / Checks → Debug, filter + search)
 - [X] Autocomplete for CraftEngine items, blocks, textures, models, sounds, particles, enchantments…
-- [X] CraftEngine item / block / equipment preview (flat icon + isometric model rendering)
+- [X] CraftEngine item / block / equipment preview (flat icon + isometric model rendering, inventory-GUI item rendering)
 - [X] CraftEngine font image preview inside simulated in-game scenes (chat, item lore, vanilla 9x1–9x6 GUI)
 - [X] In-preview resolution of CraftEngine text tags and global variables
 - [ ] CraftEngine script editing
@@ -77,9 +77,17 @@ possible) and the editor indexes it once (about 30 ms for version `26.3`) to pow
 
   | entry | scenes (default first) |
   |---|---|
-  | items / blocks / furniture / equipments / categories / paintings | **物品栏** (hotbar slot + floating tooltip) · 物品提示 · 容器 GUI · 聊天 |
-  | furniture (`furniture:` entries, and items whose `behavior.type` is `furniture_item`) | **家具** (isometric scene) · 物品提示 · 容器 GUI · 聊天 |
+  | items / blocks / furniture / equipments / categories / paintings | **物品栏** (hotbar slot + floating tooltip) · **背包 GUI** (vanilla survival inventory) · 物品提示 · 容器 GUI · 聊天 |
+  | furniture (`furniture:` entries, and items whose `behavior.type` is `furniture_item`) | **家具** (isometric scene) · **模型** (display ItemTransform preview) · 物品提示 · 容器 GUI · 聊天 |
   | images (`images:` entries) / emoji | **箱子 GUI** (the glyph inside the container title) · 聊天 · 物品 Lore · 图像总览 |
+
+  The **背包 GUI** scene draws the vanilla survival inventory
+  (`textures/gui/container/inventory`, armor + 2×2 crafting + main + hotbar slots) with the entry's
+  item rendered **exactly the way vanilla renders icons inside inventory slots**: a flat item stays a
+  1:1 16×16 texture, while a 3D model gets its `display.gui` ItemTransform baked in and is projected
+  head-on (the [30,225,0] / 0.625 rotation comes from the model's own `block/block.json` parent, not
+  the camera), centred in the slot with per-face diffuse shading. Clicking another slot moves the
+  item there.
 
   The **家具** scene lays a furniture entry out isometrically: a ground grid with the origin
   block outlined and an `N` marker for north, then every element of the selected variant drawn at its
@@ -122,12 +130,37 @@ possible) and the editor indexes it once (about 30 ms for version `26.3`) to pow
 
   The panel adds a view row for the furniture scene: **⟲ / ⟳** rotate the view in 45° steps (also
   `Q` / `E`, `R` resets) and **dragging left/right on the canvas rotates it freely** (hold `Shift`
-  while dragging to snap to 15°), **− / +** zoom 50 %–300 % (also `Ctrl`+wheel or `+` / `-`), and
-  checkboxes toggle 碰撞箱 / 填充 / 标注 / 座位 / 网格. The canvas sizes itself to the content, so tall
+  while dragging to snap to 15°), **− / +** zoom 50 %–300 % (also `Ctrl`+wheel or `+` / `-`), **⤓ / ⤒**
+  tilt the view ±15° (30° = isometric default, 90° looks straight down, `PageUp` / `PageDown`), and
+  checkboxes toggle 编辑 / 碰撞箱 / 填充 / 标注 / 座位 / 网格. The canvas sizes itself to the content, so tall
   or multi-block furniture is never clipped. Clicking a hitbox in the canvas selects it (a click that
   ends a view drag is not treated as a selection): the wireframe highlights with a translucent fill and
   the status bar shows its type, size and seat count next to a colour legend of every hitbox in the
   variant. A **变体** dropdown appears when the entry defines more than one variant.
+
+  **Edit in the preview** — the 编辑 checkbox turns the canvas into a direct manipulator: every
+  hitbox grows a **square handle** at its floor centre and a **diamond** at its top centre, every
+  seat a **yellow ring**, every item/block display element a **red dot**. Dragging a handle back-
+  projects the pointer through the isometric view (rotation and tilt included) onto the right world
+  plane and writes the change straight back into the entry's parse tree — the same object the visual
+  editor forms are built from — so the forms refresh themselves when the drag ends
+  (`ce-preview-data-changed`): move the square to reposition a hitbox (`position`), the diamond to
+  change its `height` (a `scale: [w, h]` shorthand is split into explicit `width` + `height`),
+  a ring to move a seat (the `"x,y,z yaw …"` string is rebuilt with the `yaw` and any trailing
+  tokens like `force` preserved; a seat that never had a yaw does not gain one), and the red dot to
+  change an element's `translation`. Holding `Shift` while dragging locks the drag to the vertical
+  axis (height only), and clicking a handle selects it (white highlight), clicking empty space
+  deselects. The edits are ordinary config values, so the rendered preview *is* the config.
+
+  A **模型** scene renders one item/block model the way a display entity holds it, expanded through
+  the full `display` **ItemTransform** of the selected context — `gui` (default), `ground`, `fixed`,
+  `head`, `thirdperson/firstperson` left/right hand and `on_shelf`, with the usual fallbacks
+  (a missing context falls back to `gui`, a model without any `display` renders `ground` at the
+  vanilla 0.25 scale). The rotation/scale/translation pivot is the model centre (8,8,8), Euler
+  rotations compose `X·Y·Z` and left-hand contexts mirror `x` — matching the vanilla item renderer
+  — and a **display 上下文** dropdown switches the context, with the header showing
+  `ctx: <name> (fallback)` / `faces N` / `yaw` / `pitch` / `zoom`. Flat items render as vertical
+  cards; an unresolvable model reports `model not found` instead of an empty canvas.
 
   The preview window is a normal WindowManager window, so it can be **enlarged**: drag the grip in its
   bottom-right corner, click **⛶** (or double-click the title bar) to maximize/restore, and the size you
@@ -264,6 +297,8 @@ and are ignored by git (see `.gitignore`). The `scripts\*.js` helpers are commit
 | `node_modules\.bin\electron.cmd _ce_shift_layout_test.js` | asserts the 偏移 row breaks onto its own full-width line and that its controls stay on one line in the order −10 / −1 / value / +1 / +10 / insert |
 | `node_modules\.bin\electron.cmd _ce_shift_test.js` | drives the 偏移 control in the real panel: the four ±1/±10 buttons insert `<shift:N>` at the caret, a second nudge edits that same tag in place, the number box and the ±256 clamp work, and the render actually changes |
 | `node_modules\.bin\electron.cmd _ce_panel_ui_test.js` | drives the real preview panel: asserts the 界面尺寸 options, that each factor resizes the canvas, and that 自定义文字 (including a `<image:…>` tag) actually changes the render |
+| `node_modules\.bin\electron.cmd _ce_inventory_test.js` | the 背包 GUI scene against real assets: vanilla survival-inventory texture (176×166) with the hand-drawn fallback when it is missing, the 45-slot layout coordinates, the `projectGui`/`GUI_SLOT_VIEW` math (cube ⇒ up/north/east faces, depth-sorted), a 3D `stone` rendered through its baked `display.gui` transform (icon ≈14.1×15.7 logical px, several brightness levels), flat `stick` as a 1:1 texture, count badge, hover overlay, missing-item placeholder + warning |
+| `node_modules\.bin\electron.cmd _ce_inventory_panel_test.js` | drives the real panel's 背包 GUI scene: the tab exists for item entries, the canvas is 176×166 × scale, the status bar names the current slot, clicking another slot moves the item there, and the stone also renders as a 3D model inside the 容器 GUI scene |
 | `node_modules\.bin\electron.cmd _ce_window_resize_test.js` | window system: every window gets a bottom-right resize grip and a **⛶** maximize/restore button, dragging the grip resizes it (clamped to the viewport and the window's minimum), `resizable: false` / `maximizable: false` opt out, and the preview panel's window — once enlarged or maximized — re-renders its canvas at a larger automatic 界面尺寸 and keeps the chosen size when reopened. It also guards the "can't close the app/window" cases: after 12 000 window clicks the window z-index stays under the app title bar (and `elementFromPoint` on the app's ✕ still hits it), a maximized window starts below the title/menu bar so its own ✕ stays clickable, and shrinking the app window pulls open windows back into the viewport |
 | `node scripts\render-ce-scene-matrix.js` | renders the content→scene matrix — item `demo:topaz_sword`, blocks `stone_bricks` / `oak_stairs` / `chest`, and the font image `demo:star` in the 箱子 GUI and 聊天 scenes — into `_ce_shots\scene-*.png` |
 

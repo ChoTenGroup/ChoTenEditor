@@ -6,6 +6,7 @@
  * 用法:
  *   var win = WindowManager.open({ title, content, width, height, x, y, className, onClose,
  *                                  minWidth, minHeight, resizable, maximizable });
+ *   可选 maxTitle/closeTitle/resizeTitle: 控件提示文案 (缺省走 windowManager.* 语言包)。
  *   win.close(); win.setTitle('...'); win.el; win.body;
  *   win.setSize(w, h); win.getSize(); win.toggleMax(); win.isMaximized(); win.onResize(fn);
  * 内容需要跟着窗口大小变化时, 用 win.onResize(fn) (窗口元素上也会派发 'cw:resize' 事件)。
@@ -76,16 +77,17 @@
     el.style.height = height + 'px';
     el.style.minWidth = minW + 'px';
     el.style.minHeight = minH + 'px';
+    var defTitle = defaultTitles();
     var maxBtnHtml = (opts.maximizable === false) ? ''
-      : '<button type="button" class="cw-max" title="' + esc(opts.maxTitle || 'Maximize') + '">⛶</button>';
+      : '<button type="button" class="cw-max" title="' + esc(opts.maxTitle || defTitle.max) + '">⛶</button>';
     el.innerHTML =
       '<div class="cw-titlebar">' +
         '<span class="cw-title"></span>' +
         maxBtnHtml +
-        '<button type="button" class="cw-close" title="' + esc(opts.closeTitle || '✕') + '">✕</button>' +
+        '<button type="button" class="cw-close" data-tip="' + esc(opts.closeTitle || defTitle.close) + '" title="' + esc(opts.closeTitle || defTitle.close) + '">✕</button>' +
       '</div>' +
       '<div class="cw-body"></div>' +
-      (opts.resizable === false ? '' : '<div class="cw-resize" title="' + esc(opts.resizeTitle || 'Resize') + '"></div>');
+      (opts.resizable === false ? '' : '<div class="cw-resize" data-tip="' + esc(opts.resizeTitle || defTitle.resize) + '" title="' + esc(opts.resizeTitle || defTitle.resize) + '"></div>');
     var titleEl = el.querySelector('.cw-title');
     var bodyEl = el.querySelector('.cw-body');
     var closeBtn = el.querySelector('.cw-close');
@@ -316,6 +318,22 @@
 
   function esc(s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // 默认控件提示 (跟随语言设置; I18N 未就绪/不存在时回退中文源文案)
+  function tr(key, fb) {
+    try {
+      var T = root.I18N && root.I18N.t;
+      if (T) { var v = T(key); if (v && v !== key) return v; }
+    } catch (e) { /* ignore */ }
+    return fb;
+  }
+  function defaultTitles() {
+    return {
+      max: tr('windowManager.maxRestore', '最大化 / 还原'),
+      close: tr('windowManager.close', '关闭'),
+      resize: tr('windowManager.resize', '拖动改大小'),
+    };
   }
 
   root.WindowManager = {

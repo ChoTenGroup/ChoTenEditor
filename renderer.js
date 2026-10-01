@@ -3652,6 +3652,19 @@ function initCETools() {
     gotoDiagnosticIssue(ev.detail || {});
   });
 
+  // 3.5) 预览内编辑 → 可视化编辑器数据同步桥
+  // 预览面板直接修改的是解析树里的活对象 (entry.data 的引用), 这里只需:
+  //   标记 _visualDirty (切代码模式时会提醒同步) + 重建表单显示新值。
+  document.addEventListener('ce-preview-data-changed', function (ev) {
+    const d = ev.detail || {};
+    if (!isVisualMode || !visualEditor || !visualEditor._ceParsed) return;
+    if (d.file && visualEditor._ceFilePath && d.file !== visualEditor._ceFilePath) return;
+    visualEditor._ceParsed._visualDirty = true;
+    if (typeof visualEditor._ceRenderFn === 'function') {
+      try { visualEditor._ceRenderFn(); } catch (e) { /* 表单重建失败不影响预览 */ }
+    }
+  });
+
   // 4) 状态栏徽章点击 → 打开/关闭面板
   const diagStatus = document.getElementById('ce-diag-status');
   if (diagStatus) {

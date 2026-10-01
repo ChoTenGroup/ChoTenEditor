@@ -366,6 +366,8 @@
       computeLists();
 
       // 原版语言（用于预览显示名 + 注册表补充）
+      // en_us 恒加载 (Minecraft 回退语言); zh_cn 恒加载 (源语言兜底);
+      // 再加载当前界面语言对应的原版语言文件, 让预览名跟随语言设置。
       if (mcRoot) {
         var en = await fetchLang(norm(mcRoot) + '/minecraft', 'en_us');
         if (en) {
@@ -374,6 +376,11 @@
           var zh = await fetchLang(norm(mcRoot) + '/minecraft', 'zh_cn');
           if (zh) LANG.zh_cn = zh;
           computeLists();
+        }
+        var uiLang = (typeof I18N !== 'undefined' && I18N.lang) ? I18N.lang : 'zh_cn';
+        if (uiLang !== 'en_us' && uiLang !== 'zh_cn') {
+          var ui = await fetchLang(norm(mcRoot) + '/minecraft', uiLang);
+          if (ui) LANG[uiLang] = ui;
         }
       }
       // 工程语言文件（覆盖原版同 ns）
@@ -513,11 +520,19 @@
 
   function langName(id, lang) {
     var s = splitId(id);
-    var l = lang || 'zh_cn';
+    var l = lang
+      || ((typeof I18N !== 'undefined' && I18N.lang) ? I18N.lang : 'zh_cn');
+    // 回退链: 当前语言 → (zh_tw 走 en) → zh_cn → en_us
+    var chain;
+    if (l === 'zh_cn') chain = ['zh_cn', 'en_us'];
+    else if (l === 'zh_tw') chain = ['zh_tw', 'en_us', 'zh_cn'];
+    else chain = [l, 'en_us', 'zh_cn'];
     var objs = [];
-    if (LANG_NORM[s.ns] && LANG_NORM[s.ns][l]) objs.push(LANG_NORM[s.ns][l]);
-    if (LANG[l]) objs.push(LANG[l]);
-    if (LANG.en_us) objs.push(LANG.en_us);
+    for (var c = 0; c < chain.length; c++) {
+      var cl = chain[c];
+      if (LANG_NORM[s.ns] && LANG_NORM[s.ns][cl]) objs.push(LANG_NORM[s.ns][cl]);
+      if (LANG[cl]) objs.push(LANG[cl]);
+    }
     var keys = ['item.minecraft.', 'block.minecraft.', 'entity.minecraft.', 'enchantment.minecraft.',
       'effect.minecraft.', 'biome.minecraft.', 'attribute.minecraft.', 'painting.minecraft.',
       'jukebox_song.minecraft.'];

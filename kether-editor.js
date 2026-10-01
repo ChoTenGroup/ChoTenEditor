@@ -1791,9 +1791,10 @@
     bindTooltip(h.querySelector('#ke-undo'), '撤销 (Ctrl+Z)');
     bindTooltip(h.querySelector('#ke-redo'), '重做 (Ctrl+Shift+Z)');
     bindTooltip(h.querySelector('.ke-auto-sync-label'), '自动同步积木到 Kether 代码');
-    bindTooltip(h.querySelector('#ke-win-minimize'), '最小化');
-    bindTooltip(h.querySelector('#ke-win-maximize'), '最大化');
-    bindTooltip(h.querySelector('#ke-win-close'), '关闭');
+    // 窗口控件提示跟随语言设置 (kether.* 与应用标题栏共用同一组词)
+    bindTooltip(h.querySelector('#ke-win-minimize'), keI18n('kether.minimize', '最小化'));
+    bindTooltip(h.querySelector('#ke-win-maximize'), keI18n('kether.maximize', '最大化'));
+    bindTooltip(h.querySelector('#ke-win-close'), keI18n('kether.close', '关闭'));
 
     h.querySelector('#ke-back').onclick = () => { playSound('back'); if (state.onCancel) state.onCancel(); overlay.remove(); };
     h.querySelector('#ke-undo').onclick = () => { playSound('click'); _undo(state, overlay); };
@@ -3803,6 +3804,16 @@ document.addEventListener('dragover', function (e) {
     el.addEventListener('mouseenter', function(e) { showTooltip(e, content, isHtml); });
     el.addEventListener('mousemove', function(e) { if (_tipEl && _tipEl.style.display !== 'none' && _tipEl.style.display !== '') _posTip(e); });
     el.addEventListener('mouseleave', hideTooltip);
+  }
+  // 语言包查找 (key 不存在时回退中文源文案); I18N 未加载时直接用回退
+  function keI18n(key, fb) {
+    try {
+      if (window.I18N && window.I18N.t) {
+        var v = window.I18N.t(key);
+        if (v && v !== key) return v;
+      }
+    } catch (e) { /* ignore */ }
+    return fb;
   }
 
   function showBlockDetail(block, state) {

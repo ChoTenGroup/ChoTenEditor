@@ -17,14 +17,14 @@
                 <span class="title-bar-text" data-i18n="settings.title">设置</span>
             </div>
             <div class="title-bar-controls">
-                <button class="tb-btn tb-btn-minimize" id="tb-minimize" data-tip="最小化" data-i18n-title="titlebar.minimize">─</button>
-                <button class="tb-btn tb-btn-maximize" id="tb-maximize" data-tip="最大化" data-i18n-title="titlebar.maximize">□</button>
-                <button class="tb-btn tb-btn-close" id="tb-close" data-tip="关闭" data-i18n-title="titlebar.close">✕</button>
+                <button class="tb-btn tb-btn-minimize" id="tb-minimize" data-tip="最小化" data-i18n-tip="titlebar.minimize" data-i18n-title="titlebar.minimize">─</button>
+                <button class="tb-btn tb-btn-maximize" id="tb-maximize" data-tip="最大化" data-i18n-tip="titlebar.maximize" data-i18n-title="titlebar.maximize">□</button>
+                <button class="tb-btn tb-btn-close" id="tb-close" data-tip="关闭" data-i18n-tip="titlebar.close" data-i18n-title="titlebar.close">✕</button>
             </div>
         </div>
         <div class="settings-header">
             <h1 data-i18n="settings.titlePage">⚙️ 设置</h1>
-            <button id="back-btn" class="btn-secondary" data-tip="返回编辑器" data-i18n-title="settings.backToEditor">
+            <button id="back-btn" class="btn-secondary" data-tip="返回编辑器" data-i18n-tip="settings.backToEditor" data-i18n-title="settings.backToEditor">
                 ← <span data-i18n="settings.backToEditor">返回编辑器</span>
             </button>
         </div>
@@ -64,15 +64,13 @@
                     <section class="settings-section">
                         <h2 data-i18n="settings.sectionLanguage">🌐 语言</h2>
                         <div class="setting-group">
-                            <label for="language" data-i18n="settings.language">语言</label>
-                            <div class="select-wrapper">
-                                <select id="language">
-                                    <option value="zh_cn">简体中文</option>
-                                    <option value="en_us">English</option>
-                                </select>
-                                <span class="select-icon">▼</span>
-                            </div>
-                            <div class="setting-hint" id="language-restart-hint" data-i18n="settings.languageRestartHint">更改语言后需要重启软件才能生效。</div>
+                            <label for="language-picker-btn" data-i18n="settings.language">语言</label>
+                            <button type="button" id="language-picker-btn" class="lang-picker-btn" data-tip="点击选择语言" data-i18n-tip="settings.languagePickerOpen" aria-haspopup="dialog">
+                                <span class="lang-picker-flags"><img src="images/flag/PRC.png" alt=""></span>
+                                <span class="lang-picker-label">简体中文</span>
+                                <span class="lang-picker-caret">▼</span>
+                            </button>
+                            <div class="setting-hint lang-restart-hint" id="language-restart-hint" data-i18n="settings.languageRestartHint">更改语言后需要重启软件才能生效。</div>
                         </div>
                     </section>
 
@@ -827,6 +825,78 @@
     </div>
 
     <input type="file" id="import-file" accept=".json" style="display: none;">
+
+    <!-- 语言选择弹窗 -->
+    <div class="lang-modal-overlay" id="lang-modal-overlay" hidden>
+        <div class="lang-modal" role="dialog" aria-modal="true" aria-labelledby="lang-modal-title">
+            <div class="lang-modal-header">
+                <h3 id="lang-modal-title" data-i18n="settings.languageModalTitle">选择语言</h3>
+                <button type="button" class="lang-modal-close" id="lang-modal-close" data-tip="关闭" data-i18n-tip="titlebar.close" data-i18n-title="titlebar.close">✕</button>
+            </div>
+            <div class="lang-modal-list" id="lang-modal-list">
+                <button type="button" class="lang-option" data-lang="en_us">
+                    <span class="lang-option-flags">
+                        <img src="images/flag/ENG.png" alt="UK"><img src="images/flag/USA.png" alt="US">
+                    </span>
+                    <span class="lang-option-text">
+                        <span class="lang-option-name">English</span>
+                        <span class="lang-option-region">United States / United Kingdom</span>
+                    </span>
+                    <span class="lang-option-check">✓</span>
+                </button>
+                <button type="button" class="lang-option" data-lang="zh_cn">
+                    <span class="lang-option-flags"><img src="images/flag/PRC.png" alt="CN"></span>
+                    <span class="lang-option-text">
+                        <span class="lang-option-name">简体中文 <span class="lang-option-alt">Chinese Simp.</span></span>
+                        <span class="lang-option-region">Chinese Mainland / 中国大陆</span>
+                    </span>
+                    <span class="lang-option-check">✓</span>
+                </button>
+                <button type="button" class="lang-option" data-lang="zh_tw">
+                    <span class="lang-option-flags"><img src="images/flag/HKN.png" alt="HK"></span>
+                    <span class="lang-option-text">
+                        <span class="lang-option-name">繁體中文 <span class="lang-option-alt">Chinese Trad.</span></span>
+                        <span class="lang-option-region">Hong Kong / Taiwan / 香港特別行政區・台灣</span>
+                    </span>
+                    <span class="lang-option-check">✓</span>
+                </button>
+                <button type="button" class="lang-option" data-lang="de_de">
+                    <span class="lang-option-flags"><img src="images/flag/GER.png" alt="DE"></span>
+                    <span class="lang-option-text">
+                        <span class="lang-option-name">Deutsch <span class="lang-option-alt">German</span></span>
+                        <span class="lang-option-region">Germany / Deutschland</span>
+        </span>
+                    <span class="lang-option-check">✓</span>
+                </button>
+                <button type="button" class="lang-option" data-lang="es_es">
+                    <span class="lang-option-flags"><img src="images/flag/SPR.png" alt="ES"></span>
+                    <span class="lang-option-text">
+                        <span class="lang-option-name">Español <span class="lang-option-alt">Spanish</span></span>
+                        <span class="lang-option-region">Spain / España</span>
+                    </span>
+                    <span class="lang-option-check">✓</span>
+                </button>
+                <button type="button" class="lang-option" data-lang="ko_kr">
+                    <span class="lang-option-flags"><img src="images/flag/KOR.png" alt="KR"></span>
+                    <span class="lang-option-text">
+                        <span class="lang-option-name">한국어</span>
+                        <span class="lang-option-region">Korea / 대한민국</span>
+                    </span>
+                    <span class="lang-option-check">✓</span>
+                </button>
+                <button type="button" class="lang-option" data-lang="ru_ru">
+                    <span class="lang-option-flags"><img src="images/flag/SOV.png" alt="RU"></span>
+                    <span class="lang-option-text">
+                        <span class="lang-option-name">русский язык <span class="lang-option-alt">Russian</span></span>
+                        <span class="lang-option-region">Russia / Россия</span>
+                    </span>
+                    <span class="lang-option-check">✓</span>
+                </button>
+            </div>
+            <div class="lang-modal-footer" data-i18n="settings.languageRestartHint">更改语言后需要重启软件才能生效。</div>
+        </div>
+    </div>
+
     <script src="node_modules/js-yaml/dist/js-yaml.min.js"></script>
     <script src="i18n.js"></script>
     <script src="sound.js"></script>

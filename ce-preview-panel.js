@@ -28,9 +28,10 @@
     resolveCeTags: true,
     // 家具: 当前查看的变体下标
     variant: 0,
-    // 家具视图: yaw 旋转 (度, 45°步进), 缩放, 显示开关
+    // 家具视图: yaw 旋转 (度, 45°步进), 缩放, 俯仰, 显示开关
     furnYaw: 0,
     furnZoom: 1,
+    furnPitch: 30,
     furnHitboxes: true,
     furnSeats: true,
     furnGrid: true,
@@ -38,6 +39,11 @@
     furnLabels: true,
     // 点击选中的碰撞箱下标 (-1 = 无)
     furnPick: -1,
+    // 物品栏 GUI 场景: 当前查看的槽位下标 (inventorySlots() 的顺序)
+    invSlot: 0,
+    // 预览内编辑: 开关 + 当前选中手柄 id (null = 无)
+    furnEdit: false,
+    furnEditSel: null,
     // 偏移 <shift:N>: 当前数值, 以及文本里「正在编辑的那个标签」的区间
     shiftValue: 0,
     shiftRange: null,
@@ -272,6 +278,7 @@
     if (kind === 'furniture') {
       return [
         { id: 'furniture', label: t('preview.sceneFurniture', '家具') },
+        { id: 'item-model', label: t('preview.sceneItemModel', '模型') },
         { id: 'lore', label: t('preview.sceneLore', '物品提示') },
         { id: 'gui', label: t('preview.sceneGui', '容器 GUI') },
         { id: 'chat', label: t('preview.sceneChat', '聊天') }
@@ -279,6 +286,8 @@
     }
     return [
       { id: 'item', label: t('preview.sceneItem', '物品栏') },
+      { id: 'inventory', label: t('preview.sceneInventory', '背包 GUI') },
+      { id: 'item-model', label: t('preview.sceneItemModel', '模型') },
       { id: 'lore', label: t('preview.sceneLore', '物品提示') },
       { id: 'gui', label: t('preview.sceneGui', '容器 GUI') },
       { id: 'chat', label: t('preview.sceneChat', '聊天') }
@@ -375,6 +384,8 @@
       '        </select></label>' +
       '      <label class="pv-field" id="pv-variant-field" style="display:none;"><span>' + esc(t('preview.furnitureVariant', '变体')) + '</span>' +
       '        <select class="pv-select" id="pv-variant"></select></label>' +
+      '      <label class="pv-field" id="pv-modelctx-field" style="display:none;"><span>' + esc(t('preview.modelContext', 'display 上下文')) + '</span>' +
+      '        <select class="pv-select" id="pv-modelctx"></select></label>' +
       '    </div>' +
       '    <div class="pv-group" id="pv-furn-group" style="display:none;">' +
       '      <button type="button" class="pv-btn" data-furn-yaw="-45" title="' + esc(t('preview.furnYawLeft', '视角左转 45° (Q)')) + '">⟲</button>' +
@@ -384,8 +395,13 @@
       '      <button type="button" class="pv-btn" data-furn-zoom="-1" title="' + esc(t('preview.furnZoomOut', '缩小 (-)')) + '">−</button>' +
       '      <span class="pv-field pv-furn-zoomval" id="pv-furn-zoomval">100%</span>' +
       '      <button type="button" class="pv-btn" data-furn-zoom="1" title="' + esc(t('preview.furnZoomIn', '放大 (+)')) + '">+</button>' +
+      '      <button type="button" class="pv-btn" data-furn-pitch="-15" title="' + esc(t('preview.furnPitchDown', '压低视角 (俯仰 -15°)')) + '">⤓</button>' +
+      '      <span class="pv-field pv-furn-pitchval" id="pv-furn-pitchval" title="' + esc(t('preview.furnPitchHint', '30° = 等轴测, 90° = 正俯视')) + '">30°</span>' +
+      '      <button type="button" class="pv-btn" data-furn-pitch="15" title="' + esc(t('preview.furnPitchUp', '抬高视角 (俯仰 +15°)')) + '">⤒</button>' +
       '    </div>' +
       '    <div class="pv-group pv-checks" id="pv-furn-checks" style="display:none;">' +
+      '      <label class="pv-check pv-edit-toggle" title="' + esc(t('preview.furnEditHint', '在预览里直接拖动碰撞箱 / 座位 / 元素锚点 (改动写回编辑器)')) + '">' +
+      '        <input type="checkbox" id="pv-furn-edit"> ' + esc(t('preview.furnEdit', '编辑')) + '</label>' +
       '      <label class="pv-check"><input type="checkbox" id="pv-furn-hb" checked> ' + esc(t('preview.furnitureHitboxes', '碰撞箱')) + '</label>' +
       '      <label class="pv-check"><input type="checkbox" id="pv-furn-fill"> ' + esc(t('preview.furnFill', '填充')) + '</label>' +
       '      <label class="pv-check"><input type="checkbox" id="pv-furn-labels" checked> ' + esc(t('preview.furnLabels', '标注')) + '</label>' +
@@ -572,7 +588,9 @@
     if (resetBtn) resetBtn.addEventListener('click', function () {
       state.furnYaw = 0;
       state.furnZoom = 1;
+      state.furnPitch = 30;
       state.furnPick = -1;
+      state.furnEditSel = null;
       render();
     });
     [['pv-furn-hb', 'furnHitboxes'], ['pv-furn-fill', 'furnFill'], ['pv-furn-labels', 'furnLabels'],
@@ -580,16 +598,57 @@
       var el = body.querySelector('#' + pair[0]);
       if (el) el.addEventListener('change', function () { state[pair[1]] = this.checked; render(); });
     });
+    // 预览内编辑开关
+    var editEl = body.querySelector('#pv-furn-edit');
+    if (editEl) editEl.addEventListener('change', function () {
+      state.furnEdit = this.checked;
+      if (!state.furnEdit) state.furnEditSel = null;
+      render();
+    });
+    // 俯仰步进 (±15°, clamp -90..90, 30 = 等轴测基准)
+    var pitchBtns = body.querySelectorAll('[data-furn-pitch]');
+    for (var pbi = 0; pbi < pitchBtns.length; pbi++) {
+      (function (btn) {
+        btn.addEventListener('click', function () {
+          var d = (parseInt(btn.getAttribute('data-furn-pitch'), 10) || 0) > 0 ? 15 : -15;
+          state.furnPitch = Math.max(-90, Math.min(90, Math.round((state.furnPitch == null ? 30 : state.furnPitch) + d)));
+          render();
+        });
+      })(pitchBtns[pbi]);
+    }
     // 点击画布: 命中碰撞箱 → 高亮并在状态栏显示它的类型/尺寸/座位
     if (els.canvas) {
       els.canvas.addEventListener('click', function (e) {
-        if (resolvedScene() !== 'furniture' || state.furnHitboxes === false) return;
+        var sc = resolvedScene();
+        // 物品栏 GUI: 点哪个槽位, 物品就放进哪个槽位
+        if (sc === 'inventory') {
+          if (!root.CEPreview || !root.CEPreview.inventoryPickAt) return;
+          var rectI = this.getBoundingClientRect();
+          var lxI = (e.clientX != null && rectI) ? (e.clientX - rectI.left) : (e.offsetX || 0);
+          var lyI = (e.clientY != null && rectI) ? (e.clientY - rectI.top) : (e.offsetY || 0);
+          var gsI = parseFloat(this.getAttribute('data-gui-scale')) || 1;
+          if (gsI > 0) { lxI /= gsI; lyI /= gsI; }
+          var slot = root.CEPreview.inventoryPickAt(lxI, lyI);
+          if (slot >= 0 && slot !== (state.invSlot || 0)) { state.invSlot = slot; render(); }
+          return;
+        }
+        if (sc !== 'furniture' || state.furnHitboxes === false) return;
         if (!root.CEPreview || !root.CEPreview.furniturePickAt) return;
         // 刚拖过视角就不要再当成点击选箱子
         if (_furnDragged) { _furnDragged = false; return; }
-        var lx = e.offsetX, ly = e.offsetY;
+        var rect = this.getBoundingClientRect();
+        var lx = (e.clientX != null && rect) ? (e.clientX - rect.left) : (e.offsetX || 0);
+        var ly = (e.clientY != null && rect) ? (e.clientY - rect.top) : (e.offsetY || 0);
         var gs = parseFloat(this.getAttribute('data-gui-scale')) || 1;
         if (gs > 0) { lx /= gs; ly /= gs; }
+        // 编辑模式: 点手柄 = 选中它 (再点空白处取消), 不做碰撞箱拾取
+        if (state.furnEdit) {
+          var eh = null;
+          try { eh = root.CEPreview.furnitureEditHitAt(lx, ly); } catch (err) { eh = null; }
+          var eid = eh ? (eh.id || null) : null;
+          if (eid !== state.furnEditSel) { state.furnEditSel = eid; render(); }
+          return;
+        }
         var hit = null;
         try { hit = root.CEPreview.furniturePickAt(lx, ly); } catch (err) { hit = null; }
         var idx = hit ? hit.index : -1;
@@ -599,13 +658,22 @@
       });
       // Ctrl+滚轮 = 缩放 (普通滚轮留给预览区滚动)
       els.canvas.addEventListener('wheel', function (e) {
-        if (resolvedScene() !== 'furniture' || !e.ctrlKey) return;
+        var sc = resolvedScene();
+        if ((sc !== 'furniture' && sc !== 'item-model') || !e.ctrlKey) return;
         e.preventDefault();
         stepFurnZoom(e.deltaY < 0 ? 1 : -1);
       }, { passive: false });
-      // 左右拖动 = 自由旋转视角 (按住 Shift 吸附到 15°)
+      // 左右拖动 = 自由旋转视角 (按住 Shift 吸附到 15°); 编辑模式下先试手柄命中
+      // 家具 / 模型两个场景共用同一组视图状态 (yaw/zoom/pitch), 交互一并放行
       els.canvas.addEventListener('pointerdown', function (e) {
-        if (resolvedScene() !== 'furniture' || e.button !== 0) return;
+        var sc = resolvedScene();
+        if ((sc !== 'furniture' && sc !== 'item-model') || e.button !== 0) return;
+        if (state.furnEdit && handleDragStart(e)) {
+          try { this.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+          this.style.cursor = 'move';
+          e.preventDefault();
+          return;
+        }
         _furnDrag = { id: e.pointerId, x: e.clientX, yaw: state.furnYaw || 0, moved: 0 };
         _furnDragged = false;
         try { this.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
@@ -613,7 +681,18 @@
         e.preventDefault();
       });
       els.canvas.addEventListener('pointermove', function (e) {
-        if (!_furnDrag || _furnDrag.id !== e.pointerId) return;
+        // 手柄拖拽优先于视角拖拽
+        if (_handleDrag && _handleDrag.id === e.pointerId) { handleDragMove(e); return; }
+        if (!_furnDrag || _furnDrag.id !== e.pointerId) {
+          // 悬停高亮: 编辑模式下把手柄光标变成 move
+          if (state.furnEdit && root.CEPreview && root.CEPreview.furnitureEditHitAt) {
+            var pt = canvasLogicalXY(e);
+            var hv = null;
+            try { hv = root.CEPreview.furnitureEditHitAt(pt.x, pt.y); } catch (err) { hv = null; }
+            this.style.cursor = hv ? 'move' : 'grab';
+          }
+          return;
+        }
         var dx = e.clientX - _furnDrag.x;
         if (Math.abs(dx) > 3) { _furnDrag.moved = 1; _furnDragged = true; }
         var yaw = _furnDrag.yaw + dx * (e.shiftKey ? 0.4 : 0.8);
@@ -622,6 +701,12 @@
         render();
       });
       var endDrag = function (e) {
+        if (_handleDrag && _handleDrag.id === e.pointerId) {
+          handleDragEnd(e);
+          try { els.canvas.releasePointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+          if (els.canvas.style) els.canvas.style.cursor = '';
+          return;
+        }
         if (!_furnDrag || _furnDrag.id !== e.pointerId) return;
         var wasMove = _furnDrag.moved;
         _furnDrag = null;
@@ -692,18 +777,23 @@
     var guiLike = (state.scene === 'gui');
     if (rowsEl) rowsEl.disabled = !guiLike;
     if (rowsField) rowsField.style.opacity = guiLike ? '' : '0.45';
-    // 家具场景: 显示变体下拉 + 视图控制组
+    // 家具/模型场景: 显示视图控制组; 家具场景再加显示开关, 模型场景加 display 上下文
     var isFurn = (state.scene === 'furniture');
+    var isModel = (state.scene === 'item-model');
     var furnGroup = win.body.querySelector('#pv-furn-group');
     var furnChecks = win.body.querySelector('#pv-furn-checks');
-    if (furnGroup) furnGroup.style.display = isFurn ? '' : 'none';
+    if (furnGroup) furnGroup.style.display = (isFurn || isModel) ? '' : 'none';
     if (furnChecks) furnChecks.style.display = isFurn ? '' : 'none';
     var zoomVal = win.body.querySelector('#pv-furn-zoomval');
     if (zoomVal) zoomVal.textContent = Math.round((state.furnZoom || 1) * 100) + '%';
     var yawVal = win.body.querySelector('#pv-furn-yawval');
     if (yawVal) yawVal.textContent = Math.round(state.furnYaw || 0) + '°';
-    if (els.stage) els.stage.style.cursor = isFurn ? 'crosshair' : '';
-    if (els.canvas && !_furnDrag) els.canvas.style.cursor = isFurn ? 'grab' : '';
+    var pitchVal = win.body.querySelector('#pv-furn-pitchval');
+    if (pitchVal) pitchVal.textContent = Math.round(state.furnPitch != null ? state.furnPitch : 30) + '°';
+    var editEl = win.body.querySelector('#pv-furn-edit');
+    if (editEl) editEl.checked = state.furnEdit === true;
+    if (els.stage) els.stage.style.cursor = (isFurn || isModel) ? 'crosshair' : '';
+    if (els.canvas && !_furnDrag) els.canvas.style.cursor = (isFurn || isModel) ? 'grab' : '';
     // 开关状态回填 (state 可能被程序改动)
     [['pv-furn-hb', 'furnHitboxes'], ['pv-furn-fill', 'furnFill'], ['pv-furn-labels', 'furnLabels'],
      ['pv-furn-seats', 'furnSeats'], ['pv-furn-grid', 'furnGrid']].forEach(function (pair) {
@@ -729,6 +819,33 @@
         varField.style.display = 'none';
       }
     }
+    // display 上下文下拉 (模型场景): 上下文列表来自渲染核心
+    var ctxEl = win.body.querySelector('#pv-modelctx');
+    var ctxField = win.body.querySelector('#pv-modelctx-field');
+    if (ctxEl && ctxField) {
+      if (isModel && root.CEPreview && root.CEPreview.displayContextList) {
+        var ctxList = null;
+        try { ctxList = root.CEPreview.displayContextList(); } catch (e) { ctxList = null; }
+        var names = (ctxList && ctxList.length) ? ctxList : ['gui'];
+        if (state.modelCtx == null) state.modelCtx = 'gui';
+        var csig = names.join('\u0001');
+        if (ctxEl.getAttribute('data-sig') !== csig) {
+          ctxEl.setAttribute('data-sig', csig);
+          ctxEl.innerHTML = names.map(function (n) {
+            return '<option value="' + esc(n) + '">' + esc(n) + '</option>';
+          }).join('');
+        }
+        if (names.indexOf(state.modelCtx) === -1) state.modelCtx = 'gui';
+        ctxEl.value = state.modelCtx;
+        ctxField.style.display = '';
+        if (!ctxEl.getAttribute('data-bound')) {
+          ctxEl.setAttribute('data-bound', '1');
+          ctxEl.addEventListener('change', function () { state.modelCtx = this.value; render(); });
+        }
+      } else {
+        ctxField.style.display = 'none';
+      }
+    }
   }
 
   // 家具视图缩放步进: 50% → 75% → 100% → 150% → 200% → 300%
@@ -745,17 +862,21 @@
     render();
   }
 
-  // 家具场景快捷键 (焦点不在输入框时): Q/E 旋转, R 重置, +/- 缩放
+  // 家具/模型场景快捷键 (焦点不在输入框时): Q/E 旋转, R 重置, +/- 缩放, PageUp/PageDown 俯仰
   function onFurnKey(e) {
-    if (!win || win._closed || resolvedScene() !== 'furniture') return;
+    if (!win || win._closed) return;
+    var sc = resolvedScene();
+    if (sc !== 'furniture' && sc !== 'item-model') return;
     var tag = (e.target && e.target.tagName) ? String(e.target.tagName).toLowerCase() : '';
     if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
     var k = e.key;
     if (k === 'q' || k === 'Q') { state.furnYaw = ((state.furnYaw || 0) - 45 + 360) % 360; render(); e.preventDefault(); }
     else if (k === 'e' || k === 'E') { state.furnYaw = ((state.furnYaw || 0) + 45) % 360; render(); e.preventDefault(); }
-    else if (k === 'r' || k === 'R') { state.furnYaw = 0; state.furnZoom = 1; state.furnPick = -1; render(); e.preventDefault(); }
+    else if (k === 'r' || k === 'R') { state.furnYaw = 0; state.furnZoom = 1; state.furnPitch = 30; state.furnPick = -1; state.furnEditSel = null; render(); e.preventDefault(); }
     else if (k === '+' || k === '=') { stepFurnZoom(1); e.preventDefault(); }
     else if (k === '-' || k === '_') { stepFurnZoom(-1); e.preventDefault(); }
+    else if (k === 'PageUp') { state.furnPitch = Math.max(-90, Math.min(90, (state.furnPitch == null ? 30 : state.furnPitch) + 15)); render(); e.preventDefault(); }
+    else if (k === 'PageDown') { state.furnPitch = Math.max(-90, Math.min(90, (state.furnPitch == null ? 30 : state.furnPitch) - 15)); render(); e.preventDefault(); }
   }
 
   function resolvedScene() { return state.scene || defaultScene(contentKind(ctx)); }
@@ -804,6 +925,216 @@
     }
   }
 
+  // ---------------- 预览内编辑: 把手柄拖动写回条目数据 ----------------
+  // 手柄几何来自渲染核心 (_furnPick.handles 里有活引用), 这里只负责「数字 → 配置文本」。
+  // 家具相对坐标是方块单位 (原点 = 原点方块底部中心), 世界坐标是 1/16 单位。
+  function round3(v) { return Math.round(v * 1000) / 1000; }
+  function fmtCoord(v) {
+    var n = round3(v);
+    return (Object.is(n, -0) ? 0 : n) + '';
+  }
+  function unwrapLive(v) {
+    return (v !== null && typeof v === 'object' && typeof v.__ceTag === 'string') ? v.v : v;
+  }
+  // 把新值写回活对象字段: 原值是 !!tag 包装 ({__ceTag, v}) 时只替换 .v —— 保留 YAML tag,
+  // syncToSource 序列化时才能原样输出 !!前缀; 普通值直接赋。
+  function writeLive(obj, key, value) {
+    var cur = obj[key];
+    if (cur !== null && typeof cur === 'object' && typeof cur.__ceTag === 'string') cur.v = value;
+    else obj[key] = value;
+  }
+  // 字符串坐标 ('0,-0.46,0' 官方包常态) → 数字数组 (解析不了的分量为 0)
+  function parseCoord3(v) {
+    var arr = [0, 0, 0];
+    if (typeof v === 'string') {
+      var parts = v.trim().split(/[\s,]+/).filter(Boolean);
+      for (var i = 0; i < 3; i++) {
+        var n = parseFloat(parts[i]);
+        if (isFinite(n)) arr[i] = n;
+      }
+    }
+    return arr;
+  }
+  // 座位串重建: "x,y,z yaw [tail token 原样保留]" (CE 允许 force / 未知 flags 附加在后面;
+  // 原本没写 yaw 时 tail 从第 4 个 token 开始, 重建时也不凭空补 yaw)
+  function seatToString(st, pos, yaw) {
+    var s = fmtCoord(pos[0]) + ',' + fmtCoord(pos[1]) + ',' + fmtCoord(pos[2]);
+    if (yaw != null && isFinite(yaw)) s += ' ' + fmtCoord(yaw);
+    var tail = (st && st.tail && st.tail.length) ? ' ' + st.tail.join(' ') : '';
+    return s + tail;
+  }
+  // 把世界坐标 (1/16) 写回碰撞箱的 position (方块单位, 相对原点方块底部中心)。
+  // y 始终写回: 普通拖拽锁定在底面平面 (w[1] === baseY, 恒等), Shift 竖直拖拽才真正改 y。
+  function applyHbPos(hb, wx, wz, wy) {
+    var p = unwrapLive(hb.position);
+    var arr = Array.isArray(p) ? p.slice() : parseCoord3(p);
+    while (arr.length < 3) arr.push(0);
+    arr[0] = round3(wx / 16 - 0.5);
+    arr[2] = round3(wz / 16 - 0.5);
+    if (wy != null && isFinite(wy)) arr[1] = round3(wy / 16);
+    writeLive(hb, 'position', arr);
+  }
+  // 改高度: 优先写 height; scale: [宽, 高] 简写时拆成显式 width + height (语义更清楚)
+  function applyHbHeight(hb, worldY, baseY) {
+    var newH = Math.max(0.0625, round3((worldY - baseY) / 16));
+    var curH = unwrapLive(hb.height);
+    var curScale = unwrapLive(hb.scale);
+    if (curH != null) { writeLive(hb, 'height', newH); return; }
+    if (Array.isArray(curScale) && curScale.length >= 2 && unwrapLive(hb.width) == null) {
+      writeLive(hb, 'width', round3(unwrapLive(curScale[0]) || 1));
+      delete hb.scale;
+    }
+    writeLive(hb, 'height', newH);
+  }
+  // 座位: position 相对方块中心 (x-0.5, z-0.5), y 保持方块单位; yaw 不变
+  function applySeatPos(st, hb, seatIdx, wx, wy, wz) {
+    var list = flistLocal(hb.seats);
+    var raw = list[seatIdx];
+    var target = (raw !== null && typeof raw === 'object' && !Array.isArray(raw) && typeof raw.__ceTag === 'string') ? raw : null;
+    if (target && isObjLocal(target.v)) {
+      target.v.position = [round3(wx / 16 - 0.5), round3(wy / 16), round3(wz / 16 - 0.5)];
+      return;
+    }
+    if (isObjLocal(raw)) {
+      writeLive(raw, 'position', [round3(wx / 16 - 0.5), round3(wy / 16), round3(wz / 16 - 0.5)]);
+      return;
+    }
+    // 字符串座位: 原样数组写入 (保留 tail token), 保证 seats 列表类型不变
+    var s = seatToString(st, [wx / 16 - 0.5, wy / 16, wz / 16 - 0.5], st.yaw);
+    if (Array.isArray(unwrapLive(hb.seats))) {
+      if (hb.seats !== null && typeof hb.seats === 'object' && typeof hb.seats.__ceTag === 'string') {
+        hb.seats.v[seatIdx] = s;    // wrap 列表: 只改内部数组, 保留 !!tag
+      } else {
+        hb.seats[seatIdx] = s;
+      }
+    } else {
+      writeLive(hb, 'seats', s);
+    }
+  }
+  // 元素 translation (方块单位): 锚点世界坐标 = furnWorld(pos + translation), 这里只改平移部分
+  function applyElPos(el, wx, wy, wz) {
+    var pos = unwrapLive(el.position);
+    var pa = Array.isArray(pos)
+      ? pos.map(function (x) { return typeof x === 'number' ? x : (parseFloat(x) || 0); })
+      : parseCoord3(pos);
+    while (pa.length < 3) pa.push(0);
+    writeLive(el, 'translation', [round3(wx / 16 - 0.5 - pa[0]), round3(wy / 16 - pa[1]), round3(wz / 16 - 0.5 - pa[2])]);
+  }
+  function isObjLocal(v) { return v !== null && typeof v === 'object' && !Array.isArray(v); }
+  function flistLocal(v) {
+    v = unwrapLive(v);
+    return v == null ? [] : (Array.isArray(v) ? v : [v]);
+  }
+
+  // 拖拽结束 / 每次写回后: 通知宿主同步可视化编辑器
+  function dispatchDataChanged(reason) {
+    try {
+      document.dispatchEvent(new CustomEvent('ce-preview-data-changed', {
+        detail: {
+          file: ctx && ctx.file, entryKey: ctx && ctx.entryKey,
+          section: ctx && ctx.section, reason: reason || 'edit',
+          apply: function (data) {
+            // data 是 renderer 传进来的解析树条目 data; 预览期间直接改的就是同一棵树,
+            // 这里无需再拷贝 —— 保留钩子是为了未来面板与编辑器分离数据时的兼容。
+            return true;
+          }
+        }
+      }));
+    } catch (e) { /* ignore */ }
+  }
+
+  // 手柄拖拽状态机: pointerdown 命中手柄 → move 反投影 → 改数据 → up 提交 + 重渲染
+  var _handleDrag = null;
+  // 指针事件 → 画布逻辑坐标。offsetX/offsetY 在合成事件 (自动化测试/程序派发) 上
+  // 不可用 (构造时只读、恒为 0), 所以统一从 clientX/Y - 画布矩形推导, 两者都正确。
+  function canvasLogicalXY(e) {
+    var lx, ly;
+    if (e.clientX != null && els.canvas && els.canvas.getBoundingClientRect) {
+      var r = els.canvas.getBoundingClientRect();
+      lx = e.clientX - r.left;
+      ly = e.clientY - r.top;
+    } else {
+      lx = e.offsetX || 0;
+      ly = e.offsetY || 0;
+    }
+    var gs = parseFloat(els.canvas && els.canvas.getAttribute ? els.canvas.getAttribute('data-gui-scale') : null) || 1;
+    if (gs > 0) { lx /= gs; ly /= gs; }
+    return { x: lx, y: ly };
+  }
+  function handleDragStart(e) {
+    if (!root.CEPreview || !root.CEPreview.furnitureEditHitAt) return false;
+    if (state.furnEdit !== true || resolvedScene() !== 'furniture') return false;
+    var pt = canvasLogicalXY(e);
+    var h = null;
+    try { h = root.CEPreview.furnitureEditHitAt(pt.x, pt.y); } catch (err) { h = null; }
+    if (!h) return false;
+    _handleDrag = {
+      id: e.pointerId, h: h,
+      start: { x: e.clientX, y: e.clientY },
+      startWorld: (h.kind === 'seat') ? (h.world || [0, 0, 0]).slice()
+        : (h.kind === 'el-pos') ? (h.anchor || [0, 0, 0]).slice()
+        : null
+    };
+    state.furnEditSel = h.id || null;
+    return true;
+  }
+  // 把世界坐标写到对应目标 (拖拽中实时调用, 活引用直接生效 → 下一次渲染就反映移动)
+  function applyHandleWorld(h, w) {
+    var hb = h.hb;
+    if (h.kind === 'hb-pos' && hb) applyHbPos(hb, w[0], w[2], w[1]);
+    else if (h.kind === 'hb-height' && hb) applyHbHeight(hb, w[1], h.baseY);
+    else if (h.kind === 'seat' && hb) applySeatPos(h.seat, hb, h.seatIndex, w[0], w[1], w[2]);
+    else if (h.kind === 'el-pos' && h.el) applyElPos(h.el, w[0], w[1], w[2]);
+  }
+  // 移动中: 只改内存里的数据 (活引用), 不派发事件; up 时统一提交
+  function handleDragMove(e) {
+    if (!_handleDrag || _handleDrag.id !== e.pointerId) return;
+    var P = root.CEPreview;
+    var h = _handleDrag.h;
+    var pt = canvasLogicalXY(e);
+    var lx = pt.x, ly = pt.y;
+    var w;
+    if (h.kind === 'hb-height') {
+      // 高度手柄: 沿手柄的竖直线改世界 y (已知 x/z, 反解 y)。
+      // 不走平面反投影 —— 锁在 y=topY 平面上 y 永远等于 topY, 高度就改不动了。
+      var hx = (h.wx != null) ? h.wx : ((_handleDrag.startWorld && _handleDrag.startWorld[0]) || 8);
+      var hz = (h.wz != null) ? h.wz : ((_handleDrag.startWorld && _handleDrag.startWorld[2]) || 8);
+      var hy = null;
+      try { hy = P.furnitureUnprojectY(lx, ly, hx, hz); } catch (err) { hy = null; }
+      if (hy == null || !isFinite(hy)) return;
+      w = [hx, hy, hz];
+    } else if (e.shiftKey) {
+      // Shift = 锁定水平位置只改高度 (hb-pos/seat 锁 x/z, el-pos 也一样 ——
+      // 元素锚点平时在 y=锚点平面内拖动, 只有 Shift 才能竖直移动它)
+      var base = _handleDrag.startWorld || [0, 0, 0];
+      var y = null;
+      try { y = P.furnitureUnprojectY(lx, ly, base[0], base[2]); } catch (err) { y = null; }
+      if (y == null || !isFinite(y)) return;
+      w = [base[0], y, base[2]];
+    } else {
+      // hb-pos 锁底面 (h.baseY), 其它手柄锁拖拽开始时的锚点高度;
+      // 普通分支里 y 不变 → applyHbPos 的 y 写回是恒等操作
+      var planeY = h.kind === 'hb-pos' ? h.baseY : (_handleDrag.startWorld ? _handleDrag.startWorld[1] : 0);
+      try { w = P.furnitureUnproject(lx, ly, planeY); } catch (err) { w = null; }
+      if (!w || !isFinite(w[0]) || !isFinite(w[2])) return;
+    }
+    _handleDrag.last = w;
+    // 实时写活数据 + 重画: 渲染核心下次 render() 读的就是被改过的配置
+    applyHandleWorld(h, w);
+    render();
+  }
+  function handleDragEnd(e) {
+    if (!_handleDrag || _handleDrag.id !== e.pointerId) return false;
+    var h = _handleDrag.h;
+    var w = _handleDrag.last;
+    _handleDrag = null;
+    if (!w) { render(); return true; }   // 没动过: 只取消选中态
+    applyHandleWorld(h, w);
+    dispatchDataChanged(h.kind);
+    render();
+    return true;
+  }
+
   // ---------------- 渲染 ----------------
   async function render() {
     if (!root.CEPreview || !ctx) return;
@@ -841,13 +1172,24 @@
         payload = {
           type: 'furniture', scale: state.scale, options: makeOpts(),
           furniture: resolvedFurniture(), variant: state.variant || 0,
-          yaw: state.furnYaw || 0, zoom: state.furnZoom || 1,
+          yaw: state.furnYaw || 0, zoom: state.furnZoom || 1, pitch: state.furnPitch != null ? state.furnPitch : 30,
           showHitboxes: state.furnHitboxes !== false,
           showSeats: state.furnSeats !== false,
           showGrid: state.furnGrid !== false,
           hbFill: state.furnFill !== false,
           hbLabels: state.furnLabels !== false,
           hlHitbox: state.furnPick,
+          edit: state.furnEdit === true,
+          editSel: state.furnEditSel || null,
+        };
+      } else if (scene === 'item-model') {
+        payload = {
+          type: 'item-model', scale: state.scale, options: makeOpts(),
+          modelRef: p.icon || ctx.entryKey || undefined,
+          displayContext: state.modelCtx || 'gui',
+          yaw: state.furnYaw || 0, zoom: state.furnZoom || 1,
+          pitch: state.furnPitch != null ? state.furnPitch : 30,
+          showGround: state.furnGrid !== false,
         };
       } else if (scene === 'item') {
         payload = {
@@ -855,6 +1197,13 @@
           name: useCustom ? cLines[0] : (p.name || ('<white>' + esc(ctx.entryKey || ''))),
           lore: useCustom ? cLines.slice(1) : p.lore, item: p.icon || undefined,
           count: countOf(p), rarity: rarityOf(ctx),
+        };
+      } else if (scene === 'inventory') {
+        // 原版生存物品栏: 物品按 gui 上下文的 ItemTransform 渲染 (3D 模型 = 正交直视)
+        payload = {
+          type: 'inventory', scale: state.scale, options: makeOpts(),
+          item: p.icon || undefined, slot: state.invSlot || 0,
+          count: countOf(p), hoverSlot: state.invSlot || 0,
         };
       } else {
         payload = {
@@ -935,16 +1284,33 @@
           }
         }
       }
+      // 物品栏 GUI: 当前槽位 (点击画布上的其它槽位可以把物品挪过去)
+      if (scene === 'inventory') {
+        var invData = null;
+        try { invData = root.CEPreview.inventoryPickData ? root.CEPreview.inventoryPickData() : null; } catch (e) { invData = null; }
+        var invSlotIdx = state.invSlot || 0;
+        if (invData && invData.slots && invData.slots[invSlotIdx]) {
+          var invKey = String(invData.slots[invSlotIdx].key || '');
+          var invName = invKey.replace(/^hotbar/, t('preview.invSlotHotbar', '快捷栏') + ' ')
+            .replace(/^main(\d)(\d)$/, t('preview.invSlotMain', '背包') + ' $1-$2')
+            .replace(/^craft(\d)(\d)$/, t('preview.invSlotCraft', '合成') + ' $1-$2')
+            .replace(/^armor(\d)$/, t('preview.invSlotArmor', '装备') + ' $1')
+            .replace(/^result$/, t('preview.invSlotResult', '产物'));
+          parts.push(t('preview.invSlotLabel', '槽位') + ': ' + invName + ' #' + invSlotIdx);
+        }
+      }
       if (w && w.state === 'ready') parts.push(t('preview.assetsOk', '资源已索引 ({n} 项)', { n: Object.keys(w.counts || {}).reduce(function (a, k) { return a + w.counts[k]; }, 0) }));
       else if (w && w.state === 'loading') parts.push(t('preview.assetsLoading', '资源索引中…'));
       else parts.push(t('preview.assetsMissing', '未配置 Minecraft 资源目录，使用内置回退字形'));
       if (warnings.length) parts.push('⚠ ' + warnings.length);
       setStatus(parts.join('  ·  '), warnings.length ? 'warn' : '', legend);
-      // 视图缩放/角度读数回写 (按钮/滚轮/快捷键/拖动都会改 state)
+      // 视图缩放/角度/俯仰读数回写 (按钮/滚轮/快捷键/拖动都会改 state)
       var zv = win.body.querySelector('#pv-furn-zoomval');
       if (zv) zv.textContent = Math.round((state.furnZoom || 1) * 100) + '%';
       var yv = win.body.querySelector('#pv-furn-yawval');
       if (yv) yv.textContent = Math.round(state.furnYaw || 0) + '°';
+      var pv2 = win.body.querySelector('#pv-furn-pitchval');
+      if (pv2) pv2.textContent = Math.round(state.furnPitch != null ? state.furnPitch : 30) + '°';
       if (warnings.length) console.warn('[CEPreviewPanel] warnings:', warnings);
     } catch (e) {
       console.error('[CEPreviewPanel] render failed:', e);
@@ -958,11 +1324,13 @@
   function sceneName(s) {
     var map = {
       item: t('preview.sceneItem', '物品栏'),
+      inventory: t('preview.sceneInventory', '背包 GUI'),
       chat: t('preview.sceneChat', '聊天'),
       lore: t('preview.sceneLore', '物品 Lore'),
       gui: t('preview.sceneGui', kindSceneLabel(s)),
       image: t('preview.sceneImage', '图像总览'),
-      furniture: t('preview.sceneFurniture', '家具')
+      furniture: t('preview.sceneFurniture', '家具'),
+      'item-model': t('preview.sceneItemModel', '模型')
     };
     return map[s] || s;
   }
@@ -1050,6 +1418,8 @@
       state.shiftValue = 0;
       state.shiftRange = null;
       state.furnPick = -1;
+      state.furnEditSel = null;   // 手柄选中态是旧条目数据的 id, 换条目一并清掉
+      state.invSlot = 0;          // 物品栏场景的槽位选择也回到快捷栏第一格
     }
     // 尊重调用方指定的场景, 否则用该内容类型的默认场景
     if (c && c.scene && c.scene !== 'auto') state.scene = c.scene;
@@ -1080,6 +1450,7 @@
       onClose: function () {
         win = null; els = {};
         _furnDrag = null; _furnDragged = false;
+        _handleDrag = null;   // 手柄拖拽状态一并清掉, 防止 pointerId 复用时旧状态劫持新窗口
         document.removeEventListener('keydown', onFurnKey);
       },
     });

@@ -1,0 +1,2168 @@
+# ChoTenEditor Русский (Russia)
+app:
+  title: "CHOTEN EDITOR"
+  loading: "Загрузка..."
+
+titlebar:
+  minimize: "Свернуть"
+  maximize: "Развернуть"
+  close: "Закрыть"
+
+windowManager:
+  maxRestore: "Развернуть / Восстановить"
+  close: "Закрыть"
+  resize: "Потяните для изменения размера"
+
+common:
+  openProject: "📁 Открыть проект"
+  newFile: "📄 Новый файл"
+  save: "💾 Сохранить"
+  settings: "⚙️ Настройки"
+  remote: "🌐 Удалённый режим"
+  ai: "✨ ИИ"
+  ok: "ОК"
+  cancel: "Отмена"
+  delete: "Удалить"
+  reload: "Обновить"
+  back: "Назад"
+  close: "Закрыть"
+  approve: "Принять"
+  reject: "Отклонить"
+
+minimessage:
+  title: "Редактор MiniMessage"
+  editBtn: "Редактор MiniMessage"
+  preview: "Предпросмотр"
+  previewEmpty: "(Пустой предпросмотр)"
+  parseError: "Ошибка разбора"
+  restrictedTip: "Ограниченный тег, может работать не везде"
+  useColor: "Применить цвет"
+  previewBg: "Переключить чёрный/белый фон"
+  detailTitle: "Добавить оформление"
+  detailContent: "Текстовое содержимое"
+  detailType: "Тип"
+  detailAdd: "Добавить"
+  detailFont: "Шрифт"
+  detailNamespace: "Пространство имён (необязательно)"
+  detailColor: "Цвет (например, #ff0000 или red)"
+  detailGradientA: "Цвет градиента 1"
+  detailGradientB: "Цвет градиента 2"
+  detailUrl: "URL"
+  detailCommand: "Команда"
+  detailHoverText: "Текст при наведении"
+  editBtnTip: "ЛКМ: добавить оформление · ПКМ: быстрое добавление"
+  tooltipWrap: "Применить к выделенному тексту"
+  tooltipInsert: "Вставить в позицию курсора"
+  tag_bold: "Жирный"
+  tag_italic: "Курсив"
+  tag_underline: "Подчёркнутый"
+  tag_strikethrough: "Зачёркнутый"
+  tag_obfuscated: "Обфусцированный"
+  tag_reset: "Сбросить форматирование"
+  tag_newline: "Перенос строки"
+  tag_rainbow: "Радуга"
+  tag_gradient: "Градиент"
+  tag_color: "Цвет"
+  tag_font: "Шрифт"
+  tag_open_url: "Открыть URL по клику"
+  tag_run_command: "Выполнить команду по клику"
+  tag_suggest_command: "Подставить команду по клику"
+  tag_hover_text: "Текст при наведении"
+  phFont: "Название шрифта (например, unifont)"
+  phNamespace: "Пространство имён (например, minecraft)"
+  phColor: "#ff0000 или red"
+  phGradientA: "Начальный цвет градиента (например, #ff0000)"
+  phGradientB: "Конечный цвет градиента (например, #ffff00)"
+  phUrl: "https://..."
+  phCommand: "/command"
+  phHoverText: "Текст при наведении"
+  color_black: "Чёрный"
+  color_dark_blue: "Тёмно-синий"
+  color_dark_green: "Тёмно-зелёный"
+  color_dark_aqua: "Тёмно-бирюзовый"
+  color_dark_red: "Тёмно-красный"
+  color_dark_purple: "Тёмно-фиолетовый"
+  color_gold: "Золотой"
+  color_gray: "Серый"
+  color_dark_gray: "Тёмно-серый"
+  color_blue: "Синий"
+  color_green: "Зелёный"
+  color_aqua: "Бирюзовый"
+  color_red: "Красный"
+  color_light_purple: "Светло-фиолетовый"
+  color_yellow: "Жёлтый"
+  color_white: "Белый"
+
+ui:
+  ok: "ОК"
+  cancel: "Отмена"
+  confirmTitle: "Подтверждение"
+  alertTitle: "Уведомление"
+  promptTitle: "Введите значение"
+
+sidebar:
+  files: "Файлы проекта"
+  previousFile: "Предыдущий файл"
+  tabLocal: "Локальные"
+  tabRemote: "Удалённые"
+  loading: "Загрузка..."
+  emptyDir: "Пусто"
+  navBack: "Назад (к предыдущему открытому расположению)"
+  navForward: "Вперёд"
+  navPrev: "Предыдущий файл"
+  navNext: "Следующий файл"
+
+menu:
+  file: "Файл"
+  edit: "Правка"
+  debug: "Отладка"
+  settings: "Настройки"
+  help: "Справка"
+  newFile: "📄 Новый файл"
+  openFile: "📂 Открыть файл…"
+  openProject: "📁 Открыть проект…"
+  recent: "🕘 Недавние"
+  save: "💾 Сохранить"
+  closeTab: "Закрыть вкладку"
+  closeAllTabs: "Закрыть все вкладки"
+  undo: "Отменить"
+  redo: "Повторить"
+  cut: "Вырезать"
+  copy: "Копировать"
+  paste: "Вставить"
+  selectAll: "Выделить всё"
+  noDebug: "Функции отладки недоступны"
+  checks: "Проверки"
+  checksDebug: "🐞 Отладка · Все проблемы конфигурации…"
+  settingsItem: "⚙️ Настройки…"
+  remote: "🌐 Удалённый режим…"
+  ai: "✨ ИИ-студия…"
+  about: "ℹ️ О ChoTenEditor"
+  recentProjects: "Недавние проекты"
+  recentFiles: "Недавние файлы"
+  clearRecent: "🗑 Очистить историю"
+  empty: "Нет элементов"
+  allFiles: "Все файлы"
+  experimentalRemoteWarning: "Удалённый режим — крайне нестабильная, непроверенная функция, предназначенная только для отладки, и она может серьёзно угрожать вашим файлам! Чтобы включить её, активируйте соответствующий пункт в разделе «Экспериментальные» в настройках. Вы были предупреждены!"
+  experimentalAIStudioWarning: "ИИ-студия — крайне нестабильная, непроверенная функция, предназначенная только для отладки, и она может серьёзно угрожать вашим файлам! Чтобы включить её, активируйте соответствующий пункт в разделе «Экспериментальные» в настройках. Вы были предупреждены!"
+
+editor:
+  sourceMode: "Исходник"
+  visualMode: "Визуальный"
+  typeAuto: "Автоопределение"
+  typeConversation: "Диалог"
+  typeQuest: "Задание"
+  typeCraftEngine: "CraftEngine"
+  visualEmptyTitle: "Визуальное редактирование"
+  visualEmptyHint: "Откройте файл .yml / .yaml, чтобы перейти к визуальному редактированию"
+
+status:
+  ready: "Готово"
+  projectOpened: "Проект открыт: {name}"
+  projectTypesConversationQuest: " [Диалог + Задание]"
+  projectTypesConversation: " [Диалог]"
+  projectTypesQuest: " [Задание]"
+  directory: "Каталог: {path}"
+  file: "Файл: {name}"
+  fileType: "Файл: {name} [{type}]"
+  interpreterTypeAuto: "Тип интерпретатора: автоопределение"
+  interpreterType: "Тип интерпретатора: {type}"
+  noFileOpen: "Файл не открыт"
+  visualMode: "Режим визуального редактора"
+  sourceMode: "Режим редактора исходника"
+  fileModified: "Файл изменён"
+  fileSaved: "Файл сохранён: {path}"
+  fileCreated: "Файл создан: {path}"
+  typeOverrideCleared: "Переопределение типа сброшено"
+  typeOverrideSet: "Тип интерпретатора установлен: {type} (Область: {scope})"
+  ceOwner: " · Проект CE: {root} · Пакет: {pack}"
+
+typeScope:
+  file: "Файл"
+  directory: "Каталог"
+  project: "Проект"
+
+welcome:
+  title: "Добро пожаловать в ChoTenEditor!"
+  version: "Текущая версия: {version}"
+  descPre: "Этот редактор — универсальный редактор конфигураций плагинов Minecraft с поддержкой "
+  descPost: " заданий и диалогов, базового редактирования CraftEngine (предметы/блоки/мебель...), а также скриптов Kether."
+  channelsTitle: "По любым вопросам и для обратной связи обращайтесь через:"
+  channelQq: "📢 Группа QQ:"
+  channelDiscord: "🌐 Discord:"
+  channelQqAddPre: "💬 Добавьте QQ "
+  channelQqAddPost: " и укажите цель обращения"
+  settingsHint: "Каналы обратной связи также можно найти в настройках."
+  noTip: "Больше не показывать"
+  dismissHint: "После установки флажка «Больше не показывать» это окно появляется снова только при обновлении версии."
+
+remote:
+  title: "🌐 Удалённый режим"
+  asServer: "Как сервер"
+  asClient: "Подключиться удалённо"
+  serverHost: "Адрес сервера"
+  port: "Порт"
+  password: "Пароль подключения"
+  setPasswordPlaceholder: "Задайте пароль подключения"
+  ipPlaceholder: "IP-адрес"
+  serverPasswordPlaceholder: "Пароль, заданный на сервере"
+  startServer: "Запустить сервер"
+  stopServer: "Остановить сервер"
+  connect: "Подключиться"
+  disconnect: "Отключиться"
+  disconnectAll: "Отключить всех"
+  clients: "Подключённые клиенты"
+  securityCode: "Код безопасности"
+  securityHint: "Передайте этот код безопасности администратору сервера для подтверждения подключения"
+  confirmTitle: "🔌 Новый запрос на подключение"
+  clientIp: "IP клиента:"
+  securityCodeLabel: "Код безопасности:"
+  confirmWarningPre: "⚠️ Убедитесь, что сообщённый код безопасности совпадает с указанным выше, иначе подключение может не состояться. Необдуманное подтверждение может привести к утечке или потере данных, "
+  confirmWarningStrong: "тщательно проверьте код безопасности"
+  confirmWarningPost: ". Программа не несёт ответственности за любой причинённый таким образом ущерб."
+  confirmAccept: "Принять подключение"
+  fileChangeTitle: "📝 Запрос на изменение файла"
+  client: "Клиент:"
+  filePath: "Путь к файлу:"
+  fileDeleteTitle: "🗑️ Запрос на удаление файла"
+  approveDelete: "Разрешить удаление"
+  invalidMessageFormat: "Неверный формат сообщения"
+  wrongPassword: "Неверный пароль"
+  versionMismatch: "Версия клиента ({client}) не совпадает с версией сервера ({server}). Включите «Разрешить разные версии» в настройках"
+  authenticateFirst: "Сначала пройдите аутентификацию"
+  connectionRejectedByAdmin: "Администратор отклонил запрос на подключение"
+  disconnectedByAdmin: "Отключено администратором"
+  unknownMessageType: "Неизвестный тип сообщения: {type}"
+  noReadPermission: "Нет прав на чтение этого файла"
+  noEditPermission: "Нет прав на изменение этого файла"
+  guestNoEditPermission: "Гостевой режим: нет прав на изменение"
+  noPathSpecified: "Путь не указан"
+  noDeletePermission: "Нет прав на удаление этого файла"
+  guestNoDeletePermission: "Гостевой режим: нет прав на удаление"
+  deleteRejectedByAdmin: "Администратор отклонил запрос на удаление"
+  authTimeout: "Время аутентификации истекло"
+  authRejected: "Аутентификация отклонена"
+  changeRejectedByAdmin: "Изменение отклонено администратором"
+
+dialog:
+  apiInitFailed: "Не удалось инициализировать API"
+  apiInitFailedMsg: "Не удалось инициализировать Electron API. Проверьте консоль на наличие ошибок."
+  apiError: "Ошибка API"
+  deleteFailed: "Не удалось удалить"
+  openProjectFailed: "Не удалось открыть проект"
+  loadDirFailed: "Не удалось прочитать каталог"
+  loadDirError: "Не удалось загрузить каталог"
+  openFileFailed: "Не удалось открыть файл"
+  readFailed: "Не удалось прочитать"
+  error: "Ошибка"
+  createFileFailed: "Не удалось создать файл"
+  invalidFileName: "Имя файла не может содержать разделители пути или относительные пути"
+  saveFileFailed: "Не удалось сохранить файл"
+
+error:
+  openDirectoryApi: "API openDirectory недоступен"
+  readdirApi: "API readdir недоступен"
+  readFileApi: "API readFile недоступен"
+  remoteApiUnavailable: "Удалённый API недоступен"
+  cannotReadFile: "Не удаётся прочитать файл"
+  cannotReadRemote: "Не удаётся прочитать файл с удалённого сервера"
+  codemirrorMissing: "codeMirrorEditor не существует"
+  unknown: "Неизвестная ошибка"
+
+tabs:
+  unsaved: "Несохранённые изменения"
+  unsavedMsg: "В файле <strong>{name}</strong> есть несохранённые изменения.<br>Сохранить?"
+  unsavedMsgNoName: "Сохранить?"
+  unsynced: "Несинхронизированные изменения"
+  unsyncedMsg: "В файле <strong>{name}</strong> есть визуальные правки, ещё не синхронизированные с исходником.<br>Синхронизируйте перед переключением, чтобы сохранить их."
+  unsyncedMsgNoName: "Визуальные правки не синхронизированы с исходником.<br>Синхронизируйте перед переключением, чтобы сохранить их."
+  syncAndContinue: "Синхронизировать и продолжить"
+  save: "Сохранить"
+  discard: "Не сохранять"
+  cancel: "Отмена"
+
+unsupported:
+  title: "Неподдерживаемый формат"
+  msg: "Формат {ext} не поддерживается. Всё равно загрузить?"
+  forceLoad: "Всё равно загрузить"
+
+confirm:
+  deleteFile: "Удалить \"{name}\"?"
+
+prompt:
+  newFileName: "Введите имя файла (например, config.yml):"
+
+alert:
+  openProjectFirst: "Сначала откройте проект"
+  noFileOpen: "Файл не открыт"
+
+tab:
+  unsavedTitle: "{name} (не сохранён)"
+
+tabMenu:
+  closeCurrent: "Закрыть текущую"
+  closeSaved: "Закрыть сохранённые"
+  closeLeft: "Закрыть слева"
+  closeRight: "Закрыть справа"
+  closeAll: "Закрыть все"
+
+breadcrumb:
+  root: "Корень"
+
+visual:
+  onlyYaml: "Визуальное редактирование поддерживает только файлы .yml / .yaml."
+  interpreterMissing: "Интерпретатор не загружен"
+  interpreterMissingMsg: "Модуль ChemdahInterpreter не был загружен корректно. Проверьте консоль на наличие ошибок."
+  renderFailed: "Не удалось выполнить визуальный рендеринг"
+  editInSource: "Отредактируйте в режиме исходника."
+
+rm:
+  apiError: "Ошибка: удалённый API недоступен"
+  errorPrefix: "Ошибка: {msg}"
+  startingServer: "Запуск сервера..."
+  serverStarted: "Сервер запущен на порту {port}"
+  startFailed: "Не удалось запустить: {msg}"
+  serverStopped: "Сервер остановлен"
+  connecting: "Подключение..."
+  sendCodeToAdmin: "Подключено. Передайте код безопасности администратору"
+  connected: "✅ Подключено к серверу"
+  connectFailed: "Не удалось подключиться: {msg}"
+  disconnected: "Отключено"
+  newClient: "Подключился новый клиент: {ip}"
+  requestingDelete: "Запрос на удаление файла..."
+  loadingRemoteDir: "Загрузка удалённого каталога..."
+  readingRemoteFile: "Чтение удалённого файла..."
+  savingRemoteFile: "Сохранение удалённого файла..."
+  fileUpdated: "Файл обновлён: {path}"
+  fileDeleted: "Файл удалён: {path}"
+  fileSavedOk: "Файл сохранён: {path}"
+  fileSaveFailed: "Не удалось сохранить файл: {msg}"
+  saveTimeout: "Сервер не подтвердил сохранение в течение 10 секунд, повторите попытку"
+  waitingApproveWrite: "Ожидание одобрения администратором изменения файла..."
+  fileReadOk: "Удалённый файл прочитан"
+  fileReadFailed: "Не удалось прочитать удалённый файл: {msg}"
+  listLoaded: "Список удалённых файлов загружен"
+  listLoadFailed: "Не удалось загрузить список удалённых файлов: {msg}"
+  deleteFailed: "Не удалось удалить: {msg}"
+  waitingApproveDelete: "Ожидание одобрения администратором удаления..."
+  serverClosed: "Сервер закрыт"
+  permUpdated: "Права обновлены: {level}"
+  securityCode: "Код безопасности: {code}"
+  disconnect: "Отключиться"
+
+perm:
+  guest: "Гость"
+  confirm: "Запрашивать подтверждение"
+  full: "Полный доступ"
+
+
+settings:
+  cePreview: "Включить предпросмотр сцен MC"
+  cePreviewHint: "Показывает кнопку предпросмотра в верхней части форм записей предметов / блоков / мебели / шрифтовых изображений, отрисовывая шрифтовые изображения и текстовые теги внутри смоделированных игровых сцен (чат, описание предмета, интерфейс 9x1~9x6)"
+  ceDiagnostics: "Включить проверки конфигураций"
+  ceDiagnosticsHint: "Проверяет конфигурации CraftEngine как IDE и сообщает о неизвестных ключах, ошибках типов, недопустимых перечислениях и ссылках вне диапазона как ERROR / WARN / WEAK_WARN / INFO"
+  mcAssetsPath: "Каталог ресурсов Minecraft"
+  mcAssetsPathPlaceholder: "E:/MC/Windose/.minecraft/versions/26.3/26.3/assets"
+  mcAssetsPathHint: "Папка ванильных ресурсов (та, что содержит подпапку minecraft). Используется для дополнения идентификаторов ванильных предметов/блоков/текстур/моделей/звуков/частиц/зачарований и для отрисовки предпросмотра с настоящими ванильными шрифтами и текстурами интерфейса."
+  browse: "Обзор…"
+  detect: "Автоопределение"
+  mcAssetsSet: "Каталог ресурсов Minecraft задан"
+  mcAssetsBrowseFailed: "Не удалось выбрать каталог"
+  mcAssetsUnavailable: "Эта сборка не поддерживает индексацию ресурсов"
+  mcAssetsNotFound: "Каталог ресурсов Minecraft не найден — укажите его вручную"
+  mcAssetsScanning: "Индексация ресурсов…"
+  mcAssetsInvalid: "Недопустимый каталог ресурсов: {err}"
+  mcAssetsStatus: "Проиндексировано пространств имён {ns}: предметов {items} · текстур {tex} · моделей {models}"
+  title: "Настройки"
+  titlePage: "⚙️ Настройки"
+  backToEditor: "Назад в редактор"
+  tabGeneral: "Общие"
+  tabAppearance: "Внешний вид"
+  tabEditor: "Редактор"
+  tabAI: "AI-студия"
+  tabRemote: "Удалённый доступ"
+  tabShortcuts: "Горячие клавиши"
+  tabExperimental: "Экспериментальные"
+  aboutAuthor: "🎨 Об авторе"
+  ceSearch: "Поиск…"
+  ceNoMatch: "Совпадений нет"
+  fontSearchPlaceholder: "Введите или найдите шрифт…"
+  fontComboHint: "Автоматически определяет установленные системные шрифты, дополняет по мере ввода"
+  sectionLanguage: "🌐 Язык"
+  language: "Язык"
+  languageModalTitle: "Выбор языка"
+  languagePickerOpen: "Нажмите, чтобы выбрать язык"
+  languageRestartHint: "Смена языка вступит в силу после перезапуска приложения."
+  languageRestartPending: "⚠ Выбран язык {lang} — перезапустите приложение, чтобы применить его."
+  languageRestartTitle: "Требуется перезапуск"
+  languageRestartMessage: "Язык сохранён как {lang}. Перезапустите Choten Editor, чтобы увидеть новый язык интерфейса."
+  languageCancelPending: "Отменить изменение"
+  languageReverted: "Возвращён текущий язык интерфейса."
+  sectionItemKeyStyle: "📦 Стиль ключей предметов"
+  itemKeyStyle: "Стиль ключей верхнего уровня предмета"
+  itemKeyStyleSnake: "Новый (подчёркивания) - custom_model_data"
+  itemKeyStyleKebab: "Устаревший (дефисы) - custom-model-data"
+  itemKeyStyleHint: "Стиль ключей для новых записей предметов; существующие файлы автоматически следуют своему стилю."
+  sectionTheme: "🎨 Тема"
+  themeSelect: "Выбор темы"
+  themeDark: "Тёмная"
+  themeLight: "Светлая"
+  themeAuto: "Авто"
+  sectionBackground: "🖼️ Фоновое изображение"
+  sectionFonts: "🔤 Шрифты"
+  uiFont: "Шрифт интерфейса"
+  editorFontFamily: "Шрифт редактора"
+  fontSystemDefault: "Системный по умолчанию"
+  editorFontDefault: "По умолчанию (Fira Code)"
+  bgDisclaimer: "Фоновые изображения взяты из интернета и предназначены только для предпросмотра. Свяжитесь с нами для удаления в случае нарушения прав."
+  bgSelect: "Выбор фона"
+  bgNoneThumb: "Нет"
+  bgNoneName: "Без фона"
+  bgOpacity: "Непрозрачность фона"
+  bgUpload: "📤 Загрузить фон"
+  sectionColors: "🎭 Свои цвета"
+  colorGroupMain: "Основные цвета"
+  colorPrimary: "Основной"
+  colorSuccess: "Успех"
+  colorWarning: "Предупреждение"
+  colorError: "Ошибка"
+  colorGroupBg: "Цвета фона"
+  colorBgPrimary: "Основной фон"
+  colorBgSecondary: "Вторичный фон"
+  colorGroupText: "Цвета текста"
+  colorTextPrimary: "Основной текст"
+  colorTextSecondary: "Вторичный текст"
+  sectionCheckbox: "☑️ Настройки флажков"
+  checkboxColorTitle: "Цвета флажков (по умолчанию следуют теме)"
+  checkboxColorOff: "Цвет снятого флажка"
+  checkboxColorOn: "Цвет установленного флажка"
+  checkboxMarkOn: "Показывать метку ✓ при установке"
+  checkboxMarkOff: "Показывать метку ✕ при снятии"
+  hidePremiumHints: "Скрыть подсказки о премиум-функциях"
+  hideVersionHints: "Скрыть подсказки о требованиях к версии"
+  sectionSyntax: "📝 Цвета подсветки синтаксиса"
+  syntaxGroup: "Цвета синтаксических токенов"
+  syntaxKeyword: "Ключевое слово"
+  syntaxString: "Строка"
+  syntaxNumber: "Число"
+  syntaxComment: "Комментарий"
+  syntaxFunction: "Функция"
+  syntaxOperator: "Оператор"
+  syntaxPunctuation: "Пунктуация"
+  syntaxProperty: "Имя свойства"
+  sectionCategories: "🎯 Цвета категорий"
+  categoriesGroup: "Цвета категорий блоков Kether"
+  sectionPresets: "🎪 Готовые темы"
+  presetDarkDefault: "Тёмная классика"
+  presetLightClean: "Светлая свежесть"
+  sectionEditor: "📝 Настройки редактора"
+  editorFontSize: "Размер шрифта (px)"
+  editorTabSize: "Размер табуляции"
+  tabSize2: "2 пробела"
+  tabSize4: "4 пробела"
+  tabSize8: "8 пробелов"
+  editorLineNumbers: "Показывать номера строк"
+  show: "Показать"
+  hide: "Скрыть"
+  editorLineWrapping: "Перенос строк"
+  enable: "Включить"
+  disable: "Отключить"
+  editorTheme: "Тема редактора"
+  themeDefault: "По умолчанию"
+  editorAutoSync: "Автосинхронизация изменений"
+  off: "Выкл."
+  on: "Вкл."
+  autoSyncHint: "Если включено, содержимое редактора сохраняется автоматически после каждого изменения"
+  editorDevtools: "Открывать DevTools по F12 при запуске"
+  prewarmTitle: "Предзагрузка при запуске"
+  prewarmFiles: "Предзагружать последние открытые файлы проекта"
+  prewarmMax: "Макс."
+  prewarmHint: "При запуске считывает последние открытые файлы в кэш памяти для мгновенного переключения вкладок"
+  prewarmKether: "Предзагружать действия Kether"
+  prewarmKetherHint: "Загружает определения действий Kether при запуске, чтобы редактор блоков открывался мгновенно"
+  elementPickerTitle: "Предзагрузка элементов CE"
+  elementPicker: "Предзагружать обнаруженные элементы CE"
+  elementPickerHint: "При открытии файла CraftEngine автоматически сканирует папку конфигурации проекта (items/blocks/furniture/categories/templates) и показывает кнопку быстрого заполнения рядом с подходящими полями ввода"
+  aiTitle: "Генерация с помощью AI"
+  aiEndpoint: "Конечная точка API"
+  aiEndpointHint: "Конечная точка API, совместимая с форматом OpenAI"
+  aiModel: "Модель"
+  aiModelCustom: "Своя"
+  aiCustomModel: "Своё название модели"
+  aiCustomModelPlaceholder: "Введите название модели"
+  aiApiKey: "Ключ API"
+  aiNewKeyPlaceholder: "Введите новый ключ"
+  aiAddKey: "Добавить"
+  aiSystemPrompt: "Системный промпт"
+  aiPromptDefault: "По умолчанию"
+  aiPromptCustom: "Свой"
+  aiCustomPrompt: "Содержимое своего промпта"
+  aiCustomPromptPlaceholder: "Введите свой системный промпт..."
+  aiSavePrompt: "Сохранить как свой промпт"
+  aiManagePrompts: "Управление промптами"
+  aiNewPromptNamePlaceholder: "Название нового промпта"
+  aiNewPromptDescPlaceholder: "Описание"
+  aiMaxTokens: "Макс. выходных токенов"
+  aiTemperature: "Температура"
+  remoteTitle: "Режим удалённого доступа"
+  remotePassword: "Пароль удалённого подключения"
+  remotePasswordPlaceholder: "Задайте пароль удалённого подключения"
+  remotePasswordHint: "Пароль по умолчанию, используемый при запуске сервера в режиме удалённого доступа"
+  remoteAllowDifferentVersions: "Разрешить подключение клиентов разных версий"
+  remoteAllowDifferentVersionsHint: "Если выключено, к серверу могут подключаться только клиенты с совпадающими версиями"
+  sectionExperimental: "🧪 Экспериментальные функции"
+  experimentalWarning: "⚠️ Экспериментальные функции предназначены только для разработчиков. Они крайне нестабильны, не протестированы и служат только для отладки, а также могут представлять большую опасность для ваших файлов! Вы были предупреждены!"
+  experimentalRemote: "Включить режим удалённого доступа"
+  experimentalRemoteHint: "Если включено, доступ через меню → Настройки → Удалённый доступ…"
+  experimentalAIStudio: "Включить AI-студию"
+  experimentalAIStudioHint: "Если включено, доступ через меню → Настройки → AI-студия…"
+  blockTitle: "Отображение блоков"
+  blockFontSize: "Размер шрифта блоков (px)"
+  sectionShortcuts: "⌨️ Горячие клавиши"
+  shortcutSave: "Сохранить файл"
+  shortcutNewFile: "Новый файл"
+  shortcutOpenProject: "Открыть проект"
+  shortcutToggleMode: "Переключить режим редактирования"
+  resetShortcuts: "Сбросить горячие клавиши"
+  editShortcuts: "Изменить горячие клавиши"
+  editShortcutDone: "Готово"
+  shortcutHint: "Нажмите новую комбинацию клавиш (Esc для отмены)"
+  shortcutConflict: "Конфликтует с \"{{name}}\""
+  sectionFeedback: "💬 Каналы обратной связи"
+  feedbackIntro: "По любым вопросам и отзывам обращайтесь через:"
+  feedbackQqGroup: "📢 Группа QQ: "
+  feedbackQq: "💬 QQ: "
+  feedbackJoinQq: "Вступить в группу"
+  feedbackJoinDiscord: "Присоединиться к Discord"
+  feedbackAddFriend: "Добавить в друзья"
+  sectionSave: "💾 Сохранение и сброс"
+  saveSettings: "✓ Сохранить настройки"
+  resetSettings: "↻ Восстановить значения по умолчанию"
+  exportSettings: "⬇ Экспорт настроек"
+  importSettings: "⬆ Импорт настроек"
+  sectionPreview: "👁️ Предпросмотр компонентов"
+  previewPrimary: "Основная кнопка"
+  previewSecondary: "Вторичная кнопка"
+  previewDanger: "Кнопка опасного действия"
+  previewAccent: "Акцентная кнопка"
+  previewCheckbox: "Флажок"
+  previewInputPlaceholder: "Пример ввода…"
+  previewSelect1: "Вариант 1"
+  previewSelect2: "Вариант 2"
+  previewSelect3: "Вариант 3"
+  previewMainText: "Так выглядит основной текст"
+  previewSecondaryText: "Так выглядит вторичный текст"
+  previewDemoDialog: "📦 Показать пример диалога"
+  previewDialogTitle: "Пример диалога"
+  previewDialogBody: "Этот диалог отрисовывается самим приложением с учётом темы и своих цветов в реальном времени."
+  previewDialogInput: "Введите что-нибудь, чтобы проверить поле ввода:"
+  previewDialogResult: "Вы ввели: {value}"
+  loading: "Загрузка..."
+  noPrompts: "Промптов пока нет"
+  aiNoKeys: "Ключи пока не добавлены"
+  badgeBuiltIn: "Встроенный"
+  badgeUser: "Пользовательский"
+  badgeOverridden: "(Переопределён)"
+  badgeLocal: "Локальный"
+  promptNameRequired: "Введите название промпта"
+  promptContentRequired: "Введите содержимое промпта"
+  promptSaved: "Промпт сохранён"
+  promptSaveFailed: "Не удалось сохранить: {msg}"
+  promptSavedLocal: "Промпт сохранён (локально)"
+  promptDeleted: "Промпт удалён"
+  promptDeleteFailed: "Не удалось удалить: {msg}"
+  deletePromptConfirm: "Удалить промпт \"{name}\"?"
+  promptInfoCustom: "Использовать содержимое поля своего промпта ниже как системный промпт"
+  promptInfoBuiltin: "Встроенный промпт"
+  promptInfoUser: "Пользовательский промпт"
+  promptInfoOverridden: " (переопределён версией пользователя)"
+  promptInfoLocal: "Локальный пользовательский промпт"
+  promptNameUser: "{name} (пользовательский)"
+  promptNameLocal: "{name} (локальный)"
+  keyRequired: "Введите ключ"
+  keyExists: "Ключ уже существует"
+  keyAdded: "Ключ добавлен"
+  keyDeleted: "Ключ удалён"
+  bgUploadSuccess: "Фон загружен"
+  bgUploadFailed: "Не удалось загрузить: {msg}"
+  bgUploadError: "Не удалось загрузить фон"
+  saved: "Настройки сохранены"
+  resetConfirm: "Сбросить настройки по умолчанию?"
+  resetDone: "Настройки сброшены"
+  exportDone: "Настройки экспортированы"
+  invalidConfig: "Недопустимый файл конфигурации"
+  importDone: "Настройки импортированы"
+  importFailed: "Не удалось импортировать: {msg}"
+  imageFilter: "Файлы изображений"
+  remotePasswordSet: "Пароль задан"
+
+ai:
+  title: "Генерация с помощью AI"
+  followSettings: "Использовать из настроек"
+  customModel: "Своя модель"
+  settings: "Настройки"
+  clearChat: "Очистить чат"
+  currentFile: "Текущий файл: {name}"
+  noContextFile: "Нет файла контекста"
+  inputPlaceholder: "Введите запрос... (Enter — отправить, Shift+Enter — новая строка)"
+  send: "Отправить"
+  stop: "Остановить"
+  needApiKey: "Сначала настройте ключ API в настройках."
+  thinking: "Думает..."
+  error: "Ошибка"
+  regenerate: "Сгенерировать заново"
+  requestFailed: "Запрос не выполнен: {msg}"
+  apiError: "Ошибка API {status}: {body}"
+  apiUnavailable: "Функция AI недоступна (electronAPI не загружен)"
+  stopped: "Остановлено"
+  pendingOps: "Ожидающие операции с файлами ({count})"
+  opCreate: "Создание"
+  opEdit: "Изменение"
+  opDelete: "Удаление"
+  view: "Просмотр"
+  accept: "✓ Применить"
+  reject: "✕ Отклонить"
+  original: "Исходное содержимое"
+  updated: "Обновлённое"
+  willDelete: "Этот файл будет удалён"
+  opFailedNoApi: "❌ Операция с файлом не выполнена: electronAPI недоступен"
+  openFileFirst: "⚠️ Сначала откройте файл, чтобы определить каталог проекта"
+  created: "✅ Создано: {path}"
+  edited: "✅ Изменено: {path}"
+  deleted: "✅ Удалено: {path}"
+  createFailed: "❌ Не удалось создать: {msg}"
+  editFailed: "❌ Не удалось изменить: {msg}"
+  editOriginalNotFound: "⚠️ Исходное содержимое не найдено в {path}, изменение отменено"
+  deleteFailed: "❌ Не удалось удалить: {msg}"
+  emptyHint: "💡 Опишите свою задачу, и AI поможет написать и изменить код"
+  clearConfirm: "Очистить всю историю чата?"
+  cleared: "Чат очищен"
+
+
+kether:
+  builtinText: "Текст"
+  builtinList: "Список"
+  builtinBrace: "Группа блоков"
+  slotHelp: "Нажмите или перетащите сюда, чтобы добавить действие<br>CTRL+Click — быстрое добавление текста<br>SHIFT+Click — быстрое добавление группы действий<br>CTRL+SHIFT+Click — быстрое добавление списка"
+  back: "← Назад"
+  title: "Редактор блоков Kether"
+  actionCount: "{count} действий"
+  blocks: "🧊 Блоки"
+  code: "📝 Код"
+  confirm: "✓ Подтвердить"
+  undo: "Отменить (Ctrl+Z)"
+  redo: "Повторить (Ctrl+Shift+Z)"
+  autoSync: "Автосинхронизация блоков с кодом Kether"
+  minimize: "Свернуть"
+  maximize: "Развернуть"
+  close: "Закрыть"
+  searchActions: "Поиск действий..."
+  workspaceInfo: "Записи ({entries}) · Блоки ({blocks})"
+  blockColor: "Цвет блока"
+  provider: "Провайдер"
+  category: "Категория"
+  displayName: "Отображаемое имя"
+  nameCnEn: "Китайский + английский"
+  nameCn: "Только китайский"
+  nameEn: "Только английский"
+  quoteBtn: "Кнопка кавычек"
+  semanticDisplay: "Семантическое отображение"
+  on: "Вкл."
+  off: "Выкл."
+  addBlock: "+ Добавить блок"
+  newEntry: "📥 Новая запись"
+  newDef: "📦 Новое определение"
+  clear: "🗑 Очистить"
+  codePreview: "▶ Предпросмотр кода"
+  codePreviewOpen: "▼ Предпросмотр кода"
+  empty: "(пусто)"
+  stash: "Хранилище"
+  stashArea: "📦 Хранилище"
+  stashDrop: "Перетащите блоки сюда, чтобы отложить их"
+  saved: "💾 Сохранено"
+  common: "Общие"
+  custom: "Свои"
+  catCommon: "⭐ Общие"
+  catAll: "Все"
+  deleteCommonConfirm: "Удалить общий блок \"{name}\"?"
+  noCommonBlocks: "Общих блоков пока нет<br><small>Щёлкните блок правой кнопкой, чтобы добавить его в общие</small>"
+  cancel: "Отмена"
+  insert: "Вставить"
+  copyBlock: "📋 Копировать блок"
+  viewDetail: "📖 Описание"
+  addFavorite: "⭐ Добавить в общие блоки"
+  noMatchActions: "Подходящих действий нет"
+  customSymbol: "✎ Свой"
+  customSymbolPlaceholder: "Свой символ"
+  itemEdit: "Визуальный редактор предметов"
+  posEdit: "Визуальный редактор координат"
+  emptyState: "Нажмите <strong>+ Добавить блок</strong>, чтобы начать"
+  emptyStateHint: "или переключитесь в режим кода и вводите текст напрямую"
+  then: "Тогда"
+  else: "Иначе"
+  addCondition: "+ Добавить условие"
+  deleteBranch: "Удалить эту ветвь"
+  addWhenBranch: "+ Добавить ветвь when"
+  customBlock: "⧉ Свой"
+  ketherCode: "Код Kether..."
+  removeQuote: "Нажмите, чтобы убрать кавычки"
+  addQuote: "Нажмите, чтобы добавить кавычки"
+  textValue: "Текстовое значение..."
+  unquoted: "# Без кавычек"
+  value: "Значение..."
+  list: "[ ] Список"
+  actionGroup: "{ } Группа действий"
+  entry: "Запись"
+  normal: "Обычный"
+  entrySlotHint: "+ Перетащите или нажмите, чтобы добавить блоки"
+  blockDetail: "Сведения о блоке"
+  fieldName: "Имя"
+  fieldProvider: "Провайдер"
+  fieldType: "Тип"
+  private: "Приватный"
+  public: "Публичный"
+  fieldCategory: "Категория"
+  fieldSyntax: "Синтаксис"
+  fieldExample: "Пример"
+  fieldSemantic: "Семантика"
+  fieldDescription: "Описание"
+  selectAction: "Выбор действия"
+  search: "Поиск..."
+  noMatch: "Нет совпадений"
+  ctxDetail: "📋 Описание"
+  ctxCopy: "📋 Копировать"
+  ctxPaste: "📄 Вставить"
+  ctxSave: "💾 Сохранить выражение"
+  ctxDelete: "🗑 Удалить"
+  saveStmtPrompt: "Имя сохраняемого выражения:"
+  saveStmtDefault: "Блок"
+  codeTitle: "Код Kether"
+  parseToBlocks: "🔄 Разобрать на блоки"
+
+chemdah:
+  noDialogues: "Записей диалога нет"
+  dialoguesHeader: "Записи диалога"
+  addDialogue: "+ Добавить диалог"
+  cardView: "📋 Карточки"
+  mindmapView: "🌐 Карта связей"
+  syncToSource: "Синхронизировать с исходником"
+  autoSync: "Автосинхронизация"
+  syncHint: "Изменения будут применены к редактору после нажатия \"Синхронизировать с исходником\""
+  dialogueNav: "Навигация по диалогам"
+  fileOptions: "Параметры файла"
+  theme: "Тема"
+  customTheme: "Своя..."
+  customThemePlaceholder: "Введите название своей темы"
+  title: "Заголовок"
+  optionalTitle: "Необязательный заголовок"
+  flags: "Теги (flags)"
+  addFlag: "+ Добавить тег"
+  custom: "Своя..."
+  switch: "SWITCH"
+  dialogue: "Диалог"
+  noCondition: "Без условия"
+  optionCount: "{count} вариантов"
+  deleteDialogue: "Удалить этот диалог"
+  dialogueIdPrefix: "ID диалога: {id}"
+  npcId: "ID NPC"
+  npcIdPlaceholder: "например, adyeshach BoFeng"
+  whenBranches: "Ветви условий (when)"
+  addBranch: "+ Добавить ветвь"
+  noWhenBranches: "Ветвей условий нет (будет использован переход по умолчанию)"
+  npcText: "Текст диалога NPC"
+  npcTextPlaceholder: "Содержимое диалога NPC..."
+  format: "Формат"
+  tags: "Теги"
+  ifCondition: "Если (if)"
+  conditionPlaceholder: "Выражение условия или true"
+  openJump: "Переход (open)"
+  targetDialoguePlaceholder: "Имя целевого диалога"
+  deleteBranch: "Удалить ветвь"
+  playerOptions: "Варианты игрока"
+  addOption: "+ Добавить вариант"
+  noOptions: "Вариантов для игрока нет"
+  condition: "Условие"
+  optionTextPlaceholder: "Текст варианта"
+  thenScript: "Выполнить скрипт (KETHER)"
+  ketherScriptPlaceholder: "Содержимое скрипта KETHER..."
+  deleteOption: "Удалить вариант"
+  newDialoguePrefix: "Новый диалог_{count}"
+  newQuestPrefix: "Новый квест_{count}"
+  defaultReply: "Хорошо"
+  customTagPrompt: "Введите название своего тега:"
+  syncedToSource: "Синхронизировано из визуального редактора в исходник"
+  empty: "(пусто)"
+  entryNode: "Начальный узел"
+  orphanNode: "Изолированный узел"
+  nodeCount: "{count} узлов"
+  edgeCount: "{count} связей"
+  entryCount: "{count} записей"
+  mindmapHint: "🔄 Прокрутка — масштаб · Перетаскивание — сдвиг · Щелчок по узлу — переход · Двойной щелчок — сброс"
+  emptyObject: "Пустой объект"
+  yamlError: "Ошибка разбора YAML"
+  yamlErrorHint: "Исправьте синтаксическую ошибку в режиме исходного кода и повторите попытку."
+  questList: "Список квестов"
+  addQuest: "+ Добавить квест"
+  noQuests: "Данных о квестах нет"
+  questNav: "Навигация по квестам"
+  subtaskCount: "{count} подзадач"
+  deleteQuest: "Удалить этот квест"
+  basicInfo: "Основные сведения"
+  questId: "ID квеста"
+  questIdPlaceholder: "Уникальный ID квеста"
+  displayName: "Отображаемое имя"
+  questNamePlaceholder: "Отображаемое имя квеста"
+  type: "Тип"
+  description: "Описание"
+  questDescPlaceholder: "Описание квеста..."
+  depend: "Предусловия (depend)"
+  dependPlaceholder: "ID квестов через запятую"
+  statsVisible: "Показывать прогресс в статистике"
+  show: "Показывать"
+  hide: "Скрывать"
+  optional: "Необязательная запись"
+  yes: "Да"
+  no: "Нет"
+  subtasks: "Подзадачи"
+  noSubtasks: "Подзадач нет"
+  agentScripts: "Скрипты жизненного цикла квеста (agent)"
+  addHook: "+ Добавить хук"
+  noHooks: "Хуки agent не заданы"
+  ketherScript: "Скрипт KETHER..."
+  deleteHook: "Удалить этот хук"
+  addons: "Аддоны"
+  noAddons: "Компоненты аддонов не заданы"
+  search: "Поиск..."
+  addSelected: "Добавить выбранные"
+  select: "Выбрать"
+  addSelectedCount: "Добавить выбранные ({count})"
+  cancel: "Отмена"
+  itemEditor: "Визуальный редактор предметов"
+  namespaceNotice: "⚠ Это пространство имён поддерживается аддоном, некоторые серверы могут его не поддерживать"
+  namespace: "Пространство имён"
+  itemId: "ID предмета"
+  itemIdPlaceholder: "например, diamond, diamond_sword или *"
+  wildcard: "Подстановочный знак"
+  display: "Отображение"
+  nameField: "Имя (name)"
+  exact: "= (Точное)"
+  notEqual: "!= (Не равно)"
+  ignoreColor: "# (Игнорировать цвет)"
+  contains: "( ) (Содержит)"
+  namePlaceholder: "Текст имени"
+  lore: "Описание (по строке на элемент)"
+  attributes: "Характеристики"
+  amountPlaceholder: "Количество"
+  damagePlaceholder: "Значение прочности/урона"
+  valuePlaceholder: "Значение"
+  enchants: "Зачарования"
+  add: "+ Добавить"
+  noEnchants: "Зачарования не добавлены"
+  nbt: "NBT"
+  noNbt: "NBT не добавлен"
+  preview: "Предпросмотр"
+  confirm: "Подтвердить"
+  enchantIdPlaceholder: "ID зачарования (например, damage_all)"
+  level: "Уровень"
+  nbtPathPlaceholder: "Путь NBT (например, craftengine:id)"
+  value: "Значение"
+  minecraftVanilla: "minecraft (ванильный)"
+  nativeSupport: "Встроенная поддержка"
+  addonSupport: "Поддержка аддоном (при использовании выводится предупреждение)"
+  taskManager: "Менеджер подзадач — {name}"
+  totalSubtasks: "Всего подзадач: {count}"
+  subtaskTab: "Подзадача {index}"
+  subtaskPrefix: "Подзадача {count}"
+  addSubtask: "+ Добавить подзадачу"
+  addSubtaskHint: "Нажмите кнопку \"Добавить подзадачу\" слева, чтобы добавить"
+  close: "Закрыть"
+  selectObjectiveType: "Выбор типа цели подзадачи"
+  selectTaskObjectiveType: "Выбор типа цели"
+  searchObjectivePlaceholder: "Поиск типов целей..."
+  noSubtaskSelected: "Подзадача не выбрана"
+  selectType: "Выберите тип..."
+  delete: "Удалить"
+  subtaskId: "ID подзадачи"
+  name: "Имя"
+  objectiveType: "Тип цели"
+  customObjectivePlaceholder: "Свой тип цели"
+  objectiveCondition: "Условие"
+  position: "Координаты"
+  posEdit: "Визуальный редактор координат"
+  itemEdit: "Визуальный редактор предметов"
+  ketherScriptField: "Скрипт KETHER ($)"
+  goal: "Цель (goal)"
+  amountField: "Количество (amount)"
+  subtaskAgentScripts: "Скрипты agent подзадачи"
+  addonManager: "Менеджер аддонов — {name}"
+  totalAddons: "Всего аддонов: {count}"
+  addAddon: "+ Добавить аддон"
+  addAddonHint: "Нажмите кнопку \"Добавить аддон\" слева, чтобы добавить"
+  noAddonComponents: "Аддонов нет"
+  selectAddon: "Выбор аддона"
+  searchAddonPlaceholder: "Поиск названий аддонов..."
+  customKeyValues: "Свои пары «ключ — значение»"
+  enabled: "Включено"
+  deleteItem: "Удалить этот элемент"
+  addNode: "+ Добавить узел"
+  noConfigurableFields: "У этого аддона нет настраиваемых полей"
+  selectAgentHook: "Выбор хука agent"
+  searchHookPlaceholder: "Поиск названий хуков..."
+  customScopePrompt: "Введите своё пространство (scope):"
+  customScopeLabel: "@ Своё"
+  selectScopeForHook: "Выберите пространство для {hook}"
+  searchScopePlaceholder: "Поиск пространств..."
+  customHookPrompt: "Введите имя хука и пространство (например, completed @ all):"
+  scopeGroup: "Пространство"
+  posEditor: "Редактор выражений координат"
+  world: "Мир"
+  required: "Обязательно"
+  xyz: "Координаты X Y Z"
+  mode: "Режим"
+  exactPos: "Точные координаты"
+  radiusPos: "В пределах радиуса (~ radius)"
+  areaPos: "В пределах области (> position)"
+  multiPos: "Несколько координат (&)"
+  radius: "Радиус"
+  radiusPlaceholder: "например, 10"
+  areaTo: "Область до X Y Z"
+  toX: "До X"
+  toY: "До Y"
+  toZ: "До Z"
+  multiCoords: "Несколько координат"
+  addCoord: "+ Добавить координаты"
+  ok: "OK"
+  worldRequired: "Введите название мира"
+  selectTypeTitle: "Выбор типа интерпретатора Chemdah"
+  typeUnknownMsg: "Не удалось автоматически определить тип файла{detected}. Выберите тип интерпретатора вручную:"
+  detectedAs: " (определён как {type})"
+  interpreterType: "Тип интерпретатора"
+  typeConversation: "Диалог"
+  typeQuest: "Квест"
+  scopeLabel: "Область"
+  scopeFile: "Только этот файл"
+  scopeDirectory: "Все файлы в текущей папке"
+  scopeProject: "Весь проект"
+  typeUnknown: "Неизвестно"
+  typeConversationFull: "Файл диалогов"
+  typeQuestFull: "Файл квестов"
+  unknownTypeTitle: "Нераспознанный тип файла"
+  unknownTypeMsg: "Этот файл не является ни файлом диалогов, ни файлом квестов."
+  unknownTypeHint: "Отредактируйте в режиме исходного кода или"
+  manualSelect: "выберите тип вручную"
+  rendering: "Отрисовка..."
+  visualEditTitle: "Визуальное редактирование"
+  visualEditHint: "Выберите тип интерпретатора и повторите попытку либо отредактируйте файл в режиме исходного кода."
+
+craftengine:
+  premiumHint: "Эта возможность доступна только в премиум-версии плагина CraftEngine — в community-версии этот параметр может не действовать."
+  versionHint: "Для этой возможности есть требования по версии: {versions}"
+  hintDetail: "Подробности подсказки"
+  hintModeEditor: "Вид редактора"
+  hintModeWiki: "Исходник Wiki"
+  yvObject: "Объект"
+  yvList: "Список"
+  yvEmpty: "пусто"
+  yvOf: " — это "
+  yvCase: "Регистр"
+  syncedToSource: "Синхронизировано с исходником"
+  fieldEmpty: "(пусто)"
+  type_config: "Конфигурация плагина"
+  listEmpty: "Записей нет — нажмите кнопку ниже, чтобы добавить"
+  listAdd: "Добавить"
+  mapAdd: "+ Добавить ключ"
+  unionEmpty: "Не задано"
+  unionClear: "Очистить"
+  customValue: "Простое значение…"
+  componentAdd: "Добавить компонент…"
+  componentCustom: "Свой (ключ — значение)"
+  componentsEmpty: "Компонентов данных пока нет — выберите один в списке ниже"
+  componentConditionTitle: "Условия"
+  condAdd: "Добавить условие"
+  modelSimplified: "Упрощённая модель"
+  modelTree: "Дерево модели"
+  modelPath: "Путь модели"
+  popupEdit: "Изменить"
+  popupEmpty: "Не задано"
+  popupDetailed: "Подробно"
+  popupOk: "OK"
+  popupCancel: "Отмена"
+  jsonEditor: "Редактор JSON"
+  jsonEditorHint: "Редактируйте это поле как JSON; изменения применяются сразу"
+  material: "Материал (material)"
+  customModelData: "Данные кастомной модели (custom-model-data)"
+  texture: "Текстура (texture)"
+  category: "Категория (category)"
+  dataLabel: "Данные предмета (data)"
+  displayName: "Отображаемое имя (item-name)"
+  itemName: "Имя предмета (display-name)"
+  lore: "Строки описания (lore)"
+  dataJsonHint: "Полное редактирование данных предмета в JSON"
+  model: "Модель (model)"
+  modelJsonHint: "Полное редактирование модели в JSON"
+  behaviorType: "Тип поведения (behavior.type)"
+  behavior: "Поведение (behavior)"
+  settings: "Настройки (settings)"
+  events: "События (events)"
+  updater: "Обновление (updater)"
+  state: "Состояние блока (state)"
+  states: "Состояния (states)"
+  statesHint: "Сопоставление нескольких состояний, редактируется как JSON"
+  hardness: "Прочность (hardness)"
+  resistance: "Сопротивление (resistance)"
+  behaviors: "Поведения (behaviors)"
+  loot: "Добыча (loot)"
+  variants: "Варианты (variants)"
+  variantsHint: "Элементы вариантов / хитбоксы / места для сидения"
+  settingsItem: "Предмет (item)"
+  hitTimes: "Число попаданий (hit-times)"
+  settingsSounds: "Звуки (sounds)"
+  recipeType: "Тип рецепта (type)"
+  pattern: "Шаблон (pattern)"
+  patternHint: "По одной строке шаблона на строку"
+  ingredients: "Ингредиенты (ingredients)"
+  ingredientsHint: "Пары «ключ — значение»: символ = предмет"
+  result: "Результат (result)"
+  resultId: "Предмет (id)"
+  resultCount: "Количество (count)"
+  experience: "Опыт (experience)"
+  time: "Время (time)"
+  base: "Базовый предмет (base)"
+  addition: "Добавляемый предмет (addition)"
+  templateType: "Шаблон кузнечного дела (template_type)"
+  group: "Группа (group)"
+  unlockOnIngredient: "Открывать при получении ингредиента (unlock_on_ingredient_obtained)"
+  unlockOnJoin: "Открывать при входе (unlock_on_join)"
+  otherFields: "Другие поля"
+  customTabWarning: "Вкладку «Свои» следует использовать только при редактировании файлов плагина для параметров, не охваченных остальными вкладками."
+  type_item: "Предмет"
+  type_block: "Блок"
+  type_furniture: "Мебель"
+  type_recipe: "Рецепт"
+  type_generic: "Общее"
+  yamlError: "Не удалось разобрать YAML"
+  yamlErrorHint: "Файл содержит синтаксическую ошибку, визуальное редактирование невозможно. Исправьте её в режиме исходного кода и повторите попытку."
+  noSections: "Редактируемых разделов не найдено"
+  noEntries: "В этом разделе нет записей"
+  addEntry: "+ Добавить запись"
+  emptySection: "Пустой раздел"
+  selectEntry: "Выберите запись слева для редактирования"
+  ownerLoading: "Определение принадлежности к проекту..."
+  syncToSource: "Синхронизировать с исходником"
+  autoSync: "Автосинхронизация"
+  ownerBadge: "Проект: {root} · Пак: {pack}"
+  ownerNone: "Проект CE не найден"
+  pickerBtn: "Быстрое заполнение"
+  pickerSearch: "Поиск..."
+  pickerEmpty: "Записей пока нет. Нажмите ⟳ для повторного сканирования"
+  pickerNoMatch: "Нет совпадений"
+  pickerScanning: "Сканирование элементов проекта..."
+  pickerRescan: "Сканировать заново"
+  pickerCount: "{n} записей · щёлкните, чтобы подставить · в многострочные поля можно добавлять многократно"
+  newEntryTitle: "Новая запись"
+  section: "Раздел"
+  entryNamespace: "Пространство имён (namespace)"
+  entryPath: "Путь (path)"
+  confirmAdd: "Добавить"
+  confirmDelete: "Удалить"
+  deleteEntry: "Удалить запись"
+  deleteConfirmTitle: "Подтверждение удаления"
+  deleteConfirmMsg: "Удалить запись {key}? Это действие необратимо."
+  entryNamespaceInvalid: "Пространство имён может содержать только строчные латинские буквы, цифры и знаки подчёркивания"
+  entryPathInvalid: "Путь может содержать только буквы, цифры, знаки подчёркивания, точки, косые черты и дефисы"
+  entryExists: "Запись {key} уже существует"
+  entryId: "ID записи"
+  entryIdInvalid: "ID может содержать только буквы, цифры, знаки подчёркивания, точки и дефисы"
+  keyOnlyHint: "Записи этого раздела не имеют префикса namespace:path — введите ID напрямую"
+  type_equipment: "Снаряжение"
+  type_image: "Изображение"
+  type_category: "Категория"
+  type_sound: "Звук"
+  type_emoji: "Эмодзи"
+  type_jukeboxSong: "Песня музыкального блока"
+  type_painting: "Картина"
+  type_globalVariable: "Глобальная переменная"
+  type_translation: "Перевод"
+  type_lang: "Язык"
+  type_lootSource: "Источник добычи"
+  type_placedFeature: "Размещённая структура"
+  type_template: "Шаблон"
+  type: "Тип (type)"
+  allItems: "Все предметы (all_items)"
+  arguments: "Аргументы (arguments)"
+  ascent: "Подъём (ascent)"
+  assetId: "ID ресурса (asset_id)"
+  author: "Автор (author)"
+  biome: "Биом (biome)"
+  char: "Символ (char)"
+  chars: "Символы (chars)"
+  chatCompletion: "Завершение чата (chat_completion)"
+  clientBoundMaterial: "Материал на стороне клиента (client-bound-material)"
+  column: "Столбец (column)"
+  comparatorOutput: "Выход компаратора (comparator_output)"
+  conditions: "Условия (conditions)"
+  content: "Содержимое (content)"
+  description: "Описание (description)"
+  dimension: "Измерение (dimension)"
+  dimensionType: "Тип измерения (dimension_type)"
+  equipment: "Снаряжение (equipment)"
+  equipmentType: "Тип (type)"
+  feature: "Структура (feature)"
+  featureHint: "Строка или объект, например default:tree или {type: ...}"
+  file: "Файл (file)"
+  font: "Шрифт (font)"
+  food: "Еда (food)"
+  globalVariableMap: "Глобальная переменная (ключ — значение)"
+  gridSize: "Размер сетки (grid_size)"
+  height: "Высота (height)"
+  hidden: "Скрыто (hidden)"
+  icon: "Значок (icon)"
+  image: "Изображение (image)"
+  keywords: "Ключевые слова (keywords)"
+  kvWholeHint: "Вся запись — это карта «ключ — значение»; значения JSON разбираются автоматически"
+  templateContent: "Содержимое шаблона (YAML)"
+  templateContentHint: "Шаблон — это произвольная карта «ключ — значение»: поддерживаются вложенные структуры, ключи версий с $$ и теги !!type"
+  layers: "Слои (layers)"
+  layersHint: "Доступные слои: {names}; значение может быть путём к текстуре или объектом JSON"
+  length: "Длина (length)"
+  list: "Список предметов (list)"
+  lootSourceType: "Тип источника (type)"
+  mapColor: "Цвет карты (map-color)"
+  merges: "Объединения (merges)"
+  name: "Имя (name)"
+  overrides: "Переопределения (overrides)"
+  overwrite: "Перезапись (overwrite)"
+  permission: "Право (permission)"
+  placement: "Размещение (placement)"
+  priority: "Приоритет (priority)"
+  range: "Дальность (range)"
+  ref: "Ссылка (ref)"
+  replace: "Замена (replace)"
+  row: "Строка (row)"
+  showInOpTab: "Показывать во вкладке оператора (show_in_op_tab)"
+  sound: "Звук (sound)"
+  sounds: "Звуки (sounds)"
+  soundsHint: "По одному на строку: обычная строка или объект JSON"
+  subtitle: "Субтитры (subtitle)"
+  tags: "Теги (tags)"
+  target: "Цель (target)"
+  targets: "Цели (targets)"
+  template: "Шаблон (template)"
+  title: "Заголовок (title)"
+  translationMap: "Карта переводов (ключ — значение)"
+  width: "Ширина (width)"
+  world: "Мир (world)"
+  entryKey: "Ключ записи (namespace:path)"
+  entryKeyHint: "Применяется сразу; разделы global_variables / translations / lang не имеют префикса"
+  tabBasic: "Основное"
+  tabModel: "Модель"
+  tabItemData: "Данные предмета"
+  tabBehavior: "Поведение"
+  tabEvents: "События"
+  eventsAdd: "+ Добавить событие"
+  eventsBack: "← Назад к списку"
+  eventsTrigger: "Триггер (on)"
+  eventsTriggerRequired: "Введите имя триггера"
+  eventsTriggerHint: "Несколько триггеров через пробел или запятую, например attack left_click"
+  eventsTriggerPh: "attack right_click…"
+  eventsFunctions: "Функции (functions)"
+  eventsFunctionsHint: "Выполняются по порядку; функции могут содержать вложенные условия и события"
+  eventsScalarPh: "Сырая строка (своя/расширенная)"
+  eventsContent: "Содержимое события"
+  eventsCount: "{count} событий"
+  eventsEmpty: "Событий пока нет — нажмите «Добавить событие» в правом верхнем углу"
+  newEventTitle: "Новое событие"
+  newEventHint: "Несколько триггеров через пробел или запятую, например attack left_click"
+  eventExists: "Событие {name} уже существует"
+  eventDeleteMsg: "Удалить событие {name}? Это действие необратимо."
+  specTitle: "Особые настройки"
+  specHasVersions: "условий по версии: {n}"
+  specHasType: "Тип {type}"
+  specLoc: "Расположение"
+  specVersions: "Условия по версии"
+  specVersionsDesc: "Значения по версиям: $1.21.4 — фиксированное · $1.20.1~1.21.4 — диапазон · $>=1.21.4 — сравнение · $ — значение по умолчанию"
+  specNoVersions: "Условий по версии нет — добавьте ниже"
+  specFixed: "Фиксированное"
+  specRange: "Диапазон"
+  specCompare: "Сравнение"
+  specFallback: "По умолчанию"
+  specAdd: "Добавить"
+  specKeyPh: "Версия, например 1.21.4"
+  specValPh: "Значение"
+  specEmptyVal: "Пустое значение удаляет условие"
+  specDel: "Удалить"
+  specType: "Тип значения (!!type)"
+  specTypeNone: "Без типа"
+  specTypeHint: "Отметьте значение типом; префикс !!type сохраняется при записи обратно"
+  specCurVal: "Текущее значение"
+
+
+content:
+  categories:
+    实体操作: "Операции с сущностями"
+    数据与变量: "Данные и переменные"
+    文本与运算: "Текст и операции"
+    游戏机制: "Игровая механика"
+    系统管理: "Системное администрирование"
+    逻辑判断: "Логика"
+    世界与坐标: "Мир и координаты"
+    物品管理: "Управление предметами"
+    脚本控制: "Управление скриптами"
+    界面与显示: "Интерфейс и отображение"
+    时间与日期: "Время и дата"
+    基本: "Базовые"
+  param:
+    symbol: "Символ"
+    action: "Действие"
+    int: "Целое число"
+    double: "Десятичное число"
+    number: "Число"
+    string: "Текст"
+    token: "Параметр"
+    player: "Игрок"
+    item: "Предмет"
+    location: "Координаты"
+    world: "Мир"
+    time: "Время"
+    message: "Сообщение"
+    permission: "Право"
+    list: "Список"
+    条件: "Условие"
+    执行: "Тогда"
+    否则: "Иначе"
+    次数: "Количество"
+    变量: "Переменная"
+    条件列表: "Список условий"
+
+  kether:
+    all: 'Проверить, все ли {возвращаемые значения} в списке действий равны {yes}.'
+    any: 'Проверить, соответствует ли любое {возвращаемое значение} в списке действий условию {yes}.'
+    async: 'Выполнить действия в {асинхронном} режиме, не привязанном к жизненному циклу.<br>При завершении программы все незавершённые действия {#Async} немедленно закрываются.'
+    await: Дождаться завершения действия.
+    await_all: 'Дождаться завершения {всех действий} в {списке действий}.'
+    await_any: 'Дождаться завершения {любого действия} в {списке действий}.'
+    call: '{В режиме Shell этот оператор ничего не делает.}<br>Вызвать любую объявленную функцию, включая функцию {main}.'
+    exit: Завершить программу.
+    goto: '{В режиме Shell этот оператор ничего не делает.}<br>Перейти к любой объявленной функции, включая функцию {main}, или к определённой структуре диалога.'
+    if_else: 'Базовый логический оператор.<br>Если {возвращаемое значение} действия равно {yes}, выполнить второе действие, иначе выполнить третье.'
+    literal: 'Создать и вернуть {строку}.<br>Если строка содержит пробелы, заключите её в {двойные кавычки} или {одинарные кавычки}; кавычки можно опустить, если пробелов нет.<br><br>{Примечание:}<br>Даже {literal 100} не является целым числом; при необходимости используйте действие {#Type}.'
+    not: 'Проверить, равно ли {возвращаемое значение} действия {false}, то есть инвертировать результат.'
+    repeat: Повторить действие несколько раз.
+    sleep: Заблокировать рабочий поток на определённое время.
+    variable_get: Получить переменную.
+    variable_set: 'Присвоить переменной {примитивный тип} или {возвращаемое значение} действия.'
+    while: 'Базовый логический оператор.<br>Пока {возвращаемое значение} первого действия равно {yes}, повторять второе действие, пока оно не станет {false}.'
+    absorption_amount: 'Получить или задать запас поглощения урона у игрока.'
+    action_bar: 'Отправить {возвращаемое значение} действия {исполнителю} как сообщение в {action bar}.'
+    address: 'Получить IP-адрес игрока.'
+    allow_flight: Проверить или изменить, разрешён ли игроку полёт.
+    array: 'Вернуть все {возвращаемые значения} списка действий как {коллекцию}.'
+    attack_cooldown: 'Получить перезарядку атаки игрока.'
+    bed_spawn: 'Получить или изменить точку возрождения у кровати игрока; блок должен быть кроватью.'
+    'bed_spawn_x,y,z': 'Получить координату по оси точки возрождения у кровати игрока.'
+    blocking: Проверить, блокирует ли игрок удар.
+    break: 'Завершает тело цикла при использовании внутри операторов цикла ({ForEach, Join, Map, While}).'
+    'case & when': 'Сложный оператор выбора с более широкими возможностями, чем #IF.<br>Полный оператор выбора требует как минимум одну ветвь, то есть {блок when}.<br><br>Каждая стандартная ветвь состоит из {when} {{условие}} -> {{выражение}}.<br>Также можно использовать {else} {{выражение}} как ветвь по умолчанию.<br><br>{Пример:}<br>set number to 3<br>set numberProvided to case &number [<br>&nbsp;&nbsp;&nbsp;&nbsp;when 1 -> "One"<br>&nbsp;&nbsp;&nbsp;&nbsp;when 2 -> "Two"<br>&nbsp;&nbsp;&nbsp;&nbsp;when 3 -> "Three"<br>&nbsp;&nbsp;&nbsp;&nbsp;else "One"<br>]<br>log inline "You provide {{ &numberProvided }}"<br><br>{Результат:}<br>You provide Three<br><br>{Его также можно использовать как другие операторы:}<br>set number to 3<br>case &number [<br>&nbsp;&nbsp;&nbsp;&nbsp;when 1 -> log "One"<br>&nbsp;&nbsp;&nbsp;&nbsp;when 2 -> log "Two"<br>&nbsp;&nbsp;&nbsp;&nbsp;when 3 -> log "Three"<br>&nbsp;&nbsp;&nbsp;&nbsp;else log "One"<br>]<br><br>{Или с несколькими операторами:}<br>set number to 1<br>case &number [<br>&nbsp;&nbsp;&nbsp;&nbsp;when 1 -> {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;log "Monday"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;log "First day of the week"<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;when [ 2 3 4 5 6 7 ] -> {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;log "Sunday"<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;else log "Other days"<br>]<br><br>{Или для логических проверок:}<br>set number to 1<br>case &number [<br>&nbsp;&nbsp;&nbsp;&nbsp;when < 10 -> {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;log "Small"<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;when > 10 -> {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;log "Big"<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;else log "Other"<br>]'
+    check: 'Сравнить {возвращаемые значения} двух действий с помощью нескольких режимов сравнения.<br><br>1. Равно ({==}, {is}): два значения совпадают {буквально}.<br>2. Не равно ({!=}, {not}): два значения различаются {буквально}.<br>3. Похожее равенство ({=?}, {is?}): два значения совпадают {буквально}, если {регистр игнорируется}.<br>4. Абсолютное равенство ({=!}, {is!}): два значения совпадают по {ссылке в памяти}.<br>5. Больше ({>}, {gt}): первое значение {больше} второго.<br>6. Больше или равно ({>=}): первое значение {больше} или {равно} второму.<br>7. Меньше ({<}, {lt}): первое значение {меньше} второго.<br>8. Меньше или равно ({<=}): первое значение {меньше} или {равно} второму.<br>9. Правое содержит левое (in): содержит ли второе значение первое.<br>10. Левое содержит правое (has): содержит ли первое значение второе.<br><br>{Примечание:}<br>При сравнении с условием {равенства} к обоим аргументам автоматически добавляются действия вывода типа {#Type}.'
+    color: 'Заменить все {цветовые коды} в {возвращаемом значении} действия.<br>Поддерживаются расширенные цветовые коды, предоставляемые {TabooLib}.'
+    command: 'Выполнить {возвращаемое значение} действия как команду; по умолчанию исполнителем является {игрок}.'
+    compass_target: 'Получить или изменить цель компаса игрока.'
+    'compass_x,y,z': 'Получить координату по оси цели компаса игрока.'
+    conversing: 'Проверяет, активно ли участвует объект Conversable в разговоре.<br><br>{Возвращает:}<br>True, если разговор идёт'
+    date_day: 'День года, месяца или недели.<br>Год: ({1} ~ {365})<br>Месяц: ({1} ~ {31})<br>Неделя: ({1} ~ {7})'
+    date_hour: 'Текущий час ({0} ~ {23}).'
+    date_minute: 'Текущая минута ({0} ~ {59}).'
+    date_month: 'Текущий месяц ({1} ~ {12}).'
+    date_second: 'Текущая секунда ({0} ~ {59}).'
+    date_year: 'Текущий год ({MIN_YEAR} ~ {MAX_YEAR}).'
+    dead: Проверить, мёртв ли игрок.
+    element: 'Получить элемент по указанному индексу из {возвращаемого значения} действия как {список}.'
+    exhaustion: 'Получить или изменить истощение игрока.'
+    exp: 'Получить или изменить данные опыта игрока; изменяемым является только {опыт игрока}.'
+    first_played: Вернуть время первого входа игрока.
+    fly___walk_speed: 'Получить или изменить скорость полёта или ходьбы игрока.'
+    flying: Проверить или изменить, летит ли игрок.
+    food_level: 'Получить или изменить уровень сытости игрока.'
+    foreach: 'Перебрать все {элементы} {возвращаемого значения} первого действия, передавая каждый из них второму действию как {временную переменную}.'
+    format_time: 'Отформатировать определённое время с помощью определённого {формата}.<br><br>'
+    gamemode: 'Получить или изменить игровой режим игрока.<br><br>Доступные режимы:<br>{Survival}: SURVIVAL, 0<br>{Creative}: CREATIVE, 1<br>{Adventure}: ADVENTURE, 2<br>{Spectator}: SPECTATOR, 3'
+    gliding: Проверить или изменить, планирует ли игрок.
+    glowing: Проверить или изменить, светится ли игрок.
+    gravity: Проверить или изменить, действует ли на игрока гравитация.
+    health: 'Получить или изменить здоровье или максимальное здоровье игрока.'
+    inline: 'Заменить все {встроенные скрипты} в {возвращаемом значении} действия. <br>Встроенный скрипт вставляет код скрипта в строку с помощью {{{} ... {}}}.'
+    inside_vehicle: Проверить, находится ли игрок внутри транспорта.
+    javascript: 'Выполнить код {JavaScript} и {вернуть} результат.<br>Передаются все переменные текущей программы, а также событие ({event}), отправитель ({sender}) и сервер ({server}).'
+    join: 'Объединить все {возвращаемые значения} списка действий в {строку}, по умолчанию используя {пробел} как разделитель.'
+    jumping: Проверить или изменить, прыгает ли игрок.
+    last_played: 'Вернуть время последнего входа игрока в игру.'
+    leashed: Возвращает, привязана ли сущность сейчас на поводок.
+    level: 'Получить или изменить уровень игрока.'
+    locale: 'Получить язык клиента игрока.'
+    location: Создать координаты.
+    location1: 'Получить или изменить местоположение игрока.'
+    location_angle: 'Получить или изменить угол игрока.'
+    'location_x,y,z': 'Получить или изменить X, Y, Z, рыскание (Yaw) или наклон (Pitch) местоположения.'
+    map: 'Перебрать все {элементы} {возвращаемого значения} первого действия, передавая каждый из них второму действию как {временную переменную}.<br>В конце вернуть все {возвращаемые значения} второго действия как {коллекцию}.<br><br>В отличие от {#ForEach}, {#Map} собирает каждый непустой результат.<br><br>Возвращает список, содержащий результаты применения заданной функции преобразования к каждому элементу исходной коллекции.'
+    math: 'Обработать все {возвращаемые значения} списка действий с помощью {математического оператора}.<br><br>Поддерживаемые операторы:<br>{Сложение}: +, add, plus<br>{Вычитание}: -, sub, minus<br>{Умножение}: *, mul, times<br>{Деление}: /, div, divided<br>'
+    name: 'Получить игровое имя, отображаемое имя или имя в списке игрока.'
+    no_damage_tick: 'Получить или изменить такты неуязвимости игрока.'
+    null: 'Вернуть значение {null}.'
+    on_guard: Проверить, стоит ли игрок на земле; эти данные приходят от клиента и могут быть подделаны.
+    op: Проверить или изменить, есть ли у игрока OP.
+    optional: 'Проверить, является ли {возвращаемое значение} действия не равным null.'
+    pass: 'Вернуть {пустую строку}.'
+    pause: 'Принудительно приостановить {жизненный цикл} программы; это нельзя отменить до закрытия программы.'
+    permission: 'Проверить, обладает ли {исполнитель} {возвращаемым значением} действия как правом.'
+    placeholderapi: 'Заменить все плейсхолдеры {PlaceholderAPI} в {возвращаемом значении} действия.'
+    print: 'Отправить {возвращаемое значение} действия в {консоль} как сообщение.'
+    random: 'Случайно вернуть {число с плавающей точкой} в диапазоне или случайно вернуть {элемент} из {возвращаемого значения} действия.<br>При задании диапазона второй аргумент можно опустить, чтобы выбрать от 0 до границы диапазона.'
+    random2: 'Случайно вернуть {число с плавающей точкой} или {целое число} в диапазоне; в отличие от #{random}, диапазон задаётся возвращаемым значением действия.'
+    range: 'Создать числовую {коллекцию}; если опустить {шаг} или использовать {целый} шаг, создаётся коллекция целых чисел, иначе — коллекция чисел с плавающей точкой.<br>Тип коллекции зависит от типа шага, а не от типа чисел диапазона.'
+    remaining_air: 'Получить или изменить остаток воздуха у игрока.'
+    riptiding: Проверить, использует ли игрок рывок трезубцем.
+    round: 'Округлить {возвращаемое значение} действия как {число с плавающей точкой} до ближайшего {целого числа}.'
+    saturation: 'Получить или изменить насыщение игрока.'
+    scale: 'Отформатировать {возвращаемое значение} действия как {число с плавающей точкой} с двумя знаками после запятой.'
+    size: 'Получить длину {возвращаемого значения} действия как {списка}.'
+    sleep_ignored: 'Возвращает, игнорируется ли игрок как не спящий. Если все либо спят, либо имеют этот флаг, время перейдёт к следующему дню. Если у всех установлен этот флаг, но никто фактически не лежит в кровати, ничего не произойдёт.'
+    sleep_ticks: 'Вернуть такты сна игрока.'
+    sleeping: Проверить, спит ли игрок.
+    sneaking: Проверить, крадётся ли игрок.
+    sound: 'Воспроизвести текст как звук; объём и высота тона по умолчанию — {1.0}.<br>Используйте "{resource:}" как префикс, чтобы воспроизвести звук из {набора ресурсов}.'
+    split: 'Разделить {возвращаемое значение} действия как строку и вернуть части.'
+    sprinting: Проверить, бежит ли игрок.
+    subtitle: 'Отправить {возвращаемое значение} действия {исполнителю} как {субтитр}; время появления, показа и исчезновения по умолчанию — {0}, {20}, {0}.'
+    swimming: Проверить или изменить, плывёт ли игрок.
+    switch: 'Переключить текущего {наблюдателя} на определённого игрока.'
+    tell: 'Отправить {возвращаемое значение} действия {исполнителю} как сообщение.'
+    time: 'Текущее системное время.<br><br>Возвращает текущее время в миллисекундах. Обратите внимание: хотя единица измерения возвращаемого значения — миллисекунда, гранулярность значения зависит от операционной системы и может быть больше. Например, многие операционные системы измеряют время в единицах по десять миллисекунд.<br>Описание класса Date содержит обсуждение небольших расхождений, которые могут возникать между "компьютерным временем" и всемирным координированным временем (UTC).<br><br>{Возвращает: }разницу, измеренную в миллисекундах, между текущим временем и полуночью 1 января 1970 года UTC.'
+    time_format: 'Отформатировать текущее системное время с помощью определённого {формата}.<br><br>'
+    title: 'Отправить {возвращаемое значение} действия {исполнителю} как {заголовок}; время появления, показа и исчезновения по умолчанию — {0}, {20}, {0}.'
+    toast: 'Отправить {возвращаемое значение} действия {исполнителю} как {всплывающее уведомление о достижении}.<br>В качестве возвращаемого значения поддерживается {список}.<br><br>Требуется версия сервера выше 1.13'
+    type: 'Создать и вернуть наиболее подходящее {строку}, {целое число}, {long}, {число с плавающей точкой} или {логическое значение}.<br>Если строка содержит пробелы, заключите её в {двойные кавычки} или {одинарные кавычки}; кавычки можно опустить, если пробелов нет.<br><br>Либо отформатировать с помощью {определённого типа} (передав действие как аргумент):<br>int, long, float, double, boolean'
+    variable: 'Изменить или получить глобальные переменные.<br>Справку по глобальным переменным см. в документации {Chemdah}.<br><br>Использование {default} после синтаксиса получения возвращает значение по умолчанию, когда данные отсутствуют; использование {default} после синтаксиса добавления (add) берёт за основу эти данные, когда они отсутствуют.'
+    variables: 'Вернуть все {узлы} переменных, объединённые в строковый {список}.'
+    warning: 'Отправить {возвращаемое значение} действия в {консоль} как предупреждение.'
+    whitelist: Проверить или изменить, находится ли игрок в белом списке.
+    world: Получить название мира, в котором сейчас находится игрок.
+    import: Импортировать пространство имён.
+    release: Освободить пространство имён.
+    block: 'Получить целочисленные значения X, Y, Z местоположения.'
+    cancel: 'Используется в скриптовых прокси в начале {квеста} или {диалога} для отмены поведения.'
+    ceil: Округление вверх
+    close: Используется в скриптовых прокси диалога для завершения диалога.
+    distance: Получить расстояние между двумя местоположениями; возвращает -1, если они находятся в разных мирах.
+    equipment_check: 'Проверить, является ли экипировка игрока определённым предметом, с помощью выражений предметов {Chemdah}.<br>Справку по выражениям см. в документации {Chemdah}.<br><br>Доступные слоты:<br>{Основная рука}: hand, mainhand<br>{Вторая рука}: offhand<br>{Шлем}: head, helmet<br>{Нагрудник}: chest, chestplate<br>{Поножи}: legs, leggings<br>{Ботинки}: boots, feet'
+    floor: Округление вниз
+    inventory_count: 'Подсчитать определённый предмет в инвентаре игрока с помощью выражений предметов {Chemdah}.<br>Справку по выражениям см. в документации {Chemdah}.'
+    inventory_check: 'Проверить, содержит ли инвентарь игрока определённый предмет, с помощью выражений предметов {Chemdah}. Справку по выражениям см. в документации {Chemdah}.'
+    inventory_close: 'Закрыть текущий инвентарь игрока.'
+    inventory_slot_check: 'Проверить, находится ли в определённом слоте инвентаря игрока определённый предмет, с помощью выражений предметов {Chemdah}.<br>Справку по выражениям см. в документации {Chemdah}.'
+    inventory_take: 'Проверить, содержит ли инвентарь игрока определённый предмет, и удалить его, используя выражения предметов {Chemdah}.<br>Справку по выражениям см. в документации {Chemdah}.'
+    max: Максимум из двух или более значений
+    min: Минимум из двух или более значений
+    mmocore_attribute_point: 'Получить очки атрибутов {MMOCore} игрока.'
+    mmocore_class: 'Получить данные класса {MMOCore} игрока.'
+    mmocore_level___exp: 'Получить уровень или опыт {MMOCore} игрока.'
+    mmocore_mana: 'Получить ману {MMOCore} игрока.'
+    mmocore_skill_point: 'Получить очки навыков {MMOCore} игрока.'
+    mmocore_stamina: 'Получить выносливость {MMOCore} игрока.'
+    mythicmobs_cast: 'Заставить игрока применить навык {MythicMobs}.<br><br>Доступные типы {Trigger}:<br>DEFAULT, API, ATTACK, BOW_HIT, BLOCK, BLOCK_PLACE, BLOCK_BREAK, <br>COMBAT, CONSUME, CROUCH, UNCROUCH, DAMAGED, DROPCOMBAT, DEATH, <br>DESPAWNED, ENTERCOMBAT, EXPLODE, INTERACT, KILL, KILLPLAYER, <br>PLAYERDEATH, SHOOT, SIGNAL, SPAWN, SPLASH_POTION, SWING, TARGETCHANGE, <br>TARGETED, TELEPORT, TIMER, USE, RIGHTCLICK, READY, CAST, FISH, <br>FISH_BITE, FISH_CATCH_FISH, FISH_CATCH_ENTITY, FISH_GROUND, FISH_REEL, <br>FISH_FAIL, TAME, TAME_FAIL, TRIDENT_THROW, TRIDENT_HIT, CUSTOM'
+    origin: 'Используется в скриптовых прокси диалога для получения местоположения над головой NPC.'
+    particle_normal: 'Воспроизвести эффект частиц в указанном местоположении; добавьте {@self} в конце, чтобы показать его только себе.<br><br>{Синтаксис выражений частиц:}<br>https://wiki.ptms.ink/index.php?title=Chemdah_通用粒子表达式'
+    position: Получить местоположение выбранных NPC; возвращает список, если выбрано несколько.
+    profile_data: 'Изменить или получить переменные игрока.<br>Справку по переменным игрока см. в документации {Chemdah}.<br><br>Использование {default} после синтаксиса получения возвращает значение по умолчанию, когда данные отсутствуют; использование {default} после синтаксиса добавления (add) берёт за основу эти данные, когда они отсутствуют.'
+    profile_level: 'Изменить или получить уровень или опыт игрока в {пользовательских уровнях}.<br>Справку по пользовательским уровням см. в документации {Chemdah}.'
+    quest_group_check: Проверить, принял ли или завершил ли игрок группу квестов.
+    quest_check: 'Проверить текущие или ещё не принятые квесты игрока (выбранные).<br><br>Доступные поведения:<br>accept-check (разрешено ли принятие) accepted (принят ли) completed (завершён ли)'
+    quest_control: 'Управлять текущими или ещё не принятыми квестами игрока (выбранными).<br><br>Доступные поведения:<br>accept (принять квест) complete (завершить квест) fail (отказаться от квеста) restart (сбросить квест) stop (завершить квест)'
+    quest_progress: 'Получить прогресс текущего (выбранного) квеста игрока или определённой записи (выбранного) квеста.'
+    quest_select: Выбрать любой действительный квест на сервере для последующих операций.
+    quest_data: 'Изменить или получить переменные в текущем (выбранном) квесте игрока.<br>Справку по переменным квеста см. в документации {Chemdah}.<br><br>Использование {default} после синтаксиса получения возвращает значение по умолчанию, когда данные отсутствуют; использование {default} после синтаксиса добавления (add) берёт за основу эти данные, когда они отсутствуют.'
+    quest_stats: 'Скрыть или обновить отображение прогресса (выбранного) квеста или определённой записи в (выбранном) квесте.<br>Используйте отдельные {} для обозначения всех записей.'
+    quest_tasks: Получить индексы записей (выбранного) квеста.
+    quest_this: 'В скриптовых прокси квестов {Chemdah} вернуть текущий квест или индекс записи.'
+    quest_track: Заставить игрока отслеживать (выбранный) квест.
+    quest_tracking: Получить название квеста, который отслеживает игрок.
+    quests: 'Получить все квесты, которые игрок выполняет сейчас; используйте {self}, чтобы игнорировать общие (многопользовательские) квесты.'
+    schematic: 'Создать определённую схему {WorldEdit} в местоположении, построенном с помощью {#Location}. Поддерживает поворот и игнорирование воздуха.'
+    script: Запустить или остановить файл скрипта.
+    skillapi_attribute_point: 'Получить атрибуты или очки атрибутов {SkillAPI} игрока.'
+    skillapi_cast: 'Заставить игрока применить навык {SkillAPI}.<br>'
+    skillapi_class: 'Получить данные класса {SkillAPI} игрока.'
+    skillapi_exp: 'Получить текущий опыт {SkillAPI} игрока или опыт, необходимый для повышения уровня.'
+    skillapi_level: 'Получить уровень {SkillAPI} игрока или сведения о том, достигнут ли максимум.'
+    skillapi_mana: 'Получить ману {SkillAPI} игрока.'
+    skillapi_skill_point: 'Получить очки навыков {SkillAPI} игрока.'
+    talk: 'При использовании в {agent:begin}:<br>добавляет содержимое, которое NPC собирается отправить.<br><br>При использовании в {agent:refuse}, {agent:end}, {then}:<br>заставляет NPC немедленно отправить определённое содержимое, часто используется для завершения диалога.'
+    trigger: 'Запустить квест {Trigger} игрока.<br>Справку по этому типу квеста см. в документации {Chemdah}.'
+    ui: 'Работает только в конфигурациях модуля {UI}, используется для построения прогресса квеста.<br>Справку по модулю UI см. в документации {Chemdah}.'
+    wizard: Запустить или остановить мастер настройки Wizard.
+    workflow_fetch: 'Определить офлайн-компенсацию: если игрок выйдет из игры до выполнения оператора {fetch reset}, операторы в {fetch mark} будут выполнены при следующем входе.'
+    animation: 'Заставить всех выбранных сейчас NPC воспроизвести анимацию.<br><br>{Известные:}<br>SWING_MAIN_HAND, TAKE_DAMAGE, LEAVE_BED, SWING_OFFHAND<br>CRITICAL_EFFECT, MAGIC_CRITICAL_EFFECT'
+    controller: 'Назначить контроллер всем выбранным сейчас NPC, а также удалить или очистить их.<br><br>{Известные:}<br>Move, Gravity, SmoothLook, LookAtPlayer, LookAtPlayerAlways<br>RandomLookGround, RandomStrollLand'
+    create: Создать NPC в определённом местоположении.
+    delete: Удалить и уничтожить всех выбранных NPC.
+    destroy: Уничтожить всех выбранных сейчас NPC.
+    look: 'Заставить всех выбранных NPC смотреть на местоположение, при желании с плавным поворотом.'
+    meta: 'Изменить метаданные всех выбранных NPC или сбросить их.<br><br>{См. также:}<br>https://wiki.ptms.ink/index.php?title=AdyeshachPremium:开始:附录:第二节'
+    move: 'Заставить всех выбранных NPC идти к местоположению, при желании используя относительные координаты.'
+    passenger: 'Добавить пассажира всем выбранным NPC, а также удалить или очистить их.'
+    remove: 'Удалить всех выбранных NPC. Они удаляются из менеджера и больше не управляются, но сущности не уничтожаются.'
+    respawn: Возродить всех выбранных сейчас NPC.
+    select: 'Использовать {возвращаемое значение} действия как {ID} или {UUID} NPC для его выбора.'
+    still: 'Заставить всех выбранных NPC остановить движение; противоположность {#Move}.'
+    freeze: Заморозить или возобновить все поведения выбранных сейчас NPC.
+    tag: 'Изменить теги всех выбранных NPC, а также удалить, очистить или проверить их.<br>Используйте ключевое слово {persistent} для работы с постоянными тегами.<br>Обратите внимание, что постоянные теги требуют Adyeshach 1.4.21 или выше.'
+    teleport: 'Телепортировать всех выбранных NPC в указанное местоположение, используя тот же синтаксис местоположения, что и {#Create}.'
+    use: 'Использовать определённый менеджер NPC или временный.<br><br>{Известные:}<br>public, private'
+    viewer: 'Добавить {возвращаемое значение} действия как онлайн-игрока в список наблюдателей всех выбранных NPC, а также удалить или очистить их.'
+    modelengine_animation_add: Воспроизвести анимацию ModelEngine; у NPC должна быть привязанная модель.
+    modelengine_animation_remove: Удалить анимацию ModelEngine; у NPC должна быть привязанная модель.
+    germengine_animation_add: Воспроизвести анимацию GermEngine; у NPC должна быть привязанная модель.
+    germengine_animation_remove: Удалить анимацию GermEngine; у NPC должна быть привязанная модель.
+    arr-clear: Очистить все элементы в списке.
+    map-size: 'Получить количество записей в Map или длину строки, если это не Map.'
+    map-mutable: Преобразовать в изменяемую карту.
+    map-shuffle: Перемешать карту.
+    map-reverse: Развернуть карту.
+    map-get: Получить элемент из карты.
+    map-put: Добавить пару ключ-значение в карту.
+    map-remove: Удалить пару ключ-значение из карты.
+    map-keys: Получить список ключей в карте.
+    a-wait: Ожидать указанное время (в секундах) в скрипте. Скрипт завершается, если игрок выходит из игры во время ожидания.
+    instance-of: Проверить, является ли объект экземпляром указанного типа. Возвращает false, если тип не существует.
+    cast: Привести объект к указанному типу. Возвращает исходный объект, если приведение не удалось.
+    get-block-drops: Получить список выпадений указанного блока. Можно указать инструмент и ломающую сущность.
+    a-cd: 'Проверить или добавить перезарядку зачарования.<br>check: проверить перезарядку, при желании уведомив игрока и отправив сообщение через action bar<br>add: добавить время перезарядки'
+    spawn-entity: Создать сущность в указанном местоположении.
+    real-damage: Нанести сущности истинный урон.
+    entity-name: 'Получить имя сущности. Для игроков возвращает имя игрока, иначе — пользовательское или локализованное имя.'
+    remove-entity: Удалить указанную сущность.
+    add-potion-effect: Добавить сущности эффект зелья.
+    near-by-entities: Получить список сущностей рядом с сущностью.
+    a-vec-add: Добавить сущности скорость. Можно включить безопасный режим и проверки отбрасывания.
+    entity-is-behind: Проверить, находится ли сущность позади другой сущности.
+    launch-arrow: Запустить стрелу.
+    equip-set-item: 'Установить предмет экипировки сущности.'
+    equip-get-item: 'Получить предмет экипировки сущности.'
+    build-firework: 'Создать фейерверк в указанном местоположении. Можно указать тип (BALL, BALL_LARGE, BURST, CREEPER, STAR), мощность, мерцание, след, основной цвет и цвет затухания. Цвета принимают распространённые английские названия и могут быть заданы одним значением или списком.'
+    detonate-firework: Немедленно взорвать указанную сущность фейерверка.
+    send-lang: 'Отправить сущности локализованное сообщение, при желании с массивом параметров.'
+    mark: Добавить объекту метку метаданных.
+    unmark: 'Удалить метку метаданных у объекта.'
+    has-mark: Проверить, есть ли у объекта указанная метка метаданных.
+    set-metadata: Установить метаданные объекту.
+    remove-metadata: 'Удалить метаданные у объекта.'
+    has-metadata: Проверить, есть ли у объекта указанные метаданные.
+    get-metadata: 'Получить метаданные объекта по указанному индексу.'
+    give-exp: Дать игроку опыт. При желании применить починку.
+    a-money: 'Получить баланс экономики игрока.'
+    take-money: Забрать деньги у игрока.
+    give-money: Выдать игроку деньги.
+    has-money: Проверить, достаточно ли у игрока денег.
+    get-vein: Получить рудную жилу вокруг указанного блока.
+    strike-lightning: Ударить молнией в указанном местоположении.
+    create-explosion: 'Создать взрыв в указанном местоположении. Можно настроить сущность-источник, поджигает ли он, и разрушает ли блоки.'
+    drop-item: 'Выбросить предмет в указанном местоположении, при желании как естественное выпадение.'
+    operation: Выполнить зарегистрированную операцию.
+    modifiable-var: 'Получить значение изменяемой переменной зачарования.'
+    modifiable-var-set: 'Задать значение изменяемой переменной зачарования.'
+    arim-weight: Взвешенный случайный выбор.
+    arim-inv: Проверка предметов в инвентаре.
+    dungeon: 'Запустить скрипт DungeonPlus.<br>Подробнее: https://ersha.gitbook.io/dungeonplus/di-lao/untitled/kether'
+    dungeon-data-area: Получить количество игроков в области подземелья.
+    dungeon-data-players: Получить всех игроков в подземелье.
+    dungeon-data-data: Получить значение данных подземелья.
+    dungeon-data-mob: Получить количество убийств моба или проверить, был ли он убит.
+    dungeon-data-world: 'Получить название мира подземелья.'
+    dungeon-data-name: Получить название подземелья.
+    dungeon-data-options: 'Получить параметры запуска подземелья.'
+    message: Отправить игроку сообщение с поддержкой форматирования Invero.
+    invero_money: Управлять экономикой Vault.
+    invero_points: Управлять экономикой PlayerPoints.
+    connect: Межсерверное подключение.
+    depend: 'Проверить, есть ли на сервере указанная зависимость. Возвращает: true/false'
+    context: 'context /ctx — при активном контексте меню (то есть когда меню открыто) работать с данными переменных в контексте меню.'
+    persist: Работать с постоянными данными независимо от контекста меню.
+    menu: Операции, связанные с меню.
+    icon: 'Операции со значками:<br>relocate<br>update<br>refresh<br>index | sub_index<br>pause_update<br>pause_relocate<br>pause_frames<br>resume_update<br>resume_relocate<br>resume_frames<br>refresh = update (обновить переменные) + relocate (перенаправить подзначки)'
+    page: Операция панели страниц (требуется контекст пагинированной панели).
+    scroll: Операция панели прокрутки (требуется контекст прокручиваемой панели).
+    regenerate: Операция панели генератора элементов.
+    storage: Операция интерактивного слота (требуется интерактивная панель).
+    node: Узел
+    item: Создать предмет.
+    item_match: 'Использовать {возвращаемое значение} действия как {шаблон предмета}, чтобы проверить, держит ли его игрок.<br>Справку по шаблонам предметов см. в документации {TrMenu}.'
+    metadata: 'Получить или задать {метаданные} игрока.<br><br>{meta} временно хранится в памяти сервера,<br>а {data} использует {LocalPlayer} из TabooLib для хранения в собственном файле данных игрока.'
+    trmenu_money: 'Использовать {возвращаемое значение} действия как валюту {Vault}, чтобы проверить, есть ли она у игрока.'
+    trmenu_playerpoints: 'Использовать {возвращаемое значение} действия как валюту {PlayerPoints}, чтобы проверить, есть ли она у игрока.'
+    event_cancel: Отменить текущее событие или задать, отменено ли оно.
+    event_wait: 'Ожидать указанное событие и обработать его особым образом.<br>{Синтаксис см. здесь:}<br>https://www.yuque.com/lanscarlos/vulpecula-doc/action-event#x7y9W'
+    entity_damage: Нанести урон сущности.
+    entity_potion: 'Выдать или снять эффект зелья у сущности.<br>{Синтаксис см. здесь:}<br>https://www.yuque.com/lanscarlos/vulpecula-doc/action-entity#ZzVee'
+    entity_teleport: Телепортировать сущность в указанное местоположение.
+    regex: 'Найти или заменить текст с помощью регулярных выражений.<br>{Синтаксис см. здесь:}<br>https://www.yuque.com/lanscarlos/vulpecula-doc/action-regex'
+    function_call: '{В режиме Shell этот оператор ничего не делает.}<br>Вызвать любую объявленную функцию, включая функцию main. Аргументы поддерживаются.'
+    get_cooldown: 'В поведениях предметов {Zaphkiel}:<br>получить перезарядку {текущего предмета} или {текущего игрока} (в игровых тактах).'
+    update_cooldown: 'В поведениях предметов {Zaphkiel}:<br>записать {возвращаемое значение} действия как перезарядку (в игровых тактах) {текущего предмета} или {текущего игрока}.'
+    check_cooldown: 'В поведениях предметов {Zaphkiel}:<br>проверить, находится ли {текущий предмет} или {текущий игрок} на перезарядке.'
+    effect: 'В поведениях предметов {Zaphkiel}:<br>применить {возвращаемое значение} действия как эффект зелья Bukkit к игроку, а также удалить или очистить их.'
+    item_durability: 'В поведениях предметов {Zaphkiel}:<br>получить текущую прочность предмета; можно заменить на {item data durability_current}.'
+    item_durability_operate: 'В поведениях предметов {Zaphkiel}:<br>использовать {возвращаемое значение} действия как прочность для вычитания или восстановления.'
+    item_consume: 'В поведениях предметов {Zaphkiel}: потребить 1 предмет из поведения.'
+    item_data: 'В поведениях предметов {Zaphkiel}:<br>получить или задать активные данные предмета.'
+    save: 'В поведениях предметов {Zaphkiel}:<br>записать кеш в поток предмета.'
+    build_1: 'Во время сборки предмета {Zaphkiel}:<br>изменить переменные в названии или описании.'
+    build_2: 'Во время сборки предмета {Zaphkiel}:<br>изменить материал или значение данных; здесь {data} означает значение данных предмета, а не активные данные.'
+
+  ketherSem:
+    all: 'Все условия {0}'
+    any: 'Любое из условий {0}'
+    async: 'Выполнить асинхронно {0}'
+    await: 'Ожидать {0}'
+    await_all: 'Ожидать все действия {0}'
+    await_any: 'Ожидать любое действие {0}'
+    call: 'Вызвать {0}'
+    exit: 'Выйти {0}'
+    goto: 'Перейти к {0}'
+    if_else: 'Если {0}, то {1}, иначе {2}'
+    not: 'Не {0}'
+    repeat: 'Повторить {0} раз {1}'
+    sleep: 'Подождать {0}'
+    while: 'Пока {0}, цикл {1}'
+    absorption_amount: 'Поглощение игрока {0} {1}'
+    action_bar: 'Отправить action bar {0}'
+    address: Получить IP игрока
+    allow_flight: 'Игрок может летать {0}'
+    array: 'Создать массив {0}'
+    attack_cooldown: Получить перезарядку атаки игрока
+    bed_spawn: 'Точка возрождения игрока {0}'
+    'bed_spawn_x,y,z': 'Ось {0} точки возрождения игрока'
+    blocking: Блокирует ли игрок
+    break: Прервать цикл
+    'case & when': 'Случай {0} совпадает с {1}'
+    check: 'Проверить {0} {1} {2}'
+    color: 'Форматировать цвета {0}'
+    command: 'Выполнить команду {0} от имени {1}'
+    compass_target: 'Цель компаса игрока {0}'
+    'compass_x,y,z': 'Ось {0} компаса игрока'
+    conversing: Ведёт ли игрок диалог
+    date_day: 'Получить день в {0}'
+    date_hour: Текущий час
+    date_minute: Текущая минута
+    date_month: Текущий месяц
+    date_second: Текущая секунда
+    date_year: Текущий год
+    dead: Мёртв ли игрок
+    element: 'Получить элемент {1} из {0}'
+    exhaustion: 'Истощение игрока {0} {1}'
+    exp: 'Опыт игрока {0} {1}'
+    first_played: Время первого входа игрока
+    fly___walk_speed: 'Скорость {0} игрока {1} {2}'
+    flying: 'Полёт игрока {0}'
+    food_level: 'Уровень сытости игрока {0} {1}'
+    foreach: 'Для каждого {0} в {1} выполнить {2}'
+    format_time: 'Форматировать время {0} с помощью {1}'
+    gamemode: 'Игровой режим игрока {0}'
+    gliding: 'Планирование игрока {0}'
+    glowing: 'Свечение игрока {0}'
+    gravity: 'Гравитация игрока {0} {1}'
+    health: 'Здоровье {0} игрока {1} {2}'
+    inside_vehicle: Находится ли игрок в транспорте
+    javascript: 'Запустить JS {0}'
+    join: 'Объединить список {0} через {1}'
+    jumping: 'Прыжок игрока {0}'
+    last_played: 'Время последнего {0} игрока'
+    leashed: Привязана ли сущность
+    level: 'Уровень игрока {0} {1}'
+    locale: Язык клиента игрока
+    location: 'Создать локацию {0} {1} {2} {3} рыскание {4} наклон {5}'
+    location1: 'Локация игрока {0}'
+    location_angle: 'Угол {0} игрока {1} {2}'
+    'location_x,y,z': 'Игрок {0} {1}'
+    map: 'Преобразовать {0} из {1}, применить {2}'
+    math: 'Математика {0} {1}'
+    name: 'Имя {0} игрока'
+    no_damage_tick: 'Тики неуязвимости игрока {0} {1}'
+    null: Пусто
+    on_guard: Стоит ли игрок на земле
+    op: 'OP игрока {0}'
+    optional: 'Необязательно {0}, иначе {1}'
+    pass: Пустая строка
+    pause: Приостановить программу
+    permission: 'Проверить разрешение {0}'
+    random2: 'Случайное от {0} до {1}'
+    range: 'Диапазон от {0} до {1} с шагом {2}'
+    remaining_air: 'Остаток воздуха игрока {0} {1}'
+    riptiding: Использует ли игрок тридент
+    round: 'Округлить {0}'
+    saturation: 'Насыщение игрока {0} {1}'
+    scale: 'Округлить до 2 знаков {0}'
+    size: 'Получить размер {0}'
+    sleep_ignored: 'Игнорирование сна игроком {0}'
+    sleep_ticks: Тики сна игрока
+    sleeping: Спит ли игрок
+    sneaking: Крадётся ли игрок
+    sound: 'Воспроизвести звук {0} громкость {1} тон {2}'
+    split: 'Разделить {0} по {1}'
+    sprinting: Бежит ли игрок
+    subtitle: 'Отправить субтитры {0} появление {1} показ {2} исчезновение {3}'
+    swimming: 'Плавание игрока {0} {1}'
+    switch: 'Переключить наблюдателя {0}'
+    title: 'Отправить заголовок {0} субтитры {1} появление {2} показ {3} исчезновение {4}'
+    toast: 'Отправить уведомление {0} {1} тип {2}'
+    warning: 'Предупреждение в консоль {0}'
+    whitelist: 'В белом списке игрок {0}'
+    world: Текущий мир игрока
+    import: 'Импортировать пространство имён {0}'
+    release: 'Освободить пространство имён {0}'
+    block: 'Получить локацию блока {0} из {1}'
+    cancel: Отменить текущее поведение
+    ceil: 'Округлить вверх {0}'
+    close: Закрыть диалог
+    distance: 'Расстояние от {0} до {1}'
+    equipment_check: 'Проверить снаряжение {0} равно {1} количество {2}'
+    floor: 'Округлить вниз {0}'
+    inventory_count: 'Подсчитать предмет в инвентаре {0}'
+    inventory_check: 'Проверить инвентарь {0} количество {1}'
+    inventory_close: Закрыть инвентарь игрока
+    inventory_slot_check: 'Проверить слот инвентаря {0} равно {1} количество {2}'
+    inventory_take: 'Убрать предмет из инвентаря {0} количество {1}'
+    max: 'Максимум {0} {1}'
+    min: 'Минимум {0} {1}'
+    mmocore_attribute_point: Получить очки атрибутов MMOCore
+    mmocore_class: 'Получить класс MMOCore {0}'
+    mmocore_level___exp: 'Получить MMOCore {0}'
+    mmocore_mana: Получить ману MMOCore
+    mmocore_skill_point: Получить очки навыков MMOCore
+    mmocore_stamina: Получить выносливость MMOCore
+    mythicmobs_cast: 'Применить навык MythicMobs {0} триггер {1}'
+    origin: Получить исходную локацию NPC
+    particle_normal: 'Воспроизвести частицу {0} {1} {2} только себе {3}'
+    position: 'Проверить позицию в регионе {0}'
+    profile_level: 'Уровень профиля игрока {0} {1} {2} {3}'
+    quest_group_check: 'Проверить группу заданий {0} {1}'
+    quest_check: 'Проверить задание {0}'
+    quest_control: 'Управлять заданием {0}'
+    quest_progress: 'Получить прогресс задания {0} задание {1}'
+    quest_select: 'Выбрать задание {0}'
+    quest_stats: 'Статистика заданий {0} задание {1}'
+    quest_tasks: Получить все записи заданий
+    quest_this: Получить текущее задание/запись
+    quest_track: Отслеживать текущее задание
+    quest_tracking: Получить отслеживаемое задание
+    quests: Получить список активных заданий
+    schematic: 'Вставить схематику {0} {1} {2} поворот {3} игнорировать воздух {4}'
+    script: 'Скрипт {0} {1}'
+    skillapi_attribute_point: 'Получить атрибуты SkillAPI {0}'
+    skillapi_cast: 'Применить навык SkillAPI {0}'
+    skillapi_class: 'Получить класс SkillAPI {0}'
+    skillapi_exp: 'Получить опыт SkillAPI {0}'
+    skillapi_level: Получить уровень SkillAPI
+    skillapi_mana: Получить ману SkillAPI
+    skillapi_skill_point: Получить очки навыков SkillAPI
+    talk: 'Разговор NPC {0}'
+    trigger: 'Запустить задание {0}'
+    ui: 'Прогресс UI {0} {1} исключить {2}'
+    wizard: 'Мастер {0}'
+    workflow_fetch: 'Офлайн-компенсация {0} {1}'
+    animation: 'Воспроизвести анимацию {0}'
+    controller: 'Контроллер {0} {1}'
+    create: 'Создать NPC {0} {1} в {2}'
+    delete: Удалить и уничтожить NPC
+    destroy: Уничтожить NPC
+    look: 'NPC смотрит X {0} Y {1} Z {2} плавно {3}'
+    move: 'NPC движется к X {0} Y {1} Z {2} относительно {3}'
+    passenger: 'Пассажир {0} {1}'
+    remove: Убрать NPC
+    respawn: Возродить NPC
+    select: 'Выбрать NPC {0} по {1}'
+    still: Остановить движение
+    freeze: 'Заморозить NPC {0}'
+    tag: 'Метка {0} {1} как {2}'
+    teleport: 'Телепортировать NPC к {0}'
+    use: 'Использовать менеджер NPC {0} временно {1}'
+    viewer: 'Наблюдатель {0} {1}'
+    modelengine_animation_add: 'ModelEngine добавить анимацию {0} {1} {2} асинхронно {3}'
+    modelengine_animation_remove: 'ModelEngine убрать анимацию {0} игнорировать lerp {1}'
+    germengine_animation_add: 'GermEngine отправить анимацию {0}'
+    germengine_animation_remove: 'GermEngine убрать анимацию {0}'
+    arr-clear: 'Очистить массив {0}'
+    map-mutable: 'Преобразовать в изменяемую карту {0}'
+    map-shuffle: 'Перемешать карту {0}'
+    map-reverse: 'Обратить карту {0}'
+    map-get: 'Получить ключ карты {0} из {1}'
+    map-put: 'Положить пару карты {0} значение {1} в {2}'
+    map-remove: 'Убрать ключ карты {0} из {1}'
+    map-keys: 'Получить все ключи карты {0}'
+    instance-of: 'Проверить, является ли {0} экземпляром {1}'
+    cast: 'Привести {0} к {1}'
+    get-block-drops: 'Получить дроп блоков {0} инструмент {1} разрушитель {2}'
+    spawn-entity: 'Создать сущность {0} в {1}'
+    real-damage: 'Истинный урон {0} количество {1} источник {2}'
+    entity-name: 'Получить имя сущности {0}'
+    remove-entity: 'Удалить сущность {0}'
+    add-potion-effect: 'Добавить эффект зелья {0} к {1} длительность {2} уровень {3} фоновый {4} частицы {5} значок {6}'
+    near-by-entities: 'Ближайшие сущности {0} радиус {1} {2} {3}'
+    a-vec-add: 'Добавить скорость {0} к {1} безопасно {2} проверка отбрасывания {3}'
+    entity-is-behind: 'Находится ли сущность {0} позади {1}'
+    launch-arrow: 'Запустить стрелу {0} скорость {1}'
+    equip-set-item: 'Установить снаряжение {0} слот {1} для {2}'
+    equip-get-item: 'Получить предмет из слота снаряжения {0} у {1}'
+    build-firework: 'Создать фейерверк {0} тип {1} мощность {2} мерцание {3} след {4} основной цвет {5} затухание {6}'
+    detonate-firework: 'Взорвать фейерверк {0}'
+    send-lang: 'Отправить локализованное сообщение {0} игроку {1} аргументы {2}'
+    mark: 'Добавить метку {0} к {1}'
+    unmark: 'Убрать метку {0} с {1}'
+    give-exp: 'Выдать опыт {0} игроку {1} починка {2}'
+    take-money: 'Забрать деньги {0} {1}'
+    give-money: 'Выдать деньги {0} {1}'
+    has-money: 'Есть деньги {0} {1}'
+    get-vein: 'Получить жилу {0} максимум {1}'
+    create-explosion: 'Создать взрыв {0} мощность {1} источник {2} огонь {3} разрушать блоки {4}'
+    drop-item: 'Выбросить предмет {0} в {1} естественно {2}'
+    operation: 'Выполнить операцию {0} аргументы {1}'
+    modifiable-var: 'Получить изменяемую переменную {0} имя предмета'
+    modifiable-var-set: 'Задать изменяемую переменную {0} имя предмета значение {1}'
+    dungeon: 'Скрипт подземелья {0} {1} аргументы {2} область {3}'
+    dungeon-data-area: 'Область подземелья {0} {1}'
+    dungeon-data-players: Игроки в подземелье
+    dungeon-data-data: 'Данные подземелья {0}'
+    dungeon-data-mob: 'Моб подземелья {0} {1}'
+    dungeon-data-world: Имя мира подземелья
+    dungeon-data-name: Имя подземелья
+    dungeon-data-options: 'Настройки подземелья {0}'
+    message: 'Отправить сообщение Invero {0}'
+    invero_money: 'Экономика {0} {1}'
+    invero_points: 'Очки {0} {1}'
+    connect: 'Межсерверный переход {0} игрок {1}'
+    depend: 'Проверить зависимость {0}'
+    context: 'Контекст меню {0} {1}'
+    persist: 'Постоянные данные {0} {1} область {2}'
+    menu: 'Операция меню {0} {1}'
+    icon: 'Операция с иконкой {0} {1}'
+    page: 'Операция со страницей {0}'
+    scroll: 'Операция прокрутки {0}'
+    regenerate: 'Перегенерировать {0} фильтр {1} сортировка {2}'
+    storage: 'Интерактивный слот {0} {1}'
+    node: 'Узел {0} аргументы {1}'
+    item: 'Создать предмет {0} из {1} количество {2}'
+    item_match: 'Сопоставить предмет {0}'
+    trmenu_money: 'Проверить деньги {0}'
+    trmenu_playerpoints: 'Проверить очки {0}'
+    variable: 'Разобрать переменные TrMenu {0}'
+    event_cancel: 'Отменить событие {0}'
+    event_wait: 'Ожидать событие {0} {1} {2}'
+    entity_damage: 'Урон сущности {0} количество {1} источник {2}'
+    entity_potion: 'Зелье сущности {0} {1} {2}'
+    entity_teleport: 'Телепортировать сущность {0} к {1}'
+    regex: 'Регулярное выражение {0} {1} {2}'
+    function_call: 'Вызвать функцию {0} аргументы {1}'
+    get_cooldown: 'Получить перезарядку ZAP {0}'
+    update_cooldown: 'Задать перезарядку ZAP {0} цель {1}'
+    check_cooldown: 'Проверить перезарядку ZAP {0}'
+    effect: 'Эффект зелья ZAP {0} {1} {2} {3}'
+    item_durability: Получить прочность предмета ZAP
+    item_durability_operate: 'Предмет ZAP {0} {1}'
+    item_consume: Потратить предмет ZAP
+    item_data: 'Данные предмета ZAP {0} как {1}'
+    save: Сохранить предмет ZAP
+    build_1: 'Создать имя/описание предмета ZAP {0} {1} как {2}'
+    build_2: 'Создать значок/данные предмета ZAP {0} {1}'
+
+  objective:
+    'player fish': 'Игрок ловит рыбу / Поддерживает условия на состояние рыбалки, тип предмета, опыт и т. д. / Считает попытки рыбалки'
+    'player chat': 'Игрок отправляет сообщение в чат / Поддерживает условия на содержимое сообщения, местоположение и т. д. / Считает сообщения в чате'
+    'change world': 'Игрок меняет мир / Поддерживает условия на исходный мир, целевой мир, местоположение и т. д. / Считает переходы'
+    'player kill': 'Игрок убивает сущность / Поддерживает условия на оружие, тип жертвы и т. д. / Считает убийства'
+    'food change': 'Срабатывает при изменении сытости игрока / Поддерживает условия на значение сытости, тип еды и т. д. / Считает суммарное изменение сытости'
+    'item break': 'Срабатывает, когда прочность инструмента или брони игрока заканчивается / Поддерживает условия на тип предмета, местоположение и т. д. / Считает сломанные предметы'
+    'custom level': 'Проверяет, соответствует ли пользовательский уровень игрока требованию / Поддерживает условия на местоположение, ID уровня, значение уровня и т. д. / Для системы уровней Chemdah'
+    'player move': 'Игрок перемещается / Поддерживает условия на начальное местоположение, целевое местоположение и т. д. / Считает перемещения'
+    'block interact': 'Игрок взаимодействует с блоком / Поддерживает условия на материал, тип взаимодействия, направление, предмет в руке и т. д. / Считает взаимодействия'
+    'entity tame': 'Игрок приручает сущность / Поддерживает условия на тип сущности, местоположение и т. д. / Считает приручённые сущности'
+    'horse jump': 'Срабатывает, когда игрок прыгает на лошади / Поддерживает условия на силу прыжка, тип лошади и т. д. / Считает прыжки'
+    'block break': 'Игрок ломает блок / Поддерживает условия на материал, местоположение, выпадающие предметы и т. д. / Считает сломанные блоки'
+    'bucket fill': 'Игрок наполняет ведро жидкостью / Поддерживает условия на местоположение, материал, предмет и т. д. / Считает наполнения'
+    'bucket empty': 'Игрок выливает жидкость из ведра / Поддерживает условия на местоположение, материал, предмет и т. д. / Считает опустошения'
+    'item consume': Срабатывает, когда игрок употребляет предмет / Поддерживает расходуемые предметы, такие как еда и зелья / Считает употреблённые предметы
+    'pickup exp': 'Срабатывает, когда игрок подбирает сферу опыта / Поддерживает условия на количество опыта, причину и т. д. / Считает суммарно подобранный опыт'
+    'player teleport': 'Игрок телепортируется / Поддерживает условия на начальное местоположение, целевое местоположение, причину телепортации и т. д. / Считает телепортации'
+    always: 'Проверяет условие каждый игровой тик / Для сценариев, требующих постоянно выполняющегося условия / Без события-триггера, автоматическая периодическая проверка'
+    'shoot bow': 'Игрок стреляет из лука / Поддерживает условия на тип лука, силу натяжения, расходуемый предмет и т. д. / Считает выстрелы'
+    'player animation': 'Срабатывает, когда игрок проигрывает анимацию / Поддерживает условия на тип анимации и т. д. / Считает проигрывания'
+    'player attack': 'Игрок атакует сущность / Поддерживает условия на целевую сущность, оружие, урон и т. д. / Считает атаки'
+    'player damage by entity': 'Игрок получает урон от атаки сущности / Поддерживает условия на сущность-атакующего, оружие, урон и т. д. / Считает полученные попадания'
+    'entity interact': 'Игрок кликает правой кнопкой по сущности / Поддерживает условия на тип сущности, местоположение, предмет в руке и т. д. / Считает взаимодействия'
+    'bed enter': 'Игрок ложится в кровать / Поддерживает условия на местоположение кровати, материал, причину и т. д. / Считает входы'
+    'player anvil': 'Срабатывает, когда игрок использует наковальню / Поддерживает условия на текст переименования, стоимость ремонта, итоговый предмет и т. д. / Считает использования'
+    'portal exit': 'Срабатывает, когда игрок покидает портал / Поддерживает условия на целевое и начальное местоположение и т. д. / Считает выходы'
+    never: 'Цель, которая никогда не может быть выполнена / Для placeholder-ов или особой логики / Всегда возвращает false'
+    'pickup arrow': 'Срабатывает, когда игрок подбирает стрелу / Поддерживает условия на тип стрелы, количество и т. д. / Считает суммарно подобранные'
+    'entity breed': 'Игрок разводит животных / Поддерживает условия на тип животного, родителей, предмет для разведения и т. д. / Считает разведения'
+    'player jump': 'Игрок прыгает / Поддерживает условия на местоположение и т. д. / Считает прыжки'
+    'player permission': 'Проверяет, есть ли у игрока определённое разрешение / Периодически проверяет состояние разрешения / Для сценариев, где разрешения меняются динамически'
+    'player statistic': 'Срабатывает при изменении статистики игрока / Поддерживает условия на тип статистики, тип сущности, тип материала, значение и т. д. / Считает приращения'
+    'entity combust': 'Игрок поджигает сущность / Поддерживает условия на тип сущности, местоположение и т. д. / Считает поджоги'
+    'player damage by block': 'Игрок получает урон от блока / Поддерживает условия на тип блока, урон, местоположение и т. д. / Считает полученные попадания'
+    'pickup item': 'Срабатывает, когда игрок подбирает выпавший предмет / Автоматически считает размер стопки подобранных предметов / Поддерживает условия на предмет, количество, местоположение и т. д.'
+    'criterion grant': 'Срабатывает, когда игрок выполняет критерий прогресса (требуется сервер Paper) / Поддерживает условия на ID достижения, имя критерия и т. д. / Считает выполнения'
+    'entity dismount': 'Игрок слезает с сущности / Поддерживает условия на тип сущности, местоположение и т. д. / Считает спешивания'
+    'player data': 'Проверяет значения постоянных данных игрока / Поддерживает как событийный, так и периодический режим проверки / Для обмена и проверки данных между заданиями'
+    'exp change': 'Игрок получает опыт / Поддерживает условия на количество опыта, сущность-источник, местоположение и т. д. / Считает суммарный опыт'
+    'player shear': 'Игрок стрижёт овец / Поддерживает условия на тип сущности, тип ножниц, использованную руку и т. д. / Считает стрижки'
+    'block ignite': 'Игрок поджигает блок / Поддерживает условия на материал, причину возгорания, местоположение и т. д. / Считает поджоги'
+    'item held': 'Срабатывает, когда игрок переключает предмет в руке на панели быстрого доступа / Поддерживает условия на старый/новый предмет, старый/новый слот и т. д. / Считает переключения'
+    'entity mount': 'Игрок садится на сущность / Поддерживает условия на тип сущности, местоположение и т. д. / Считает поездки'
+    'craft item': 'Игрок создаёт предметы на верстаке / Поддерживает условия на предмет, материалы рецепта, местоположение и т. д. / Поддерживает подсчёт пакетного крафта'
+    'drop item': 'Срабатывает, когда игрок выбрасывает предмет / Поддерживает условия на предмет, количество, местоположение и т. д. / Считает выбрасывания'
+    'armor change': 'Игрок меняет надетую броню (требуется сервер Paper) / Поддерживает условия на слот экипировки, предмет и т. д. / Считает изменения'
+    'portal enter': 'Срабатывает, когда игрок входит в портал / Поддерживает условия на местоположение портала и т. д. / Считает входы'
+    'enchant item': 'Срабатывает, когда игрок зачаровывает предмет на столе зачарования / Поддерживает условия на предмет, тип зачарования, затраты опыта и т. д. / Считает зачарования'
+    'block place': 'Игрок ставит блок / Поддерживает условия на материал, местоположение, предмет в руке и т. д. / Считает установки'
+    'player damage': 'Игрок получает урон / Поддерживает условия на тип урона, значение урона, местоположение и т. д. / Считает полученные попадания'
+    'player respawn': 'Игрок возрождается / Поддерживает условия на местоположение возрождения, тип возрождения (кровать/якорь возрождения) и т. д. / Считает возрождения'
+    'player real move': 'Срабатывает, когда игрок действительно перемещается на блок / Поддерживает условия на целевое и начальное местоположение и т. д. / Считает перемещения'
+    'player inventory': 'Проверяет или расходует предметы в инвентаре игрока / Поддерживает условия на местоположение, тип предмета, количество, расходование и т. д. / Для заданий на сбор или расход предметов'
+    'block farm': 'Игрок вспахивает землю мотыгой / Поддерживает условия на материал, местоположение, тип мотыги и т. д. / Считает вспашки'
+    'player conversation': 'Игрок завершает разговор, ответив вариантом / Поддерживает условия на местоположение, ID разговора и т. д. / Для внутренней системы разговоров Chemdah'
+    'item mend': 'Срабатывает, когда предмет игрока починен / Поддерживает условия на тип починенного предмета, величину починки и т. д. / Считает суммарно починенное'
+    'player conversation refused': 'Игрок прерывает разговор или отказывается от него / Поддерживает условия на местоположение, ID разговора и т. д. / Для внутренней системы разговоров Chemdah'
+    'player toggle flight': 'Срабатывает, когда игрок переключает полёт / Поддерживает условия на состояние полёта и т. д. / Считает переключения'
+    'furnace extract': 'Срабатывает, когда игрок забирает предметы из печи / Автоматически считает извлечённое количество / Поддерживает условия на предмет, опыт, местоположение и т. д.'
+    'player conversation closed': 'Игрок нормально завершает разговор / Поддерживает условия на местоположение, ID разговора и т. д. / Для внутренней системы разговоров Chemdah'
+    'item interact': 'Срабатывает, когда игрок взаимодействует с помощью предмета / Поддерживает правый клик, левый клик и т. д. / Может проверять слот в руке и тип взаимодействия'
+    trigger: 'Запускается вручную внешними командами или скриптами / Поддерживает сопоставление пользовательского значения триггера / Для связи с другими системами'
+    'bed leave': 'Игрок встаёт с кровати / Поддерживает условия на местоположение кровати, материал и т. д. / Считает выходы'
+    'level change': 'Уровень игрока изменяется / Поддерживает условия на разницу уровней, новый уровень, старый уровень и т. д. / Считает повышения уровня'
+    'player swap hand': 'Срабатывает, когда игрок нажимает F для обмена предметами между основной и второй рукой / Поддерживает условия на предметы в основной и второй руке и т. д. / Считает обмены'
+    'pressure plate': 'Срабатывает, когда игрок наступает на нажимную плиту / Поддерживает условия на местоположение и тип плиты и т. д. / Считает наступания'
+    'quest data': 'Проверяет значения постоянных данных задания / Поддерживает как событийный, так и периодический режим проверки / Для обмена и проверки данных внутри задания'
+    'health regain': 'Срабатывает, когда здоровье игрока восстанавливается / Поддерживает условия на величину восстановления, причину и т. д. / Считает суммарно восстановленное'
+    'player resurrect': 'Срабатывает, когда игрок воскресает с тотемом бессмертия / Поддерживает условия на тип использованного предмета и т. д. / Считает воскрешения'
+    'player advancement': 'Игрок получает достижение / Поддерживает условия на ID достижения, местоположение и т. д. / Считает выполнения'
+    'player command': 'Игрок выполняет команду / Поддерживает условия на содержимое команды, местоположение и т. д. / Считает выполнения команд'
+    'edit book': 'Срабатывает, когда игрок редактирует или подписывает книгу / Поддерживает условия на состояние подписи, страницы, заголовок, содержимое и т. д. / Считает редактирования'
+    'player death': 'Игрок умирает / Поддерживает условия на атакующего, оружие, сообщение о смерти и т. д. / Считает смерти'
+    'anpc interact': 'Взаимодействие с NPC Adyeshach / Поддерживает условия на ID NPC, тип, местоположение, предмет в руке, основную/вторую руку и т. д. / Требует плагин Adyeshach'
+    'anpc damage': 'Нанесение урона NPC Adyeshach / Поддерживает условия на ID NPC, тип, местоположение, использованный предмет и т. д. / Требует плагин Adyeshach'
+    'mythicmobs kill': 'Убийство монстра MythicMobs / Поддерживает условия на имя моба, уровень, местоположение и т. д. / Требует плагин MythicMobs'
+    'placeholder api': 'Получает значения переменных PlaceholderAPI / Поддерживает все переменные PAPI / Требует плагин PlaceholderAPI'
+  objectiveLabel:
+    'player fish': Рыбалка игрока
+    'player chat': Чат игрока
+    'change world': Смена мира
+    'player kill': Убийство игроком
+    'food change': Изменение сытости
+    'item break': Поломка предмета
+    'custom level': Пользовательский уровень
+    'player move': Перемещение игрока
+    'block interact': Взаимодействие с блоком
+    'entity tame': Приручение сущности
+    'horse jump': Прыжок на лошади
+    'block break': Разрушение блока
+    'bucket fill': Наполнение ведра
+    'bucket empty': Опустошение ведра
+    'item consume': Употребление предмета
+    'pickup exp': Подбор опыта
+    'player teleport': Телепортация игрока
+    always: Всегда
+    'shoot bow': Выстрел из лука
+    'player animation': Анимация игрока
+    'player attack': Атака игрока
+    'player damage by entity': Урон игроку от сущности
+    'entity interact': Взаимодействие с сущностью
+    'bed enter': Вход в кровать
+    'player anvil': Наковальня игрока
+    'portal exit': Выход из портала
+    never: Никогда
+    'pickup arrow': Подбор стрелы
+    'entity breed': Разведение сущностей
+    'player jump': Прыжок игрока
+    'player permission': Разрешение игрока
+    'player statistic': Статистика игрока
+    'entity combust': Поджог сущности
+    'player damage by block': Урон игроку от блока
+    'pickup item': Подбор предмета
+    'criterion grant': Выдача критерия
+    'entity dismount': Спешивание с сущности
+    'player data': Данные игрока
+    'exp change': Изменение опыта
+    'player shear': Стрижка игроком
+    'block ignite': Поджог блока
+    'item held': Предмет в руке
+    'entity mount': Поездка на сущности
+    'craft item': Создание предмета
+    'drop item': Выбрасывание предмета
+    'armor change': Смена брони
+    'portal enter': Вход в портал
+    'enchant item': Зачарование предмета
+    'block place': Установка блока
+    'player damage': Урон игроку
+    'player respawn': Возрождение игрока
+    'player real move': Реальное перемещение игрока
+    'player inventory': Инвентарь игрока
+    'block farm': Вспашка блока
+    'player conversation': Разговор игрока
+    'item mend': Починка предмета
+    'player conversation refused': Разговор отклонён
+    'player toggle flight': Переключение полёта
+    'furnace extract': Извлечение из печи
+    'player conversation closed': Разговор закрыт
+    'item interact': Взаимодействие предметом
+    trigger: Триггер
+    'bed leave': Выход из кровати
+    'level change': Изменение уровня
+    'player swap hand': Обмен руки
+    'pressure plate': Нажимная плита
+    'quest data': Данные задания
+    'health regain': Восстановление здоровья
+    'player resurrect': Воскрешение игрока
+    'player advancement': Достижение игрока
+    'player command': Команда игрока
+    'edit book': Редактирование книги
+    'player death': Смерть игрока
+    'anpc interact': Взаимодействие с NPC Adyeshach
+    'anpc damage': Урон NPC Adyeshach
+    'mythicmobs kill': Убийство MythicMobs
+    'placeholder api': PlaceholderAPI
+  addon:
+    automation: 'Автоматизирует запуск цепочек заданий / Каждые 40 тиков проверяет игроков онлайн для обработки автопринятия и заданий по расписанию'
+    ui: 'Настраивает отображение заданий в интерфейсе / Управляет видимостью, иконкой и описанием задания'
+    depend: 'Задаёт предварительные условия задания / Поддерживает зависимости от одного задания и от группы заданий / Поддерживает зависимости между записями / Может быть строкой, списком или строкой с разделителями-запятыми/точками с запятой'
+    stats: 'Отображает прогресс задания и записей / Поддерживает полосу прогресса BossBar, пользовательские стили и вычисления скриптами / Настраивается как временное или постоянное отображение'
+    restart: 'Управляет возможностью перезапуска задания / Определяет условия перезапуска через скрипты Kether'
+    track: 'Отслеживает местоположения целей задания и обеспечивает навигацию по маршруту / Поддерживает отображение маяком, ориентиром, навигацией и на табло / Игрок может отслеживать только одно задание одновременно'
+    party: 'Управляет функциями группы для заданий / Поддерживает общий доступ к заданию, совместное выполнение и ограничения числа игроков / Для групповых подземелий, кооперации нескольких игроков и т. д.'
+    timeout: 'Задаёт время ожидания для заданий / Поддерживает фиксированную длительность и периодические моменты времени'
+    reset-data-on-accepted: 'Управляет сбросом определённых данных при принятии задания / Влияет только на записи, реализующие интерфейс IPlayerData / Для сброса данных счётчика, прогресса и состояния'
+    optional: 'Помечает запись задания как необязательную / Необязательные записи не влияют на завершение задания / Для бонусных наград, побочных заданий и т. д.'
+    control: 'Управляет различными ограничениями заданий / Поддерживает сосуществование, повтор, ограничения перезарядки и скриптовые прокси / Настраивается как список Map, каждый Map представляет правило управления'
+  addonLabel:
+    automation: Автоматизация заданий
+    ui: Интерфейс заданий
+    depend: Зависимость задания
+    stats: Статистика задания
+    restart: Перезапуск задания
+    track: Отслеживание задания
+    party: Группа задания
+    timeout: Время ожидания задания
+    reset-data-on-accepted: Сброс данных при принятии
+    optional: Необязательная запись
+    control: Управление заданием
+  hook:
+    accepted: Выполняется после принятия задания
+    accept: Выполняется перед принятием задания (верните false для отмены)
+    accept_cancelled: Выполняется после отмены принятия задания
+    complete: Выполняется перед завершением задания (верните false для отмены)
+    completed: Выполняется после завершения задания
+    fail: Выполняется перед провалом задания
+    failed: Выполняется после провала задания
+    restart: Выполняется перед сбросом задания
+    restarted: Выполняется после сброса задания
+    continued: Выполняется после продолжения записи задания
+  scope:
+    '@ all': Все типы области действия
+    '@ party': Область действия группы
+    '@ custom': Пользовательская область действия
+
+tips:
+  - "Варим наваристый говяжий суп…"
+  - "Летим на самолётике за восемь копеек…"
+  - "Готовим «Побег из Блокова»…"
+  - "Пишем квесты…"
+  - "✶ Думаем…"
+  - "Готовим стрим на миллион подписчиков…"
+  - "Едем с АмеЧан к морю…"
+  - "Болевой шок…"
+  - "Прощаемся с zero…"
+  - "Всё исправим и вместе двинемся вперёд…"
+  - "Пьём японскую сырую колу…"
+  - "Улаживаем бурятский мятеж…"
+  - "Едины как один…"
+  - "Начинаем великую азиатскую войну…"
+  - "Принимаем таблетки карбоната лития…"
+  - "Улыбаемся как ангел…"
+  - "Создаём организацию свободных серверов…"
+  - "Держим в руках крякозябры и громко кричим: «Горячо-горячо-горячо!»…"
+
+checks:
+  title: "Проверки конфигурации"
+  subtitle: "Отладка · все проблемы конфигураций в проекте"
+  scan: "Пересканировать"
+  scanning: "Сканирование…"
+  search: "Поиск сообщения / файла / записи / ключа…"
+  noProject: "Сначала откройте в редакторе папку проекта (или файл конфигурации), затем откройте это окно."
+  empty: "Проблем не найдено."
+  emptyFiltered: "Нет проблем, соответствующих текущему фильтру."
+  stats: "Просканировано файлов конфигурации: {files} · проблем: {total}"
+  statsProgress: "Сканирование {done}/{files}…"
+  groupBy: "Группировать по файлу"
+  expandAll: "Развернуть все"
+  collapseAll: "Свернуть все"
+  openInEditor: "Открыть в редакторе"
+  copyAll: "Копировать всё"
+  copied: "Скопировано в буфер обмена"
+  close: "Закрыть"
+  colMessage: "Проблема"
+  colLocation: "Расположение"
+  severity: "Важность"
+  line: "строка {n}"
+  notCE: "Не файл CraftEngine (только проверка синтаксиса YAML)"
+  assetsIndex: "Индекс ресурсов: {state}"
+  assetsReady: "готово · пространств имён: {ns}"
+  assetsOff: "отключено"
+
+diagnostics:
+  title: "Проверки конфигурации"
+  openPanel: "Открыть панель проверок"
+  summary: "ERROR {e} · WARN {w} · WEAK {k} · INFO {i}"
+  noIssues: "Проблем не найдено ✓"
+  allFiltered: "Нет проблем, соответствующих текущему фильтру"
+  yamlSyntax: "Ошибка синтаксиса YAML: {msg}"
+  yamlTab: "YAML не допускает отступы табуляцией — используйте пробелы"
+  strippedTags: "Проигнорировано неизвестных тегов типа !!: {n} (CraftEngine их не поддерживает)"
+  unknownSection: "Раздел \"{key}\" отсутствует в списке известных — CraftEngine может его проигнорировать"
+  aliasSection: "Раздел \"{key}\" является псевдонимом. CraftEngine его принимает, но каноническое написание — \"{canon}\""
+  badEntryId: "Идентификатор записи \"{id}\" содержит недопустимые символы (разрешены только буквы/цифры/подчёркивание/дефис/точка)"
+  badEntryIdNs: "Идентификатор записи \"{id}\" не является допустимым namespace:path"
+  unknownNamespace: "Пространство имён \"{ns}\" отсутствует ни в одном из просканированных наборов ресурсов"
+  entryNotMap: "Тело записи не является отображением — CraftEngine ожидает объект конфигурации"
+  emptySection: "Раздел \"{key}\" пуст"
+  unknownKey: "Нераспознанный ключ \"{key}\": его нет ни в реестре ключей CraftEngine, ни в схеме редактора; игнорируйте его, если это пользовательское/расширяющее поле"
+  unknownType: "Нераспознанный тип \"{type}\": его нет в реестре типов CraftEngine"
+  notNumber: "\"{label}\" ожидает число, получено {value}"
+  notBool: "\"{label}\" должно быть true/false, получено {value}"
+  notInOptions: "Значение {value} параметра \"{label}\" отсутствует среди вариантов, перечисленных редактором (CraftEngine принимает и другие)"
+  expectList: "\"{label}\" обычно является списком строк, сейчас это отображение"
+  expectMap: "\"{label}\" обычно является отображением ключ/значение, сейчас — {actual}"
+  expectScalar: "\"{label}\" в схеме редактора является текстом, сейчас — {actual}"
+  premium: "\"{key}\" — функция, доступная только в premium-версии"
+  legacyKey: "\"{key}\" — устаревший ключ; новое написание — \"{new}\", и одновременное наличие обоих может вызвать конфликт"
+  emptyValue: "\"{key}\" — пустая строка, что равносильно её отсутствию"
+  cmdDuplicate: "custom_model_data {n} дублирует запись \"{other}\" — обе отрисовывают одну и ту же модель"
+  unknownRef: "Неизвестный идентификатор {label}: {id} (не найден в ванильном реестре)"
+  unknownGlobal: "Неопределённая глобальная переменная <global:{id}>"
+  unknownImage: "Неопределённое изображение <image:{id}> (в разделе images нет такой записи)"
+  imageCellOutOfRange: "Ячейка изображения вне диапазона: {id} имеет сетку {rows}×{cols}, но указана строка {row}, столбец {col}"
+  materialDefault: "Материал не задан — будет использован материал по умолчанию из config.yml"
+  imageFileRequired: "У записи images нет файла (или используйте ref, чтобы указать на существующее изображение)"
+  imageHeightAscent: "height({h}) должен быть ≥ ascent({a}) — иначе Minecraft отклонит определение шрифта"
+  badGridSize: "grid_size должен быть \"rows,cols\" (например, 2,3)"
+  charsRowMismatch: "Каждая строка chars должна иметь одинаковую длину (в строке 1 — {n} символов, в строке {row} — {m})"
+  imageFileExt: "у файла нет расширения .png; плагин добавит его автоматически"
+  emojiKeywords: "У этого эмодзи нет ключевых слов, поэтому игроки не могут его вызвать"
+  emojiContent: "У этого эмодзи нет ни изображения, ни content/template, поэтому он ничего не отобразит"
+  emojiScene: "Сцена \"{scene}\" отсутствует в списке редактора (обычные: chat/book/anvil/sign/command)"
+  badAutoState: "Группа auto_state \"{name}\" не существует (CraftEngine игнорирует эту группу состояний)"
+  autoStateId: "Развёрнутая форма auto_state также должна указывать id, иначе каждый блок получит собственную группу состояний"
+  propTypeMissing: "У свойства состояния блока отсутствует тип (CraftEngine выдаёт unknown_type)"
+  propTypeUnknown: "Неизвестный тип свойства состояния блока \"{type}\" (доступны: {list})"
+  propStringValues: "Строковому свойству нужен список значений"
+  propIntRange: "Целочисленному свойству следует указать range (например, 0~15)"
+  rotationStep: "rotation {v} не кратен 90 (CraftEngine принимает только 90/180/270)"
+  patternRowMismatch: "Каждая строка pattern должна иметь одинаковую длину (в строке 1 — {n} столбцов, в строке {row} — {m})"
+  ingredientUnused: "Ключ ингредиента \"{key}\" нигде не встречается в pattern, поэтому он не используется"
+  recipeTypeMissing: "У рецепта нет типа"
+  recipeResultMissing: "У рецепта нет результата"
+  categoryIcon: "У этой категории нет значка, и в меню он не будет отображаться"
+  equipmentType: "У этого снаряжения нет типа (component / trim)"
+  brightnessIncomplete: "brightness требует одновременно block_light и sky_light, иначе он не имеет эффекта"
+  typeMissing: "Отсутствует поле \"type\" (CraftEngine обычно требует идентификатор типа)"
+  vanillaRefNotFound: "{id} отсутствует в ванильном индексе ресурсов (игнорируйте это, если его предоставляет другой набор ресурсов)"
+  someField: "это поле"
+  shapeList: "список"
+  shapeMap: "отображение ключ/значение"
+  shapeText: "текст"
+  shapeNumber: "число"
+  shapeBool: "логическое значение"
+
+
+preview:
+  title: "Предпросмотр"
+  windowTitle: "Предпросмотр сцены MC"
+  windowMax: "Развернуть / восстановить"
+  windowResize: "Потяните, чтобы изменить размер"
+  open: "Предпросмотр в имитации игровой сцены"
+  unavailable: "Модуль предпросмотра не загружен"
+  sceneAuto: "Авто"
+  sceneChat: "Чат"
+  sceneLore: "Описание предмета"
+  sceneGui: "GUI"
+  sceneImage: "Шрифтовые изображения"
+  sceneFurniture: "Мебель"
+  furnitureVariant: "Вариант"
+  furnitureElements: "Элементы"
+  furnitureHitboxes: "Хитбоксы"
+  furnitureBoxConfig: "{n} записей конфигурации"
+  furnitureSeats: "Сиденья"
+  furnitureBlueprint: "Внешняя модель"
+  furnitureNoVariants: "<red>У этой мебели нет вариантов (нужен хотя бы один)</red>"
+  furnYaw: "Обзор"
+  furnYawLeft: "Повернуть вид влево на 45° (Q)"
+  furnYawRight: "Повернуть вид вправо на 45° (E)"
+  furnYawDrag: "Тяните влево/вправо по холсту, чтобы вращать вид (удерживайте Shift для шага 15°)"
+  furnReset: "Сбросить"
+  furnZoom: "Масштаб"
+  furnZoomIn: "Приблизить (+)"
+  furnZoomOut: "Отдалить (-)"
+  furnFill: "Заливка"
+  furnLabels: "Подписи"
+  furnGrid: "Сетка"
+  furnSelected: "Выбранный хитбокс"
+  hbTypeInteraction: "Interaction"
+  hbTypeShulker: "Shulker"
+  hbTypeHappyGhast: "Happy Ghast"
+  hbTypeCustom: "Свой"
+  rows: "Ряды"
+  scale: "Масштаб"
+  guiScale: "Масштаб GUI"
+  scaleAuto: "Авто"
+  customText: "Свой текст"
+  customTextHint: "Поддерживаются MiniMessage и <image:ns:id>, например <image:internal:item_browser>"
+  shift: "Смещение"
+  shiftInsert: "Вставить <shift:N>"
+  shiftInsertHint: "Вставьте <shift:N> в позицию курсора, затем подстройте значениями -10/-1/+1/+10 (или Alt+←/→ = ∓1, Alt+Shift+←/→ = ∓10)"
+  resolveTags: "Раскрывать текстовые теги CE"
+  resolveMiniMessage: "Раскрывать теги MiniMessage"
+  resolveCeTags: "Раскрывать теги CE"
+  resolveGlobals: "Раскрывать глобальные переменные"
+  resolveImages: "Отрисовывать шрифтовые изображения"
+  shadow: "Тень текста"
+  darkBg: "Тёмный фон"
+  copyImage: "Скопировать изображение"
+  showSource: "Показать текст"
+  copied: "Скопировано в буфер обмена"
+  copyFailed: "Не удалось скопировать: {msg}"
+  reloading: "Повторное сканирование ресурсов…"
+  renderFailed: "Ошибка отрисовки: {msg}"
+  sceneLabel: "Сцена"
+  assetsOk: "Ресурсы проиндексированы ({n} записей)"
+  assetsLoading: "Индексация ресурсов…"
+  assetsMissing: "Каталог ресурсов Minecraft не задан — используются встроенные резервные глифы"
+  imageGallery: "Галерея шрифтовых изображений"
+  noImages: "В этом проекте не найдено записей изображений"
+  sourceHint: "Исходный текст, используемый этим предпросмотром (не раскрыт)"
+  globalsHint: "Глобальные переменные проекта"
+  sceneItem: "Хотбар"
+  sceneGlyphGui: "Сундук GUI"
+  glyphChatIntro: "Шрифтовое изображение в чате"
+  glyphInline: "в строке с текстом"
+  glyphRepeat: "повторённое"
+  glyphColored: "перекрашенное"
+  sceneItemModel: "Модель"
+  sceneInventory: "GUI инвентаря"
+  modelContext: "контекст отображения"
+  furnEdit: "Изменить"
+  furnEditHint: "Перетаскивайте хитбоксы / сиденья / якоря элементов прямо в предпросмотре (изменения записываются обратно)"
+  furnPitchUp: "Поднять вид (наклон +15°)"
+  furnPitchDown: "Опустить вид (наклон -15°)"
+  furnPitchHint: "30° = изометрия, 90° = вид сверху"
+  invSlotLabel: "Слот"
+  invSlotHotbar: "Хотбар"
+  invSlotMain: "Инвентарь"
+  invSlotCraft: "Крафт"
+  invSlotArmor: "Броня"
+  invSlotResult: "Результат"

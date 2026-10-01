@@ -742,34 +742,30 @@ function setupEventListeners() {
     });
   }
 
-  // 语言切换：只保存选择，重启后生效
+  // 语言切换：弹窗选择，只保存选择，重启后生效
   // （热切换会造成设置页以外的界面残留旧语言、缓存失效，且刷新 iframe 会丢弃未保存的其他设置）
-  // 下拉框始终回显"当前生效语言"，与界面保持一致；待重启的目标语言由提示条说明，
-  // 否则会出现"界面是英文、下拉框却显示简体中文"的错位。
-  var langSelect = document.getElementById('language');
-  if (langSelect) {
-    setSelectValue(langSelect, I18N.lang);
-    updateLanguageRestartHint();
-    langSelect.addEventListener('change', function() {
+  var langPickerBtn = document.getElementById('language-picker-btn');
+  var langOverlay = document.getElementById('lang-modal-overlay');
+  if (langPickerBtn && langOverlay) {
+    langPickerBtn.addEventListener('click', function() {
       playSound('click');
-      var next = this.value;
-      setSelectValue(langSelect, I18N.lang); // 立即回显当前生效语言
-      if (next === I18N.lang) {
-        // 选回当前界面语言 = 取消待重启的更改
-        I18N.saveLang(next);
-        updateLanguageRestartHint();
-        showNotification(I18N.t('settings.languageReverted'), 'info');
-        return;
-      }
-      I18N.saveLang(next);
-      updateLanguageRestartHint();
-      var msg = I18N.t('settings.languageRestartMessage', { lang: languageLabel(next) });
-      if (window.UI && typeof UI.alert === 'function') {
-        UI.alert({ title: I18N.t('settings.languageRestartTitle'), message: msg });
-      } else {
-        showNotification(msg, 'info');
-      }
+      openLangModal();
     });
+    langOverlay.addEventListener('click', function(e) {
+      if (e.target === langOverlay) closeLangModal(); // 点击遮罩空白处关闭
+    });
+    document.getElementById('lang-modal-close').addEventListener('click', closeLangModal);
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && !langOverlay.hidden) closeLangModal();
+    });
+    document.getElementById('lang-modal-list').addEventListener('click', function(e) {
+      var opt = e.target.closest('.lang-option');
+      if (!opt) return;
+      playSound('click');
+      applyLanguageChoice(opt.dataset.lang);
+    });
+    syncLangModal();
+    updateLanguageRestartHint();
   }
 
   // 反馈按钮
@@ -789,19 +785,89 @@ function setupEventListeners() {
 }
 
 // 语言代码 → 显示名 (按当前界面语言表述, 避免英文界面里冒出"简体中文"这种混排)
+var LANG_LABELS = {
+  zh_cn: { native: '简体中文', en: 'Chinese (Simplified)', zh: '简体中文' },
+  zh_tw: { native: '繁體中文', en: 'Chinese (Traditional)', zh: '繁體中文' },
+  en_us: { native: 'English', en: 'English', zh: '英语 (English)' },
+  de_de: { native: 'Deutsch', en: 'German', zh: '德语 (Deutsch)' },
+  es_es: { native: 'Español', en: 'Spanish', zh: '西班牙语 (Español)' },
+  ko_kr: { native: '한국어', en: 'Korean', zh: '韩语 (한국어)' },
+  ru_ru: { native: 'Русский', en: 'Russian', zh: '俄语 (Русский)' },
+};
 function languageLabel(code) {
-  var isEn = code === 'en_us';
-  if (I18N.lang === 'en_us') return isEn ? 'English' : 'Chinese (Simplified)';
-  return isEn ? '英语 (English)' : '简体中文';
+  var lb = LANG_LABELS[code];
+  if (!lb) return code;
+  if (I18N.lang === 'zh_cn') return lb.zh;
+  if (I18N.lang === 'zh_tw') return lb.native; // 繁中用户看得懂原文写法
+  return lb.en;
 }
 
-// 给原生 select 赋值后同步 ce-select 自研控件的显示
-// (原生元素被隐藏替换, 不到达原型钩子时这里兜底)
-function setSelectValue(sel, value) {
-  if (!sel) return;
-  sel.value = value;
-  if (window.CESelect && typeof window.CESelect.sync === 'function') {
-    window.CESelect.sync(sel);
+// ============================================
+// 语言选择弹窗（旗帜列表）
+// ============================================
+
+function openLangModal() {
+  var overlay = document.getElementById('lang-modal-overlay');
+  if (!overlay) return;
+  syncLangModal();
+  overlay.hidden = false;
+}
+
+function closeLangModal() {
+  var overlay = document.getElementById('lang-modal-overlay');
+  if (overlay) overlay.hidden = true;
+}
+
+// 同步弹窗选中态与设置页按钮上的旗帜/名称
+function syncLangModal() {
+  var overlay = document.getElementById('lang-modal-overlay');
+  if (!overlay) return;
+  var saved = getFullConfig().language;
+  var active = I18N.isSupported(saved) ? saved : I18N.lang;
+  var pending = active !== I18N.lang;
+  overlay.querySelectorAll('.lang-option').forEach(function(opt) {
+    opt.classList.toggle('active', opt.dataset.lang === active && !pending);
+    opt.classList.toggle('pending', opt.dataset.lang === active && pending);
+  });
+  // 设置页按钮: 显示当前生效语言（界面语言），与提示条分工一致
+  var btn = document.getElementById('language-picker-btn');
+  if (btn) {
+    var flagsEl = btn.querySelector('.lang-picker-flags');
+    var labelEl = btn.querySelector('.lang-picker-label');
+    if (flagsEl) flagsEl.innerHTML = langFlagsHtml(I18N.lang);
+    if (labelEl) labelEl.textContent = LANG_LABELS[I18N.lang] ? LANG_LABELS[I18N.lang].native : I18N.lang;
+  }
+}
+
+// 弹窗选项旗帜 HTML
+function langFlagsHtml(code) {
+  var FLAG_FILES = { zh_cn: ['PRC'], zh_tw: ['HKN'], en_us: ['ENG', 'USA'], de_de: ['GER'], es_es: ['SPR'], ko_kr: ['KOR'], ru_ru: ['SOV'] };
+  var files = FLAG_FILES[code] || [];
+  return files.map(function(f) {
+    return '<img src="images/flag/' + f + '.png" alt="">';
+  }).join('');
+}
+
+// 弹窗中选择语言: 选当前生效语言=关闭; 选其他=保存待重启
+function applyLanguageChoice(next) {
+  if (next === I18N.lang) {
+    // 选当前界面语言 = 取消待重启的更改（若有）
+    var hadPending = I18N.isSupported(getFullConfig().language) && getFullConfig().language !== I18N.lang;
+    I18N.saveLang(next);
+    updateLanguageRestartHint();
+    syncLangModal();
+    closeLangModal();
+    if (hadPending) showNotification(I18N.t('settings.languageReverted'), 'info');
+    return;
+  }
+  I18N.saveLang(next);
+  updateLanguageRestartHint();
+  syncLangModal();
+  var msg = I18N.t('settings.languageRestartMessage', { lang: LANG_LABELS[next] ? LANG_LABELS[next].native : next });
+  if (window.UI && typeof UI.alert === 'function') {
+    UI.alert({ title: I18N.t('settings.languageRestartTitle'), message: msg });
+  } else {
+    showNotification(msg, 'info');
   }
 }
 
@@ -810,7 +876,7 @@ function updateLanguageRestartHint() {
   var hint = document.getElementById('language-restart-hint');
   if (!hint) return;
   var saved = getFullConfig().language;
-  var pending = (saved === 'en_us' || saved === 'zh_cn') && saved !== I18N.lang;
+  var pending = I18N.isSupported(saved) && saved !== I18N.lang;
   var key = pending ? 'settings.languageRestartPending' : 'settings.languageRestartHint';
   // 待重启文案带 {lang} 参数: 去掉 data-i18n, 否则后续 applyDOM() 会用无参版本覆盖成 "{lang}"
   if (pending) hint.removeAttribute('data-i18n');

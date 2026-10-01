@@ -1,0 +1,2163 @@
+# ChoTenEditor 한국어
+app:
+  title: "CHOTEN EDITOR"
+  loading: "로딩 중..."
+
+titlebar:
+  minimize: "최소화"
+  maximize: "최대화"
+  close: "닫기"
+
+windowManager:
+  maxRestore: "최대화 / 복원"
+  close: "닫기"
+  resize: "드래그하여 크기 조정"
+
+common:
+  openProject: "📁 프로젝트 열기"
+  newFile: "📄 새 파일"
+  save: "💾 저장"
+  settings: "⚙️ 설정"
+  remote: "🌐 원격"
+  ai: "✨ AI"
+  ok: "확인"
+  cancel: "취소"
+  delete: "삭제"
+  reload: "새로고침"
+  back: "뒤로"
+  close: "닫기"
+  approve: "승인"
+  reject: "거부"
+
+minimessage:
+  title: "MiniMessage 편집기"
+  editBtn: "MiniMessage 편집기"
+  preview: "미리보기"
+  previewEmpty: "(빈 미리보기)"
+  parseError: "구문 분석 오류"
+  restrictedTip: "제한된 태그로, 모든 위치에서 작동하지 않을 수 있습니다"
+  useColor: "색상 사용"
+  previewBg: "검정/흰색 배경 전환"
+  detailTitle: "세부 요소 추가"
+  detailContent: "텍스트 내용"
+  detailType: "유형"
+  detailAdd: "추가"
+  detailFont: "글꼴"
+  detailNamespace: "네임스페이스 (선택 사항)"
+  detailColor: "색상 (예: #ff0000 또는 red)"
+  detailGradientA: "그라데이션 색상 1"
+  detailGradientB: "그라데이션 색상 2"
+  detailUrl: "URL"
+  detailCommand: "명령어"
+  detailHoverText: "마우스 오버 텍스트"
+  editBtnTip: "왼쪽 클릭: 세부 요소 추가 · 오른쪽 클릭: 빠른 추가"
+  tooltipWrap: "선택한 텍스트에 추가"
+  tooltipInsert: "커서 위치에 삽입"
+  tag_bold: "굵게"
+  tag_italic: "기울임"
+  tag_underline: "밑줄"
+  tag_strikethrough: "취소선"
+  tag_obfuscated: "난독화"
+  tag_reset: "서식 초기화"
+  tag_newline: "줄바꿈"
+  tag_rainbow: "무지개"
+  tag_gradient: "그라데이션"
+  tag_color: "색상"
+  tag_font: "글꼴"
+  tag_open_url: "클릭하여 URL 열기"
+  tag_run_command: "클릭하여 명령어 실행"
+  tag_suggest_command: "클릭하여 명령어 입력"
+  tag_hover_text: "마우스 오버 텍스트"
+  phFont: "글꼴 이름 (예: unifont)"
+  phNamespace: "네임스페이스 (예: minecraft)"
+  phColor: "#ff0000 또는 red"
+  phGradientA: "그라데이션 시작 색 (예: #ff0000)"
+  phGradientB: "그라데이션 끝 색 (예: #ffff00)"
+  phUrl: "https://..."
+  phCommand: "/명령어"
+  phHoverText: "마우스 오버 텍스트"
+  color_black: "검정"
+  color_dark_blue: "짙은 파랑"
+  color_dark_green: "짙은 초록"
+  color_dark_aqua: "짙은 청록"
+  color_dark_red: "짙은 빨강"
+  color_dark_purple: "짙은 보라"
+  color_gold: "금색"
+  color_gray: "회색"
+  color_dark_gray: "짙은 회색"
+  color_blue: "파랑"
+  color_green: "초록"
+  color_aqua: "청록"
+  color_red: "빨강"
+  color_light_purple: "연한 보라"
+  color_yellow: "노랑"
+  color_white: "흰색"
+
+ui:
+  ok: "확인"
+  cancel: "취소"
+  confirmTitle: "확인"
+  alertTitle: "알림"
+  promptTitle: "입력"
+
+sidebar:
+  files: "프로젝트 파일"
+  previousFile: "이전 파일"
+  tabLocal: "로컬"
+  tabRemote: "원격"
+  loading: "로딩 중..."
+  emptyDir: "비어 있음"
+  navBack: "뒤로 (이전에 열었던 위치로)"
+  navForward: "앞으로"
+  navPrev: "이전 파일"
+  navNext: "다음 파일"
+
+menu:
+  file: "파일"
+  edit: "편집"
+  debug: "디버그"
+  settings: "설정"
+  help: "도움말"
+  newFile: "📄 새 파일"
+  openFile: "📂 파일 열기…"
+  openProject: "📁 프로젝트 열기…"
+  recent: "🕘 최근 항목"
+  save: "💾 저장"
+  closeTab: "탭 닫기"
+  closeAllTabs: "모든 탭 닫기"
+  undo: "실행 취소"
+  redo: "다시 실행"
+  cut: "잘라내기"
+  copy: "복사"
+  paste: "붙여넣기"
+  selectAll: "모두 선택"
+  noDebug: "사용 가능한 디버그 기능이 없습니다"
+  checks: "검사"
+  checksDebug: "🐞 디버그 · 모든 구성 문제…"
+  settingsItem: "⚙️ 설정…"
+  remote: "🌐 원격 모드…"
+  ai: "✨ AI 스튜디오…"
+  about: "ℹ️ ChoTenEditor 정보"
+  recentProjects: "최근 프로젝트"
+  recentFiles: "최근 파일"
+  clearRecent: "🗑 기록 지우기"
+  empty: "항목 없음"
+  allFiles: "모든 파일"
+  experimentalRemoteWarning: "원격 모드는 디버깅 전용의 극도로 불안정하고 테스트되지 않은 기능으로, 파일에 심각한 위험을 초래할 수 있습니다! 사용하려면 설정의 실험적 기능 항목에서 켜세요. 미리 경고합니다!"
+  experimentalAIStudioWarning: "AI 스튜디오는 디버깅 전용의 극도로 불안정하고 테스트되지 않은 기능으로, 파일에 심각한 위험을 초래할 수 있습니다! 사용하려면 설정의 실험적 기능 항목에서 켜세요. 미리 경고합니다!"
+
+editor:
+  sourceMode: "소스"
+  visualMode: "비주얼"
+  typeAuto: "자동 감지"
+  typeConversation: "대화"
+  typeQuest: "퀘스트"
+  typeCraftEngine: "CraftEngine"
+  visualEmptyTitle: "비주얼 편집"
+  visualEmptyHint: ".yml / .yaml 파일을 열면 비주얼 편집으로 전환할 수 있습니다"
+
+status:
+  ready: "준비됨"
+  projectOpened: "프로젝트가 열렸습니다: {name}"
+  projectTypesConversationQuest: " [대화 + 퀘스트]"
+  projectTypesConversation: " [대화]"
+  projectTypesQuest: " [퀘스트]"
+  directory: "디렉터리: {path}"
+  file: "파일: {name}"
+  fileType: "파일: {name} [{type}]"
+  interpreterTypeAuto: "인터프리터 유형: 자동 감지"
+  interpreterType: "인터프리터 유형: {type}"
+  noFileOpen: "열려 있는 파일이 없습니다"
+  visualMode: "비주얼 편집기 모드"
+  sourceMode: "소스 편집기 모드"
+  fileModified: "파일이 수정되었습니다"
+  fileSaved: "파일이 저장되었습니다: {path}"
+  fileCreated: "파일이 생성되었습니다: {path}"
+  typeOverrideCleared: "유형 재정의가 해제되었습니다"
+  typeOverrideSet: "인터프리터 유형이 설정되었습니다: {type} (범위: {scope})"
+  ceOwner: " · CE 프로젝트: {root} · Pack: {pack}"
+
+typeScope:
+  file: "파일"
+  directory: "디렉터리"
+  project: "프로젝트"
+
+welcome:
+  title: "ChoTenEditor에 오신 것을 환영합니다!"
+  version: "현재 버전: {version}"
+  descPre: "이 편집기는 범용 Minecraft 플러그인 구성 편집기로, "
+  descPost: " 퀘스트와 대화, CraftEngine 기본 편집(아이템/블록/가구 등), Kether 스크립트를 지원합니다."
+  channelsTitle: "문의 사항이나 피드백은 아래 채널로 알려 주세요:"
+  channelQq: "📢 QQ 그룹:"
+  channelDiscord: "🌐 Discord:"
+  channelQqAddPre: "💬 QQ "
+  channelQqAddPost: " 추가 후 용도를 적어 주세요"
+  settingsHint: "설정에서도 피드백 채널을 찾을 수 있습니다."
+  noTip: "다시 표시하지 않기"
+  dismissHint: "\"다시 표시하지 않기\"를 선택하면 이 대화 상자는 버전 업데이트 시에만 다시 나타납니다."
+
+remote:
+  title: "🌐 원격 모드"
+  asServer: "서버로 실행"
+  asClient: "원격 연결"
+  serverHost: "서버 주소"
+  port: "포트"
+  password: "연결 비밀번호"
+  setPasswordPlaceholder: "연결 비밀번호 설정"
+  ipPlaceholder: "IP 주소"
+  serverPasswordPlaceholder: "서버에 설정된 비밀번호"
+  startServer: "서버 시작"
+  stopServer: "서버 중지"
+  connect: "연결"
+  disconnect: "연결 해제"
+  disconnectAll: "모든 연결 해제"
+  clients: "연결된 클라이언트"
+  securityCode: "보안 코드"
+  securityHint: "연결 확인을 위해 이 보안 코드를 서버 관리자에게 알려 주세요"
+  confirmTitle: "🔌 새 연결 요청"
+  clientIp: "클라이언트 IP:"
+  securityCodeLabel: "보안 코드:"
+  confirmWarningPre: "⚠️ 상대방이 제공한 보안 코드가 위의 코드와 일치하는지 확인하세요. 일치하지 않으면 연결이 제대로 되지 않을 수 있습니다. 성급하게 연결을 승인하면 데이터 유출 또는 손실이 발생할 수 있으니, "
+  confirmWarningStrong: "보안 코드를 신중히 확인해 주세요"
+  confirmWarningPost: ". 이로 인한 손실에 대해 본 소프트웨어는 책임지지 않습니다."
+  confirmAccept: "연결 승인"
+  fileChangeTitle: "📝 파일 변경 요청"
+  client: "클라이언트:"
+  filePath: "파일 경로:"
+  fileDeleteTitle: "🗑️ 파일 삭제 요청"
+  approveDelete: "삭제 승인"
+  invalidMessageFormat: "잘못된 메시지 형식입니다"
+  wrongPassword: "비밀번호가 틀렸습니다"
+  versionMismatch: "클라이언트 버전({client})이 서버 버전({server})과 일치하지 않습니다. 설정에서 \"다른 버전 허용\"을 켜세요"
+  authenticateFirst: "먼저 인증해 주세요"
+  connectionRejectedByAdmin: "관리자가 연결 요청을 거부했습니다"
+  disconnectedByAdmin: "관리자가 연결을 해제했습니다"
+  unknownMessageType: "알 수 없는 메시지 유형: {type}"
+  noReadPermission: "이 파일을 읽을 권한이 없습니다"
+  noEditPermission: "이 파일을 편집할 권한이 없습니다"
+  guestNoEditPermission: "게스트 모드: 편집 권한 없음"
+  noPathSpecified: "경로가 지정되지 않았습니다"
+  noDeletePermission: "이 파일을 삭제할 권한이 없습니다"
+  guestNoDeletePermission: "게스트 모드: 삭제 권한 없음"
+  deleteRejectedByAdmin: "관리자가 삭제 요청을 거부했습니다"
+  authTimeout: "인증 시간이 초과되었습니다"
+  authRejected: "인증이 거부되었습니다"
+  changeRejectedByAdmin: "변경이 관리자에 의해 거부되었습니다"
+
+dialog:
+  apiInitFailed: "API 초기화 실패"
+  apiInitFailedMsg: "Electron API를 초기화하지 못했습니다. 콘솔에서 오류를 확인하세요."
+  apiError: "API 오류"
+  deleteFailed: "삭제 실패"
+  openProjectFailed: "프로젝트를 열지 못했습니다"
+  loadDirFailed: "디렉터리를 읽지 못했습니다"
+  loadDirError: "디렉터리를 로드하지 못했습니다"
+  openFileFailed: "파일을 열지 못했습니다"
+  readFailed: "읽기 실패"
+  error: "오류"
+  createFileFailed: "파일을 만들지 못했습니다"
+  invalidFileName: "파일 이름에 경로 구분자나 상대 경로를 포함할 수 없습니다"
+  saveFileFailed: "파일을 저장하지 못했습니다"
+
+error:
+  openDirectoryApi: "openDirectory API를 사용할 수 없습니다"
+  readdirApi: "readdir API를 사용할 수 없습니다"
+  readFileApi: "readFile API를 사용할 수 없습니다"
+  remoteApiUnavailable: "원격 API를 사용할 수 없습니다"
+  cannotReadFile: "파일을 읽을 수 없습니다"
+  cannotReadRemote: "원격 서버에서 파일을 읽을 수 없습니다"
+  codemirrorMissing: "codeMirrorEditor가 존재하지 않습니다"
+  unknown: "알 수 없는 오류"
+
+tabs:
+  unsaved: "저장되지 않은 변경 사항"
+  unsavedMsg: "<strong>{name}</strong> 파일에 저장되지 않은 변경 사항이 있습니다.<br>저장하시겠습니까?"
+  unsavedMsgNoName: "저장하시겠습니까?"
+  unsynced: "동기화되지 않은 변경 사항"
+  unsyncedMsg: "<strong>{name}</strong> 파일의 비주얼 편집이 아직 소스에 동기화되지 않았습니다.<br>전환하기 전에 동기화해야 변경 사항이 유지됩니다."
+  unsyncedMsgNoName: "비주얼 편집이 아직 소스에 동기화되지 않았습니다.<br>전환하기 전에 동기화해야 변경 사항이 유지됩니다."
+  syncAndContinue: "동기화 후 계속"
+  save: "저장"
+  discard: "저장하지 않음"
+  cancel: "취소"
+
+unsupported:
+  title: "지원되지 않는 형식"
+  msg: "{ext} 형식은 지원되지 않습니다. 그래도 불러오시겠습니까?"
+  forceLoad: "그래도 불러오기"
+
+confirm:
+  deleteFile: "\"{name}\"을(를) 삭제하시겠습니까?"
+
+prompt:
+  newFileName: "파일 이름을 입력하세요 (예: config.yml):"
+
+alert:
+  openProjectFirst: "먼저 프로젝트를 열어 주세요"
+  noFileOpen: "열려 있는 파일이 없습니다"
+
+tab:
+  unsavedTitle: "{name} (저장되지 않음)"
+
+tabMenu:
+  closeCurrent: "현재 탭 닫기"
+  closeSaved: "저장된 탭 닫기"
+  closeLeft: "왼쪽 탭 닫기"
+  closeRight: "오른쪽 탭 닫기"
+  closeAll: "모두 닫기"
+
+breadcrumb:
+  root: "루트"
+
+visual:
+  onlyYaml: "비주얼 편집은 .yml / .yaml 파일만 지원합니다."
+  interpreterMissing: "인터프리터가 로드되지 않았습니다"
+  interpreterMissingMsg: "ChemdahInterpreter 모듈이 올바르게 로드되지 않았습니다. 콘솔에서 오류를 확인하세요."
+  renderFailed: "비주얼 렌더링 실패"
+  editInSource: "소스 모드에서 편집해 주세요."
+
+rm:
+  apiError: "오류: 원격 API를 사용할 수 없습니다"
+  errorPrefix: "오류: {msg}"
+  startingServer: "서버를 시작하는 중..."
+  serverStarted: "서버가 시작되었습니다. 포트: {port}"
+  startFailed: "시작 실패: {msg}"
+  serverStopped: "서버가 중지되었습니다"
+  connecting: "연결하는 중..."
+  sendCodeToAdmin: "연결되었습니다. 보안 코드를 관리자에게 알려 주세요"
+  connected: "✅ 서버에 연결되었습니다"
+  connectFailed: "연결 실패: {msg}"
+  disconnected: "연결이 해제되었습니다"
+  newClient: "새 클라이언트가 연결되었습니다: {ip}"
+  requestingDelete: "파일 삭제를 요청하는 중..."
+  loadingRemoteDir: "원격 디렉터리를 불러오는 중..."
+  readingRemoteFile: "원격 파일을 읽는 중..."
+  savingRemoteFile: "원격 파일을 저장하는 중..."
+  fileUpdated: "파일이 업데이트되었습니다: {path}"
+  fileDeleted: "파일이 삭제되었습니다: {path}"
+  fileSavedOk: "파일이 저장되었습니다: {path}"
+  fileSaveFailed: "파일 저장 실패: {msg}"
+  saveTimeout: "서버가 10초 내에 저장을 확인하지 않았습니다. 다시 시도해 주세요"
+  waitingApproveWrite: "관리자의 파일 변경 승인을 기다리는 중..."
+  fileReadOk: "원격 파일을 읽었습니다"
+  fileReadFailed: "원격 파일 읽기 실패: {msg}"
+  listLoaded: "원격 파일 목록을 불러왔습니다"
+  listLoadFailed: "원격 파일 목록 로드 실패: {msg}"
+  deleteFailed: "삭제 실패: {msg}"
+  waitingApproveDelete: "관리자의 삭제 승인을 기다리는 중..."
+  serverClosed: "서버가 닫혔습니다"
+  permUpdated: "권한이 업데이트되었습니다: {level}"
+  securityCode: "보안 코드: {code}"
+  disconnect: "연결 해제"
+
+perm:
+  guest: "게스트"
+  confirm: "변경 시 확인 요청"
+  full: "전체 제어"
+
+settings:
+  cePreview: "MC 장면 미리보기 활성화"
+  cePreviewHint: "아이템 / 블록 / 가구 / 폰트 이미지 항목 폼 상단에 미리보기 버튼을 표시하며, 게임 내 장면(채팅, 아이템 Lore, 9x1~9x6 GUI)을 시뮬레이션하여 폰트 이미지와 텍스트 태그를 렌더링합니다"
+  ceDiagnostics: "설정 검사 활성화"
+  ceDiagnosticsHint: "IDE처럼 CraftEngine 설정을 검사하여 알 수 없는 키, 타입 오류, 잘못된 열거형, 범위를 벗어난 참조를 ERROR / WARN / WEAK_WARN / INFO 등급으로 보고합니다"
+  mcAssetsPath: "Minecraft 에셋 디렉터리"
+  mcAssetsPathPlaceholder: "E:/MC/Windose/.minecraft/versions/26.3/26.3/assets"
+  mcAssetsPathHint: "바닐라 에셋 폴더(minecraft 하위 폴더를 포함하는 폴더)입니다. 바닐라 아이템/블록/텍스처/모델/사운드/파티클/인첸트 ID를 완성하고 실제 바닐라 폰트와 GUI 텍스처로 미리보기를 렌더링하는 데 사용됩니다."
+  browse: "찾아보기…"
+  detect: "자동 감지"
+  mcAssetsSet: "Minecraft 에셋 디렉터리가 설정되었습니다"
+  mcAssetsBrowseFailed: "디렉터리 선택 실패"
+  mcAssetsUnavailable: "이 빌드는 에셋 인덱싱을 지원하지 않습니다"
+  mcAssetsNotFound: "Minecraft 에셋 디렉터리를 찾을 수 없습니다. 직접 입력해 주세요"
+  mcAssetsScanning: "에셋 인덱싱 중…"
+  mcAssetsInvalid: "잘못된 에셋 디렉터리: {err}"
+  mcAssetsStatus: "인덱싱된 네임스페이스 {ns}: 아이템 {items} · 텍스처 {tex} · 모델 {models}"
+  title: "설정"
+  titlePage: "⚙️ 설정"
+  backToEditor: "편집기로 돌아가기"
+  tabGeneral: "일반"
+  tabAppearance: "모양"
+  tabEditor: "편집기"
+  tabAI: "AI 스튜디오"
+  tabRemote: "원격"
+  tabShortcuts: "단축키"
+  tabExperimental: "실험적 기능"
+  aboutAuthor: "🎨 제작자 정보"
+  ceSearch: "검색…"
+  ceNoMatch: "일치 항목 없음"
+  fontSearchPlaceholder: "폰트를 입력하거나 검색하세요…"
+  fontComboHint: "설치된 시스템 폰트를 자동으로 감지하며, 입력 시 자동 완성됩니다"
+  sectionLanguage: "🌐 언어"
+  language: "언어"
+  languageModalTitle: "언어 선택"
+  languagePickerOpen: "클릭하여 언어를 선택하세요"
+  languageRestartHint: "언어 변경은 앱을 재시작한 후 적용됩니다."
+  languageRestartPending: "⚠ {lang}이(가) 선택되었습니다. 적용하려면 앱을 재시작하세요."
+  languageRestartTitle: "재시작 필요"
+  languageRestartMessage: "언어가 {lang}(으)로 저장되었습니다. 새 인터페이스 언어를 보려면 Choten Editor를 재시작해 주세요."
+  languageCancelPending: "변경 취소"
+  languageReverted: "현재 인터페이스 언어로 되돌렸습니다."
+  sectionItemKeyStyle: "📦 아이템 키 형식"
+  itemKeyStyle: "아이템 루트 키 형식"
+  itemKeyStyleSnake: "신규(언더스코어) - custom_model_data"
+  itemKeyStyleKebab: "구버전(하이픈) - custom-model-data"
+  itemKeyStyleHint: "새 아이템 항목의 키 형식입니다. 기존 파일은 자동으로 해당 파일의 형식을 따릅니다."
+  sectionTheme: "🎨 테마"
+  themeSelect: "테마 선택"
+  themeDark: "다크"
+  themeLight: "라이트"
+  themeAuto: "자동"
+  sectionBackground: "🖼️ 배경 이미지"
+  sectionFonts: "🔤 폰트"
+  uiFont: "인터페이스 폰트"
+  editorFontFamily: "편집기 폰트"
+  fontSystemDefault: "시스템 기본값"
+  editorFontDefault: "기본값 (Fira Code)"
+  bgDisclaimer: "배경 이미지는 웹에서 가져온 것으로 미리보기용입니다. 권리 침해 시 삭제 요청을 문의해 주세요."
+  bgSelect: "배경 선택"
+  bgNoneThumb: "없음"
+  bgNoneName: "배경 없음"
+  bgOpacity: "배경 불투명도"
+  bgUpload: "📤 배경 업로드"
+  sectionColors: "🎭 사용자 지정 색상"
+  colorGroupMain: "기본 색상"
+  colorPrimary: "기본색"
+  colorSuccess: "성공"
+  colorWarning: "경고"
+  colorError: "오류"
+  colorGroupBg: "배경 색상"
+  colorBgPrimary: "기본 배경"
+  colorBgSecondary: "보조 배경"
+  colorGroupText: "텍스트 색상"
+  colorTextPrimary: "기본 텍스트"
+  colorTextSecondary: "보조 텍스트"
+  sectionCheckbox: "☑️ 체크박스 설정"
+  checkboxColorTitle: "체크박스 색상 (기본값은 테마를 따름)"
+  checkboxColorOff: "미선택 색상"
+  checkboxColorOn: "선택 색상"
+  checkboxMarkOn: "선택 시 ✓ 표시"
+  checkboxMarkOff: "미선택 시 ✕ 표시"
+  hidePremiumHints: "프리미엄 기능 힌트 숨기기"
+  hideVersionHints: "버전 요구 사항 힌트 숨기기"
+  sectionSyntax: "📝 구문 강조 색상"
+  syntaxGroup: "구문 토큰 색상"
+  syntaxKeyword: "키워드"
+  syntaxString: "문자열"
+  syntaxNumber: "숫자"
+  syntaxComment: "주석"
+  syntaxFunction: "함수"
+  syntaxOperator: "연산자"
+  syntaxPunctuation: "구두점"
+  syntaxProperty: "속성 이름"
+  sectionCategories: "🎯 카테고리 색상"
+  categoriesGroup: "Kether 블록 카테고리 색상"
+  sectionPresets: "🎪 프리셋 테마"
+  presetDarkDefault: "다크 클래식"
+  presetLightClean: "라이트 프레시"
+  sectionEditor: "📝 편집기 설정"
+  editorFontSize: "폰트 크기 (px)"
+  editorTabSize: "탭 크기"
+  tabSize2: "공백 2칸"
+  tabSize4: "공백 4칸"
+  tabSize8: "공백 8칸"
+  editorLineNumbers: "줄 번호 표시"
+  show: "표시"
+  hide: "숨기기"
+  editorLineWrapping: "자동 줄 바꿈"
+  enable: "활성화"
+  disable: "비활성화"
+  editorTheme: "편집기 테마"
+  themeDefault: "기본값"
+  editorAutoSync: "변경 사항 자동 동기화"
+  off: "끄기"
+  on: "켜기"
+  autoSyncHint: "활성화하면 편집기 내용이 수정될 때마다 자동으로 저장됩니다"
+  editorDevtools: "시작 시 F12 개발자 도구 열기"
+  prewarmTitle: "시작 시 워밍업"
+  prewarmFiles: "마지막으로 연 프로젝트 파일 워밍업"
+  prewarmMax: "최대"
+  prewarmHint: "시작 시 마지막으로 연 파일을 메모리 캐시에 읽어 들여 탭을 즉시 전환할 수 있습니다"
+  prewarmKether: "Kether 액션 워밍업"
+  prewarmKetherHint: "시작 시 Kether 액션 정의를 미리 로드하여 블록 편집기를 즉시 엽니다"
+  elementPickerTitle: "CE 요소 프리로드"
+  elementPicker: "감지된 CE 요소 프리로드"
+  elementPickerHint: "CraftEngine 파일을 열 때 프로젝트의 configuration 폴더(아이템/블록/가구/카테고리/템플릿)를 자동으로 스캔하여 일치하는 입력란 옆에 빠른 채우기 버튼을 표시합니다"
+  aiTitle: "AI 생성"
+  aiEndpoint: "API 엔드포인트"
+  aiEndpointHint: "OpenAI 형식과 호환되는 API 엔드포인트"
+  aiModel: "모델"
+  aiModelCustom: "사용자 지정"
+  aiCustomModel: "사용자 지정 모델 이름"
+  aiCustomModelPlaceholder: "모델 이름 입력"
+  aiApiKey: "API 키"
+  aiNewKeyPlaceholder: "새 키 입력"
+  aiAddKey: "추가"
+  aiSystemPrompt: "시스템 프롬프트"
+  aiPromptDefault: "기본값"
+  aiPromptCustom: "사용자 지정"
+  aiCustomPrompt: "사용자 지정 프롬프트 내용"
+  aiCustomPromptPlaceholder: "사용자 지정 시스템 프롬프트 입력..."
+  aiSavePrompt: "사용자 지정 프롬프트로 저장"
+  aiManagePrompts: "프롬프트 관리"
+  aiNewPromptNamePlaceholder: "새 프롬프트 이름"
+  aiNewPromptDescPlaceholder: "설명"
+  aiMaxTokens: "최대 출력 토큰"
+  aiTemperature: "온도 (Temperature)"
+  remoteTitle: "원격 모드"
+  remotePassword: "원격 연결 비밀번호"
+  remotePasswordPlaceholder: "원격 연결 비밀번호 설정"
+  remotePasswordHint: "원격 모드에서 서버를 시작할 때 사용되는 기본 비밀번호"
+  remoteAllowDifferentVersions: "다른 버전의 클라이언트 연결 허용"
+  remoteAllowDifferentVersionsHint: "끄면 버전이 일치하는 클라이언트만 서버에 연결할 수 있습니다"
+  sectionExperimental: "🧪 실험적 기능"
+  experimentalWarning: "⚠️ 실험적 기능은 개발자 전용입니다. 매우 불안정하고 테스트되지 않은 디버깅 전용 기능으로, 파일에 큰 위험을 초래할 수 있습니다! 미리 경고합니다!"
+  experimentalRemote: "원격 모드 활성화"
+  experimentalRemoteHint: "활성화하면 메뉴 모음 → 설정 → 원격 모드…에서 접근할 수 있습니다"
+  experimentalAIStudio: "AI 스튜디오 활성화"
+  experimentalAIStudioHint: "활성화하면 메뉴 모음 → 설정 → AI 스튜디오…에서 접근할 수 있습니다"
+  blockTitle: "블록 표시"
+  blockFontSize: "블록 폰트 크기 (px)"
+  sectionShortcuts: "⌨️ 키보드 단축키"
+  shortcutSave: "파일 저장"
+  shortcutNewFile: "새 파일"
+  shortcutOpenProject: "프로젝트 열기"
+  shortcutToggleMode: "편집 모드 전환"
+  resetShortcuts: "단축키 초기화"
+  editShortcuts: "단축키 편집"
+  editShortcutDone: "완료"
+  shortcutHint: "새 조합키를 누르세요 (Esc는 취소)"
+  shortcutConflict: "\"{{name}}\"과(와) 충돌"
+  sectionFeedback: "💬 피드백 채널"
+  feedbackIntro: "질문이나 피드백이 있으면 아래 채널로 문의해 주세요:"
+  feedbackQqGroup: "📢 QQ 그룹: "
+  feedbackQq: "💬 QQ: "
+  feedbackJoinQq: "그룹 참여"
+  feedbackJoinDiscord: "Discord 참여"
+  feedbackAddFriend: "친구 추가"
+  sectionSave: "💾 저장 및 초기화"
+  saveSettings: "✓ 설정 저장"
+  resetSettings: "↻ 기본값 복원"
+  exportSettings: "⬇ 설정 내보내기"
+  importSettings: "⬆ 설정 가져오기"
+  sectionPreview: "👁️ 구성 요소 미리보기"
+  previewPrimary: "기본 버튼"
+  previewSecondary: "보조 버튼"
+  previewDanger: "위험 버튼"
+  previewAccent: "강조 버튼"
+  previewCheckbox: "체크박스"
+  previewInputPlaceholder: "입력란 예시…"
+  previewSelect1: "옵션 1"
+  previewSelect2: "옵션 2"
+  previewSelect3: "옵션 3"
+  previewMainText: "기본 텍스트의 표시 예시입니다"
+  previewSecondaryText: "보조 텍스트의 표시 예시입니다"
+  previewDemoDialog: "📦 예제 대화상자 표시"
+  previewDialogTitle: "예제 대화상자"
+  previewDialogBody: "이 대화상자는 앱이 직접 그리며, 테마와 사용자 지정 색상에 따라 실시간으로 변합니다."
+  previewDialogInput: "입력란을 테스트하려면 무언가를 입력해 보세요:"
+  previewDialogResult: "입력한 내용: {value}"
+  loading: "로딩 중..."
+  noPrompts: "프롬프트 없음"
+  aiNoKeys: "아직 키가 추가되지 않았습니다"
+  badgeBuiltIn: "내장"
+  badgeUser: "사용자"
+  badgeOverridden: "(재정의됨)"
+  badgeLocal: "로컬"
+  promptNameRequired: "프롬프트 이름을 입력해 주세요"
+  promptContentRequired: "프롬프트 내용을 입력해 주세요"
+  promptSaved: "프롬프트 저장됨"
+  promptSaveFailed: "저장 실패: {msg}"
+  promptSavedLocal: "프롬프트 저장됨 (로컬)"
+  promptDeleted: "프롬프트 삭제됨"
+  promptDeleteFailed: "삭제 실패: {msg}"
+  deletePromptConfirm: "프롬프트 \"{name}\"을(를) 삭제하시겠습니까?"
+  promptInfoCustom: "아래 사용자 지정 입력란의 내용을 시스템 프롬프트로 사용합니다"
+  promptInfoBuiltin: "내장 프롬프트"
+  promptInfoUser: "사용자 지정 프롬프트"
+  promptInfoOverridden: " (사용자 버전으로 재정의됨)"
+  promptInfoLocal: "로컬 사용자 지정 프롬프트"
+  promptNameUser: "{name} (사용자)"
+  promptNameLocal: "{name} (로컬)"
+  keyRequired: "키를 입력해 주세요"
+  keyExists: "키가 이미 존재합니다"
+  keyAdded: "키 추가됨"
+  keyDeleted: "키 삭제됨"
+  bgUploadSuccess: "배경 업로드됨"
+  bgUploadFailed: "업로드 실패: {msg}"
+  bgUploadError: "배경 업로드 실패"
+  saved: "설정 저장됨"
+  resetConfirm: "기본 설정으로 초기화하시겠습니까?"
+  resetDone: "설정 초기화됨"
+  exportDone: "설정 내보내기 완료"
+  invalidConfig: "잘못된 설정 파일"
+  importDone: "설정 가져오기 완료"
+  importFailed: "가져오기 실패: {msg}"
+  imageFilter: "이미지 파일"
+  remotePasswordSet: "비밀번호 설정됨"
+
+ai:
+  title: "AI 생성"
+  followSettings: "설정 사용"
+  customModel: "사용자 지정 모델"
+  settings: "설정"
+  clearChat: "대화 지우기"
+  currentFile: "현재 파일: {name}"
+  noContextFile: "컨텍스트 파일 없음"
+  inputPlaceholder: "요청을 입력하세요... (Enter: 전송, Shift+Enter: 줄 바꿈)"
+  send: "보내기"
+  stop: "중지"
+  needApiKey: "먼저 설정에서 API 키를 구성해 주세요."
+  thinking: "생각 중..."
+  error: "오류"
+  regenerate: "다시 생성"
+  requestFailed: "요청 실패: {msg}"
+  apiError: "API 오류 {status}: {body}"
+  apiUnavailable: "AI 기능을 사용할 수 없습니다 (electronAPI가 로드되지 않음)"
+  stopped: "중지됨"
+  pendingOps: "대기 중인 파일 작업 ({count})"
+  opCreate: "생성"
+  opEdit: "편집"
+  opDelete: "삭제"
+  view: "보기"
+  accept: "✓ 적용"
+  reject: "✕ 거부"
+  original: "원본 내용"
+  updated: "수정 후"
+  willDelete: "이 파일은 삭제됩니다"
+  opFailedNoApi: "❌ 파일 작업 실패: electronAPI를 사용할 수 없음"
+  openFileFirst: "⚠️ 프로젝트 디렉터리를 확인하려면 먼저 파일을 열어 주세요"
+  created: "✅ 생성됨: {path}"
+  edited: "✅ 편집됨: {path}"
+  deleted: "✅ 삭제됨: {path}"
+  createFailed: "❌ 생성 실패: {msg}"
+  editFailed: "❌ 편집 실패: {msg}"
+  editOriginalNotFound: "⚠️ {path}에서 원본 내용을 찾을 수 없어 편집이 취소되었습니다"
+  deleteFailed: "❌ 삭제 실패: {msg}"
+  emptyHint: "💡 필요한 내용을 설명하면 AI가 코드 작성과 수정을 도와줍니다"
+  clearConfirm: "모든 대화 기록을 지우시겠습니까?"
+  cleared: "대화가 지워졌습니다"
+
+kether:
+  builtinText: "텍스트"
+  builtinList: "리스트"
+  builtinBrace: "블록 그룹"
+  slotHelp: "여기를 클릭하거나 드래그하여 작업 추가<br>CTRL+클릭 텍스트 빠른 추가<br>SHIFT+클릭 액션 그룹 빠른 추가<br>CTRL+SHIFT+클릭 리스트 빠른 추가"
+  back: "← 뒤로"
+  title: "Kether 블록 편집기"
+  actionCount: "작업 {count}개"
+  blocks: "🧊 블록"
+  code: "📝 코드"
+  confirm: "✓ 확인"
+  undo: "실행 취소 (Ctrl+Z)"
+  redo: "다시 실행 (Ctrl+Shift+Z)"
+  autoSync: "블록을 Kether 코드에 자동 동기화"
+  minimize: "최소화"
+  maximize: "최대화"
+  close: "닫기"
+  searchActions: "작업 검색..."
+  workspaceInfo: "엔트리 ({entries}) · 블록 ({blocks})"
+  blockColor: "블록 색상"
+  provider: "프로바이더"
+  category: "카테고리"
+  displayName: "표시 이름"
+  nameCnEn: "중국어 + 영어"
+  nameCn: "중국어만"
+  nameEn: "영어만"
+  quoteBtn: "따옴표 버튼"
+  semanticDisplay: "의미 표시"
+  on: "켜기"
+  off: "끄기"
+  addBlock: "+ 블록 추가"
+  newEntry: "📥 새 엔트리"
+  newDef: "📦 새 정의"
+  clear: "🗑 지우기"
+  codePreview: "▶ 코드 미리보기"
+  codePreviewOpen: "▼ 코드 미리보기"
+  empty: "(비어 있음)"
+  stash: "스태시"
+  stashArea: "📦 스태시"
+  stashDrop: "블록을 여기로 드래그하여 스태시에 보관"
+  saved: "💾 저장됨"
+  common: "자주 쓰는 항목"
+  custom: "커스텀"
+  catCommon: "⭐ 자주 쓰는 항목"
+  catAll: "전체"
+  deleteCommonConfirm: "자주 쓰는 블록 \"{name}\"을(를) 삭제하시겠습니까?"
+  noCommonBlocks: "아직 자주 쓰는 블록이 없습니다<br><small>블록을 우클릭하면 자주 쓰는 블록으로 추가할 수 있습니다</small>"
+  cancel: "취소"
+  insert: "삽입"
+  copyBlock: "📋 블록 복사"
+  viewDetail: "📖 설명 보기"
+  addFavorite: "⭐ 자주 쓰는 블록으로 추가"
+  noMatchActions: "일치하는 작업이 없습니다"
+  customSymbol: "✎ 커스텀"
+  customSymbolPlaceholder: "커스텀 기호"
+  itemEdit: "시각적 아이템 편집기"
+  posEdit: "시각적 위치 편집기"
+  emptyState: "<strong>+ 블록 추가</strong>를 클릭하여 시작하세요"
+  emptyStateHint: "또는 코드 모드로 전환하여 직접 입력하세요"
+  then: "Then"
+  else: "Else"
+  addCondition: "+ 조건 추가"
+  deleteBranch: "이 분기 삭제"
+  addWhenBranch: "+ when 분기 추가"
+  customBlock: "⧉ 커스텀"
+  ketherCode: "Kether 코드..."
+  removeQuote: "클릭하여 따옴표 제거"
+  addQuote: "클릭하여 따옴표 추가"
+  textValue: "텍스트 값..."
+  unquoted: "# 따옴표 없음"
+  value: "값..."
+  list: "[ ] 리스트"
+  actionGroup: "{ } 액션 그룹"
+  entry: "엔트리"
+  normal: "일반"
+  entrySlotHint: "+ 드래그하거나 클릭하여 블록 추가"
+  blockDetail: "블록 상세"
+  fieldName: "이름"
+  fieldProvider: "프로바이더"
+  fieldType: "타입"
+  private: "비공개"
+  public: "공개"
+  fieldCategory: "카테고리"
+  fieldSyntax: "구문"
+  fieldExample: "예시"
+  fieldSemantic: "의미"
+  fieldDescription: "설명"
+  selectAction: "작업 선택"
+  search: "검색..."
+  noMatch: "일치 항목 없음"
+  ctxDetail: "📋 설명 보기"
+  ctxCopy: "📋 복사"
+  ctxPaste: "📄 붙여넣기"
+  ctxSave: "💾 구문 저장"
+  ctxDelete: "🗑 삭제"
+  saveStmtPrompt: "저장할 구문 이름:"
+  saveStmtDefault: "블록"
+  codeTitle: "Kether 코드"
+  parseToBlocks: "🔄 블록으로 변환"
+
+chemdah:
+  noDialogues: "대화 엔트리가 없습니다"
+  dialoguesHeader: "대화 엔트리"
+  addDialogue: "+ 대화 추가"
+  cardView: "📋 카드 보기"
+  mindmapView: "🌐 마인드맵"
+  syncToSource: "소스에 동기화"
+  autoSync: "자동 동기화"
+  syncHint: "\"소스에 동기화\"를 클릭하면 변경 사항이 편집기에 적용됩니다"
+  dialogueNav: "대화 탐색"
+  fileOptions: "파일 옵션"
+  theme: "테마"
+  customTheme: "커스텀..."
+  customThemePlaceholder: "커스텀 테마 이름 입력"
+  title: "제목"
+  optionalTitle: "선택적 제목"
+  flags: "태그 (Flags)"
+  addFlag: "+ 태그 추가"
+  custom: "커스텀..."
+  switch: "SWITCH"
+  dialogue: "대화"
+  noCondition: "조건 없음"
+  optionCount: "옵션 {count}개"
+  deleteDialogue: "이 대화 삭제"
+  dialogueIdPrefix: "대화 ID: {id}"
+  npcId: "NPC ID"
+  npcIdPlaceholder: "예: adyeshach BoFeng"
+  whenBranches: "조건 분기 (When)"
+  addBranch: "+ 분기 추가"
+  noWhenBranches: "조건 분기가 없습니다 (기본 점프가 사용됩니다)"
+  npcText: "NPC 대화 텍스트"
+  npcTextPlaceholder: "NPC 대화 내용..."
+  format: "형식"
+  tags: "태그"
+  ifCondition: "조건 (if)"
+  conditionPlaceholder: "조건식 또는 true"
+  openJump: "점프 (open)"
+  targetDialoguePlaceholder: "대상 대화 이름"
+  deleteBranch: "분기 삭제"
+  playerOptions: "플레이어 옵션"
+  addOption: "+ 옵션 추가"
+  noOptions: "플레이어 옵션이 없습니다"
+  condition: "조건"
+  optionTextPlaceholder: "옵션 텍스트"
+  thenScript: "실행 스크립트 (KETHER)"
+  ketherScriptPlaceholder: "KETHER 스크립트 내용..."
+  deleteOption: "옵션 삭제"
+  newDialoguePrefix: "새 대화_{count}"
+  newQuestPrefix: "새 퀘스트_{count}"
+  defaultReply: "네"
+  customTagPrompt: "커스텀 태그 이름 입력:"
+  syncedToSource: "시각적 편집기에서 소스로 동기화되었습니다"
+  empty: "(비어 있음)"
+  entryNode: "시작 노드"
+  orphanNode: "고아 노드"
+  nodeCount: "노드 {count}개"
+  edgeCount: "간선 {count}개"
+  entryCount: "엔트리 {count}개"
+  mindmapHint: "🔄 스크롤로 확대/축소 · 드래그로 화면 이동 · 노드 클릭으로 점프 · 더블클릭으로 초기화"
+  emptyObject: "빈 객체"
+  yamlError: "YAML 파싱 오류"
+  yamlErrorHint: "소스 코드 모드에서 구문 오류를 수정한 후 다시 시도해 주세요."
+  questList: "퀘스트 목록"
+  addQuest: "+ 퀘스트 추가"
+  noQuests: "퀘스트 데이터가 없습니다"
+  questNav: "퀘스트 탐색"
+  subtaskCount: "하위 작업 {count}개"
+  deleteQuest: "이 퀘스트 삭제"
+  basicInfo: "기본 정보"
+  questId: "퀘스트 ID"
+  questIdPlaceholder: "고유한 퀘스트 ID"
+  displayName: "표시 이름"
+  questNamePlaceholder: "퀘스트 표시 이름"
+  type: "타입"
+  description: "설명"
+  questDescPlaceholder: "퀘스트 설명..."
+  depend: "선행 조건 (depend)"
+  dependPlaceholder: "쉼표로 구분된 퀘스트 ID"
+  statsVisible: "스탯 진행도 표시"
+  show: "표시"
+  hide: "숨김"
+  optional: "선택 엔트리"
+  yes: "예"
+  no: "아니요"
+  subtasks: "하위 작업"
+  noSubtasks: "하위 작업이 없습니다"
+  agentScripts: "퀘스트 라이프사이클 스크립트 (Agent)"
+  addHook: "+ 훅 추가"
+  noHooks: "설정된 Agent 훅이 없습니다"
+  ketherScript: "KETHER 스크립트..."
+  deleteHook: "이 훅 삭제"
+  addons: "애드온"
+  noAddons: "설정된 애드온 컴포넌트가 없습니다"
+  search: "검색..."
+  addSelected: "선택 항목 추가"
+  select: "선택"
+  addSelectedCount: "선택 항목 추가 ({count})"
+  cancel: "취소"
+  itemEditor: "시각적 아이템 편집기"
+  namespaceNotice: "⚠ 이 네임스페이스는 애드온 지원이며 일부 서버에서는 지원하지 않을 수 있습니다"
+  namespace: "네임스페이스"
+  itemId: "아이템 ID"
+  itemIdPlaceholder: "예: diamond, diamond_sword 또는 *"
+  wildcard: "와일드카드"
+  display: "표시"
+  nameField: "이름 (name)"
+  exact: "= (정확히 일치)"
+  notEqual: "!= (같지 않음)"
+  ignoreColor: "# (색상 무시)"
+  contains: "( ) (포함)"
+  namePlaceholder: "이름 텍스트"
+  lore: "Lore (한 줄에 하나씩)"
+  attributes: "속성"
+  amountPlaceholder: "수량"
+  damagePlaceholder: "내구도/손상 값"
+  valuePlaceholder: "값"
+  enchants: "인챈트"
+  add: "+ 추가"
+  noEnchants: "추가된 인챈트가 없습니다"
+  nbt: "NBT"
+  noNbt: "추가된 NBT가 없습니다"
+  preview: "미리보기"
+  confirm: "확인"
+  enchantIdPlaceholder: "인챈트 ID (예: damage_all)"
+  level: "레벨"
+  nbtPathPlaceholder: "NBT 경로 (예: craftengine:id)"
+  value: "값"
+  minecraftVanilla: "minecraft (vanilla)"
+  nativeSupport: "네이티브 지원"
+  addonSupport: "애드온 지원 (사용 시 경고 표시)"
+  taskManager: "하위 작업 관리자 — {name}"
+  totalSubtasks: "총 {count}개의 하위 작업"
+  subtaskTab: "하위 작업 {index}"
+  subtaskPrefix: "하위 작업 {count}"
+  addSubtask: "+ 하위 작업 추가"
+  addSubtaskHint: "왼쪽의 \"하위 작업 추가\" 버튼을 클릭하여 추가하세요"
+  close: "닫기"
+  selectObjectiveType: "하위 작업 목표 타입 선택"
+  selectTaskObjectiveType: "목표 타입 선택"
+  searchObjectivePlaceholder: "목표 타입 검색..."
+  noSubtaskSelected: "선택된 하위 작업이 없습니다"
+  selectType: "타입 선택..."
+  delete: "삭제"
+  subtaskId: "하위 작업 ID"
+  name: "이름"
+  objectiveType: "목표 타입"
+  customObjectivePlaceholder: "커스텀 목표 타입"
+  objectiveCondition: "조건"
+  position: "위치"
+  posEdit: "시각적 위치 편집기"
+  itemEdit: "시각적 아이템 편집기"
+  ketherScriptField: "KETHER 스크립트 ($)"
+  goal: "목표 (goal)"
+  amountField: "수량 (amount)"
+  subtaskAgentScripts: "하위 작업 Agent 스크립트"
+  addonManager: "애드온 관리자 — {name}"
+  totalAddons: "총 {count}개의 애드온"
+  addAddon: "+ 애드온 추가"
+  addAddonHint: "왼쪽의 \"애드온 추가\" 버튼을 클릭하여 추가하세요"
+  noAddonComponents: "애드온이 없습니다"
+  selectAddon: "애드온 선택"
+  searchAddonPlaceholder: "애드온 이름 검색..."
+  customKeyValues: "커스텀 키-값 쌍"
+  enabled: "활성화"
+  deleteItem: "이 항목 삭제"
+  addNode: "+ 노드 추가"
+  noConfigurableFields: "이 애드온에는 설정 가능한 필드가 없습니다"
+  selectAgentHook: "Agent 훅 선택"
+  searchHookPlaceholder: "훅 이름 검색..."
+  customScopePrompt: "커스텀 스코프 입력:"
+  customScopeLabel: "@ 커스텀"
+  selectScopeForHook: "{hook}의 스코프 선택"
+  searchScopePlaceholder: "스코프 검색..."
+  customHookPrompt: "훅 이름 + 스코프 입력 (예: completed @ all):"
+  scopeGroup: "스코프"
+  posEditor: "위치 표현식 편집기"
+  world: "월드"
+  required: "필수"
+  xyz: "위치 X Y Z"
+  mode: "모드"
+  exactPos: "정확한 위치"
+  radiusPos: "범위 내 (~ 반지름)"
+  areaPos: "영역 내 (> 위치)"
+  multiPos: "다중 위치 (&)"
+  radius: "반지름"
+  radiusPlaceholder: "예: 10"
+  areaTo: "영역 끝점 X Y Z"
+  toX: "끝점 X"
+  toY: "끝점 Y"
+  toZ: "끝점 Z"
+  multiCoords: "다중 위치"
+  addCoord: "+ 위치 추가"
+  ok: "확인"
+  worldRequired: "월드 이름을 입력해 주세요"
+  selectTypeTitle: "Chemdah 인터프리터 타입 선택"
+  typeUnknownMsg: "파일 타입을 자동으로 감지할 수 없습니다{detected}. 인터프리터 타입을 직접 선택해 주세요:"
+  detectedAs: " ({type}(으)로 감지됨)"
+  interpreterType: "인터프리터 타입"
+  typeConversation: "대화"
+  typeQuest: "퀘스트"
+  scopeLabel: "스코프"
+  scopeFile: "이 파일만"
+  scopeDirectory: "현재 폴더의 모든 파일"
+  scopeProject: "프로젝트 전체"
+  typeUnknown: "알 수 없음"
+  typeConversationFull: "대화 파일"
+  typeQuestFull: "퀘스트 파일"
+  unknownTypeTitle: "인식할 수 없는 파일 타입"
+  unknownTypeMsg: "이 파일은 대화 타입도 퀘스트 타입도 아닙니다."
+  unknownTypeHint: "소스 코드 모드에서 편집하거나"
+  manualSelect: "타입을 직접 선택하세요"
+  rendering: "렌더링 중..."
+  visualEditTitle: "시각적 편집"
+  visualEditHint: "인터프리터 타입을 선택한 후 다시 시도하거나, 소스 코드 모드에서 편집해 주세요."
+
+craftengine:
+  premiumHint: "이 기능은 CraftEngine 플러그인의 프리미엄 버전 전용입니다 - 커뮤니티 에디션을 사용 중이라면 이 설정이 효과가 없을 수 있습니다."
+  versionHint: "이 기능에는 버전 요구 사항이 있습니다: {versions}"
+  hintDetail: "힌트 상세"
+  hintModeEditor: "에디터 보기"
+  hintModeWiki: "위키 원문"
+  yvObject: "객체"
+  yvList: "리스트"
+  yvEmpty: "비어 있음"
+  yvOf: " 은(는) "
+  yvCase: "케이스"
+  syncedToSource: "소스에 동기화됨"
+  fieldEmpty: "(비어 있음)"
+  type_config: "플러그인 설정"
+  listEmpty: "엔트리가 없습니다 — 아래 버튼을 클릭하여 추가하세요"
+  listAdd: "추가"
+  mapAdd: "+ 키 추가"
+  unionEmpty: "지정되지 않음"
+  unionClear: "지우기"
+  customValue: "간단한 값…"
+  componentAdd: "컴포넌트 추가…"
+  componentCustom: "커스텀 (키-값)"
+  componentsEmpty: "아직 데이터 컴포넌트가 없습니다 — 아래 드롭다운에서 하나를 선택하세요"
+  componentConditionTitle: "조건"
+  condAdd: "조건 추가"
+  modelSimplified: "간소화 모델"
+  modelTree: "모델 트리"
+  modelPath: "모델 경로"
+  popupEdit: "편집"
+  popupEmpty: "설정되지 않음"
+  popupDetailed: "상세"
+  popupOk: "확인"
+  popupCancel: "취소"
+  jsonEditor: "JSON 편집기"
+  jsonEditorHint: "이 필드를 JSON으로 편집합니다; 변경 사항은 즉시 적용됩니다"
+  material: "머티리얼 (material)"
+  customModelData: "커스텀 모델 데이터 (custom-model-data)"
+  texture: "텍스처 (texture)"
+  category: "카테고리 (category)"
+  dataLabel: "아이템 데이터 (data)"
+  displayName: "표시 이름 (item-name)"
+  itemName: "아이템 이름 (display-name)"
+  lore: "Lore 줄 (lore)"
+  dataJsonHint: "아이템 데이터 전체를 JSON으로 편집"
+  model: "모델 (model)"
+  modelJsonHint: "모델 전체를 JSON으로 편집"
+  behaviorType: "동작 타입 (behavior.type)"
+  behavior: "동작 (behavior)"
+  settings: "설정 (settings)"
+  events: "이벤트 (events)"
+  updater: "업데이터 (updater)"
+  state: "블록 상태 (state)"
+  states: "상태 (states)"
+  statesHint: "다중 상태 매핑, JSON으로 편집"
+  hardness: "경도 (hardness)"
+  resistance: "저항력 (resistance)"
+  behaviors: "동작 목록 (behaviors)"
+  loot: "전리품 (loot)"
+  variants: "변형 (variants)"
+  variantsHint: "변형 요소 / 히트박스 / 좌석"
+  settingsItem: "아이템 (item)"
+  hitTimes: "타격 횟수 (hit-times)"
+  settingsSounds: "사운드 (sounds)"
+  recipeType: "레시피 타입 (type)"
+  pattern: "패턴 (pattern)"
+  patternHint: "한 줄에 패턴 문자열 하나씩"
+  ingredients: "재료 (ingredients)"
+  ingredientsHint: "키-값 쌍: 문자 = 아이템"
+  result: "결과물 (result)"
+  resultId: "아이템 (id)"
+  resultCount: "수량 (count)"
+  experience: "경험치 (experience)"
+  time: "시간 (time)"
+  base: "베이스 아이템 (base)"
+  addition: "추가 재료 아이템 (addition)"
+  templateType: "대장간 형판 (template_type)"
+  group: "그룹 (group)"
+  unlockOnIngredient: "재료 획득 시 해금 (unlock_on_ingredient_obtained)"
+  unlockOnJoin: "접속 시 해금 (unlock_on_join)"
+  otherFields: "기타 필드"
+  customTabWarning: "커스텀 탭은 탭에서 다루지 않는 옵션을 위해 플러그인 파일을 편집할 때만 사용해야 합니다."
+  type_item: "아이템"
+  type_block: "블록"
+  type_furniture: "가구"
+  type_recipe: "레시피"
+  type_generic: "일반"
+  yamlError: "YAML을 파싱할 수 없습니다"
+  yamlErrorHint: "파일에 구문 오류가 있어 시각적으로 편집할 수 없습니다. 소스 모드에서 수정한 후 다시 시도해 주세요."
+  noSections: "편집 가능한 섹션이 없습니다"
+  noEntries: "이 섹션에 엔트리가 없습니다"
+  addEntry: "+ 엔트리 추가"
+  emptySection: "빈 섹션"
+  selectEntry: "왼쪽에서 편집할 엔트리를 선택하세요"
+  ownerLoading: "프로젝트 소유권 확인 중..."
+  syncToSource: "소스에 동기화"
+  autoSync: "자동 동기화"
+  ownerBadge: "프로젝트: {root} · 팩: {pack}"
+  ownerNone: "CE 프로젝트 소유권을 찾을 수 없습니다"
+  pickerBtn: "빠른 채우기"
+  pickerSearch: "검색..."
+  pickerEmpty: "아직 엔트리가 없습니다. ⟳를 클릭하여 다시 스캔하세요"
+  pickerNoMatch: "일치 항목 없음"
+  pickerScanning: "프로젝트 요소 스캔 중..."
+  pickerRescan: "다시 스캔"
+  pickerCount: "{n}개 엔트리 · 클릭하여 채우기 · 여러 줄 입력 시 반복 추가 가능"
+  newEntryTitle: "새 엔트리"
+  section: "섹션"
+  entryNamespace: "네임스페이스 (namespace)"
+  entryPath: "경로 (path)"
+  confirmAdd: "추가"
+  confirmDelete: "삭제"
+  deleteEntry: "엔트리 삭제"
+  deleteConfirmTitle: "삭제 확인"
+  deleteConfirmMsg: "엔트리 {key}을(를) 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다."
+  entryNamespaceInvalid: "네임스페이스에는 소문자, 숫자, 밑줄만 사용할 수 있습니다"
+  entryPathInvalid: "경로에는 영문자, 숫자, 밑줄, 점, 슬래시, 대시만 사용할 수 있습니다"
+  entryExists: "엔트리 {key}이(가) 이미 존재합니다"
+  entryId: "엔트리 ID"
+  entryIdInvalid: "ID에는 영문자, 숫자, 밑줄, 점, 대시만 사용할 수 있습니다"
+  keyOnlyHint: "이 섹션의 엔트리에는 namespace:path 접두사가 없으므로 ID를 직접 입력하세요"
+  type_equipment: "장비"
+  type_image: "이미지"
+  type_category: "카테고리"
+  type_sound: "사운드"
+  type_emoji: "이모지"
+  type_jukeboxSong: "주크박스 노래"
+  type_painting: "그림"
+  type_globalVariable: "전역 변수"
+  type_translation: "번역"
+  type_lang: "언어"
+  type_lootSource: "전리품 소스"
+  type_placedFeature: "배치된 피처"
+  type_template: "템플릿"
+  type: "타입 (type)"
+  allItems: "모든 아이템 (all_items)"
+  arguments: "인수 (arguments)"
+  ascent: "상승 높이 (ascent)"
+  assetId: "에셋 ID (asset_id)"
+  author: "제작자 (author)"
+  biome: "바이옴 (biome)"
+  char: "문자 (char)"
+  chars: "문자들 (chars)"
+  chatCompletion: "채팅 완성 (chat_completion)"
+  clientBoundMaterial: "클라이언트 바운드 머티리얼 (client-bound-material)"
+  column: "열 (column)"
+  comparatorOutput: "컴파레이터 출력 (comparator_output)"
+  conditions: "조건 (conditions)"
+  content: "내용 (content)"
+  description: "설명 (description)"
+  dimension: "차원 (dimension)"
+  dimensionType: "차원 타입 (dimension_type)"
+  equipment: "장비 (equipment)"
+  equipmentType: "타입 (type)"
+  feature: "피처 (feature)"
+  featureHint: "문자열 또는 객체, 예: default:tree 또는 {type: ...}"
+  file: "파일 (file)"
+  font: "폰트 (font)"
+  food: "음식 (food)"
+  globalVariableMap: "전역 변수 (키-값)"
+  gridSize: "그리드 크기 (grid_size)"
+  height: "높이 (height)"
+  hidden: "숨김 (hidden)"
+  icon: "아이콘 (icon)"
+  image: "이미지 (image)"
+  keywords: "키워드 (keywords)"
+  kvWholeHint: "엔트리 전체가 키-값 맵입니다; JSON 값은 자동으로 파싱됩니다"
+  templateContent: "템플릿 내용 (YAML)"
+  templateContentHint: "템플릿은 임의의 키-값 맵입니다: 중첩 구조, $$ 버전 키, !!type 태그가 모두 지원됩니다"
+  layers: "레이어 (layers)"
+  layersHint: "사용 가능한 레이어: {names}; 값은 텍스처 경로 또는 JSON 객체가 될 수 있습니다"
+  length: "길이 (length)"
+  list: "아이템 목록 (list)"
+  lootSourceType: "소스 타입 (type)"
+  mapColor: "지도 색상 (map-color)"
+  merges: "병합 (merges)"
+  name: "이름 (name)"
+  overrides: "재정의 (overrides)"
+  overwrite: "덮어쓰기 (overwrite)"
+  permission: "권한 (permission)"
+  placement: "배치 (placement)"
+  priority: "우선순위 (priority)"
+  range: "범위 (range)"
+  ref: "참조 (ref)"
+  replace: "교체 (replace)"
+  row: "행 (row)"
+  showInOpTab: "OP 탭에 표시 (show_in_op_tab)"
+  sound: "사운드 (sound)"
+  sounds: "사운드 (sounds)"
+  soundsHint: "한 줄에 하나씩: 일반 문자열 또는 JSON 객체"
+  subtitle: "부제목 (subtitle)"
+  tags: "태그 (tags)"
+  target: "대상 (target)"
+  targets: "대상들 (targets)"
+  template: "템플릿 (template)"
+  title: "제목 (title)"
+  translationMap: "번역 맵 (키-값)"
+  width: "너비 (width)"
+  world: "월드 (world)"
+  entryKey: "엔트리 키 (namespace:path)"
+  entryKeyHint: "즉시 적용됩니다; global_variables / translations / lang 섹션에는 접두사가 없습니다"
+  tabBasic: "기본"
+  tabModel: "모델"
+  tabItemData: "아이템 데이터"
+  tabBehavior: "동작"
+  tabEvents: "이벤트"
+  eventsAdd: "+ 이벤트 추가"
+  eventsBack: "← 목록으로 돌아가기"
+  eventsTrigger: "트리거 (on)"
+  eventsTriggerRequired: "트리거 이름을 입력해 주세요"
+  eventsTriggerHint: "여러 트리거는 공백이나 쉼표로 구분, 예: attack left_click"
+  eventsTriggerPh: "attack right_click…"
+  eventsFunctions: "함수 (functions)"
+  eventsFunctionsHint: "순서대로 실행됩니다; 함수는 조건과 이벤트를 중첩할 수 있습니다"
+  eventsScalarPh: "원시 문자열 (커스텀/고급)"
+  eventsContent: "이벤트 내용"
+  eventsCount: "이벤트 {count}개"
+  eventsEmpty: "아직 이벤트가 없습니다. 오른쪽 위의 이벤트 추가를 클릭하세요"
+  newEventTitle: "새 이벤트"
+  newEventHint: "여러 트리거는 공백이나 쉼표로 구분, 예: attack left_click"
+  eventExists: "이벤트 {name}이(가) 이미 존재합니다"
+  eventDeleteMsg: "이벤트 {name}을(를) 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다."
+  specTitle: "특수 설정"
+  specHasVersions: "버전 조건 {n}개"
+  specHasType: "타입 {type}"
+  specLoc: "위치"
+  specVersions: "버전 조건"
+  specVersionsDesc: "버전 기반 값: $1.21.4 고정 · $1.20.1~1.21.4 범위 · $>=1.21.4 비교 · $fallback 폴백"
+  specNoVersions: "버전 조건이 없습니다 — 아래에서 추가하세요"
+  specFixed: "고정"
+  specRange: "범위"
+  specCompare: "비교"
+  specFallback: "폴백"
+  specAdd: "추가"
+  specKeyPh: "버전, 예: 1.21.4"
+  specValPh: "값"
+  specEmptyVal: "빈 값은 조건을 제거합니다"
+  specDel: "삭제"
+  specType: "값 타입 (!!type)"
+  specTypeNone: "타입 없음"
+  specTypeHint: "값에 타입을 표시합니다; !!type 접두사는 쓰기 시 유지됩니다"
+  specCurVal: "현재 값"
+
+content:
+  categories:
+    实体操作: "엔티티 조작"
+    数据与变量: "데이터 및 변수"
+    文本与运算: "텍스트 및 연산"
+    游戏机制: "게임 메커니즘"
+    系统管理: "시스템 관리"
+    逻辑判断: "논리"
+    世界与坐标: "월드 및 좌표"
+    物品管理: "아이템 관리"
+    脚本控制: "스크립트 제어"
+    界面与显示: "UI 및 표시"
+    时间与日期: "시간 및 날짜"
+    基本: "기본"
+  param:
+    symbol: "기호"
+    action: "동작"
+    int: "정수"
+    double: "소수"
+    number: "숫자"
+    string: "텍스트"
+    token: "매개변수"
+    player: "플레이어"
+    item: "아이템"
+    location: "위치"
+    world: "월드"
+    time: "시간"
+    message: "메시지"
+    permission: "권한"
+    list: "목록"
+    条件: "조건"
+    执行: "실행"
+    否则: "그 외"
+    次数: "횟수"
+    变量: "변수"
+    条件列表: "조건 목록"
+
+  kether:
+    all: '동작 목록의 모든 {반환값}이 {예}인지 확인합니다.'
+    any: '동작 목록에서 임의의 {반환값}이 {예}와 일치하는지 확인합니다.'
+    async: '생명주기에 묶이지 않은 {비동기} 스케줄로 동작을 실행합니다.<br>프로그램이 종료되면 완료되지 않은 모든 {#Async} 동작은 즉시 닫힙니다.'
+    await: '동작이 완료될 때까지 기다립니다.'
+    await_all: '{동작 목록}의 {모든 동작}이 완료될 때까지 기다립니다.'
+    await_any: '{동작 목록}의 {임의의 동작}이 완료될 때까지 기다립니다.'
+    call: '{이 문은 셸 모드에서 아무 작업도 수행하지 않습니다.}<br>{main} 함수를 포함하여 선언된 모든 함수를 호출합니다.'
+    exit: '프로그램을 종료합니다.'
+    goto: '{이 문은 셸 모드에서 아무 작업도 수행하지 않습니다.}<br>{main} 함수를 포함한 선언된 함수나 특정 대화 구조로 이동합니다.'
+    if_else: '기본 논리 문입니다.<br>동작의 {반환값}이 {예}이면 두 번째 동작을 실행하고, 그렇지 않으면 세 번째 동작을 실행합니다.'
+    literal: '{문자열}을 생성하여 반환합니다.<br>문자열에 공백이 있으면 {큰따옴표} 또는 {작은따옴표}로 감싸고, 공백이 없으면 따옴표를 생략할 수 있습니다.<br><br>{참고:}<br>{literal 100}조차 정수가 아니므로 필요하다면 {#Type} 동작을 사용하세요.'
+    not: '동작의 {반환값}이 {거짓}인지 확인합니다. 즉 결과를 부정합니다.'
+    repeat: '동작을 여러 번 반복합니다.'
+    sleep: '일정 시간 동안 워커 스레드를 차단합니다.'
+    variable_get: '변수를 가져옵니다.'
+    variable_set: '변수를 {원시 타입} 또는 동작의 {반환값}으로 설정합니다.'
+    while: '기본 논리 문입니다.<br>첫 번째 동작의 {반환값}이 {예}인 동안 {거짓}이 될 때까지 두 번째 동작을 반복합니다.'
+    absorption_amount: '플레이어의 흡수 체력을 가져오거나 설정합니다.'
+    action_bar: '동작의 {반환값}을 {액션 바} 메시지로 {실행자}에게 전송합니다.'
+    address: '플레이어의 IP 주소를 가져옵니다.'
+    allow_flight: '플레이어의 비행 가능 여부를 확인하거나 변경합니다.'
+    array: '동작 목록의 모든 {반환값}을 {컬렉션}으로 반환합니다.'
+    attack_cooldown: '플레이어의 공격 쿨다운을 가져옵니다.'
+    bed_spawn: '플레이어의 침대 스폰 지점을 가져오거나 변경합니다. 해당 블록은 침대여야 합니다.'
+    'bed_spawn_x,y,z': '플레이어의 침대 스폰 지점의 한 축을 가져옵니다.'
+    blocking: '플레이어가 방어(블로킹) 중인지 확인합니다.'
+    break: '반복문({ForEach, Join, Map, While}) 내부에서 사용되면 반복 본문을 종료합니다.'
+    'case & when': '#IF보다 풍부한 기능을 갖춘 복잡한 선택 문입니다.<br>완전한 선택 문에는 최소 하나의 분기, 즉 {when 블록}이 필요합니다.<br><br>각 표준 분기는 {when} {{condition}} -> {{expression}}으로 구성됩니다.<br>{else} {{expression}}을 기본 분기로 사용할 수도 있습니다.<br><br>{예시는 다음과 같습니다:}<br>set number to 3<br>set numberProvided to case &number [<br>&nbsp;&nbsp;&nbsp;&nbsp;when 1 -> "One"<br>&nbsp;&nbsp;&nbsp;&nbsp;when 2 -> "Two"<br>&nbsp;&nbsp;&nbsp;&nbsp;when 3 -> "Three"<br>&nbsp;&nbsp;&nbsp;&nbsp;else "One"<br>]<br>log inline "You provide {{ &numberProvided }}"<br><br>{결과는 다음과 같습니다:}<br>You provide Three<br><br>{다른 문처럼 사용할 수도 있습니다:}<br>set number to 3<br>case &number [<br>&nbsp;&nbsp;&nbsp;&nbsp;when 1 -> log "One"<br>&nbsp;&nbsp;&nbsp;&nbsp;when 2 -> log "Two"<br>&nbsp;&nbsp;&nbsp;&nbsp;when 3 -> log "Three"<br>&nbsp;&nbsp;&nbsp;&nbsp;else log "One"<br>]<br><br>{또는 여러 문과 함께 사용할 수 있습니다:}<br>set number to 1<br>case &number [<br>&nbsp;&nbsp;&nbsp;&nbsp;when 1 -> {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;log "Monday"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;log "First day of the week"<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;when [ 2 3 4 5 6 7 ] -> {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;log "Sunday"<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;else log "Other days"<br>]<br><br>{논리 검사에도 사용할 수 있습니다:}<br>set number to 1<br>case &number [<br>&nbsp;&nbsp;&nbsp;&nbsp;when < 10 -> {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;log "Small"<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;when > 10 -> {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;log "Big"<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;else log "Other"<br>]'
+    check: '두 동작의 {반환값}을 여러 비교 모드로 비교합니다.<br><br>1. 같음 ({==}, {is}): 두 값이 {문자 그대로} 동일합니다.<br>2. 같지 않음 ({!=}, {not}): 두 값이 {문자 그대로} 다릅니다.<br>3. 유사 같음 ({=?}, {is?}): {대소문자를 무시하면} 두 값이 {문자 그대로} 동일합니다.<br>4. 절대 같음 ({=!}, {is!}): {메모리}상에서 두 값이 동일합니다.<br>5. 보다 큼 ({>}, {gt}): 첫 번째 값이 두 번째 값보다 {큽니다}.<br>6. 이상 ({>=}): 첫 번째 값이 두 번째 값보다 {크거나} {같습니다}.<br>7. 미만 ({<}, {lt}): 첫 번째 값이 두 번째 값보다 {작습니다}.<br>8. 이하 ({<=}): 첫 번째 값이 두 번째 값보다 {작거나} {같습니다}.<br>9. 오른쪽이 왼쪽을 포함 (in): 두 번째 값이 첫 번째 값을 포함하는지 여부입니다.<br>10. 왼쪽이 오른쪽을 포함 (has): 첫 번째 값이 두 번째 값을 포함하는지 여부입니다.<br><br>{참고:}<br>{같음} 조건으로 비교할 때 양쪽 인수에 {#Type} 추론 동작이 자동으로 추가됩니다.'
+    color: '동작의 {반환값}에 있는 모든 {색상 코드}를 치환합니다.<br>{TabooLib}에서 제공하는 고급 색상 코드를 지원합니다.'
+    command: '동작의 {반환값}을 명령어로 실행하며, 기본 실행자는 {플레이어}입니다.'
+    compass_target: '플레이어의 나침반 대상을 가져오거나 변경합니다.'
+    'compass_x,y,z': '플레이어의 나침반 대상의 한 축을 가져옵니다.'
+    conversing: 'Conversable 객체가 현재 대화에 참여 중인지 확인합니다.<br><br>{반환값:}<br>대화가 진행 중이면 True'
+    date_day: '연도, 월 또는 주 기준의 일(day)입니다.<br>연: ({1} ~ {365})<br>월: ({1} ~ {31})<br>주: ({1} ~ {7})'
+    date_hour: '현재 시(時)입니다 ({0} ~ {23}).'
+    date_minute: '현재 분입니다 ({0} ~ {59}).'
+    date_month: '현재 월입니다 ({1} ~ {12}).'
+    date_second: '현재 초입니다 ({0} ~ {59}).'
+    date_year: '현재 연도입니다 ({MIN_YEAR} ~ {MAX_YEAR}).'
+    dead: '플레이어가 사망했는지 확인합니다.'
+    element: '동작의 {반환값}({목록})에서 지정된 인덱스의 요소를 가져옵니다.'
+    exhaustion: '플레이어의 소진 수치를 가져오거나 변경합니다.'
+    exp: '플레이어의 경험치 데이터를 가져오거나 변경합니다. {플레이어 경험치}만 수정할 수 있습니다.'
+    first_played: '플레이어가 처음 플레이한 시각을 반환합니다.'
+    fly___walk_speed: '플레이어의 비행 속도 또는 걷기 속도를 가져오거나 변경합니다.'
+    flying: '플레이어가 비행 중인지 확인하거나 변경합니다.'
+    food_level: '플레이어의 허기 수치를 가져오거나 변경합니다.'
+    foreach: '첫 번째 동작의 {반환값}에 있는 모든 {멤버}를 순회하며, 각각을 {임시 변수}로 두 번째 동작에 전달합니다.'
+    format_time: '특정 시각을 지정한 {형식}으로 포맷합니다.<br><br>'
+    gamemode: '플레이어의 게임 모드를 가져오거나 변경합니다.<br><br>사용 가능한 모드:<br>{서바이벌}: SURVIVAL, 0<br>{크리에이티브}: CREATIVE, 1<br>{어드벤처}: ADVENTURE, 2<br>{관전}: SPECTATOR, 3'
+    gliding: '플레이어가 활공 중인지 확인하거나 변경합니다.'
+    glowing: '플레이어가 발광 중인지 확인하거나 변경합니다.'
+    gravity: '플레이어가 중력의 영향을 받는지 확인하거나 변경합니다.'
+    health: '플레이어의 체력 또는 최대 체력을 가져오거나 변경합니다.'
+    inline: '동작의 {반환값}에 있는 모든 {인라인 스크립트}를 치환합니다. <br>인라인 스크립트는 {{{} ... {}}} 형태로 문자열에 스크립트 코드를 삽입합니다.'
+    inside_vehicle: '플레이어가 탈것에 탑승 중인지 확인합니다.'
+    javascript: '{JavaScript} 코드를 실행하고 결과를 {반환}합니다.<br>현재 프로그램의 모든 변수가 전달되며, 이벤트({event}), 발신자({sender}), 서버({server})도 함께 전달됩니다.'
+    join: '동작 목록의 모든 {반환값}을 {문자열}로 결합하며, 기본 구분자는 {공백}입니다.'
+    jumping: '플레이어가 점프 중인지 확인하거나 변경합니다.'
+    last_played: '플레이어가 마지막으로 플레이/접속한 시각을 반환합니다.'
+    leashed: '엔티티가 현재 리드에 묶여 있는지 여부를 반환합니다.'
+    level: '플레이어의 레벨을 가져오거나 변경합니다.'
+    locale: '플레이어의 클라이언트 언어를 가져옵니다.'
+    location: '좌표를 생성합니다.'
+    location1: '플레이어의 위치를 가져오거나 변경합니다.'
+    location_angle: '플레이어의 각도를 가져오거나 변경합니다.'
+    'location_x,y,z': '좌표의 X, Y, Z, Yaw 또는 Pitch를 가져오거나 수정합니다.'
+    map: '첫 번째 동작의 {반환값}에 있는 모든 {멤버}를 순회하며, 각각을 {임시 변수}로 두 번째 동작에 전달합니다.<br>마지막으로 두 번째 동작의 모든 {반환값}을 {컬렉션}으로 반환합니다.<br><br>{#ForEach}와 달리 {#Map}은 비어 있지 않은 모든 결과를 수집합니다.<br><br>원본 컬렉션의 각 요소에 지정된 변환 함수를 적용한 결과를 담은 목록을 반환합니다.'
+    math: '동작 목록의 모든 {반환값}을 {수학 연산자}로 처리합니다.<br><br>지원되는 연산자:<br>{덧셈}: +, add, plus<br>{뺄셈}: -, sub, minus<br>{곱셈}: *, mul, times<br>{나눗셈}: /, div, divided<br>'
+    name: '플레이어의 게임 이름, 표시 이름 또는 목록 이름을 가져옵니다.'
+    no_damage_tick: '플레이어의 무적 틱을 가져오거나 변경합니다.'
+    null: '{null} 값을 반환합니다.'
+    on_guard: '플레이어가 지상에 있는지 확인합니다. 이 데이터는 클라이언트에서 제공되므로 변조될 수 있습니다.'
+    op: '플레이어의 OP 여부를 확인하거나 변경합니다.'
+    optional: '동작의 {반환값}이 null이 아닌지 확인합니다.'
+    pass: '{빈 문자열}을 반환합니다.'
+    pause: '프로그램의 {생명주기}를 강제로 일시정지합니다. 프로그램이 종료되기 전까지는 되돌릴 수 없습니다.'
+    permission: '{실행자}가 동작의 {반환값}을 권한으로 보유하고 있는지 확인합니다.'
+    placeholderapi: '동작의 {반환값}에 있는 모든 {PlaceholderAPI} 플레이스홀더를 치환합니다.'
+    print: '동작의 {반환값}을 {콘솔}에 메시지로 전송합니다.'
+    random: '범위 내에서 무작위 {실수}를 반환하거나, 동작의 {반환값}에서 무작위 {멤버}를 반환합니다.<br>범위 지정 시 두 번째 인수를 생략하면 0부터 범위까지에서 선택합니다.'
+    random2: '범위 내에서 무작위 {실수} 또는 {정수}를 반환합니다. #{random}과 달리 범위는 동작의 반환값으로 지정합니다.'
+    range: '숫자 {컬렉션}을 생성합니다. {단계}를 생략하거나 {정수} 단계를 사용하면 정수 컬렉션이 생성되고, 그렇지 않으면 실수 컬렉션이 생성됩니다.<br>컬렉션 타입은 범위 숫자의 타입이 아닌 단계의 타입에 따라 결정됩니다.'
+    remaining_air: '플레이어의 잔여 공기(산소)를 가져오거나 변경합니다.'
+    riptiding: '플레이어가 트라이던트 급돌진(리프타이딩) 중인지 확인합니다.'
+    round: '동작의 {반환값}({실수})을 가장 가까운 {정수}로 반올림합니다.'
+    saturation: '플레이어의 포화도를 가져오거나 변경합니다.'
+    scale: '동작의 {반환값}을 소수점 둘째 자리까지의 {실수}로 포맷합니다.'
+    size: '동작의 {반환값}을 {목록}으로 보았을 때의 길이를 가져옵니다.'
+    sleep_ignored: '플레이어가 수면 무시 상태인지 여부를 반환합니다. 모든 플레이어가 수면 중이거나 이 플래그가 설정되어 있으면 시간이 다음 날로 진행됩니다. 모든 플레이어가 이 플래그를 설정했지만 실제로 침대에 있는 사람이 없으면 아무 일도 일어나지 않습니다.'
+    sleep_ticks: '플레이어의 수면 틱을 반환합니다.'
+    sleeping: '플레이어가 수면 중인지 확인합니다.'
+    sneaking: '플레이어가 웅크린 상태인지 확인합니다.'
+    sound: '텍스트를 소리로 재생합니다. 기본 볼륨과 음높이는 {1.0}입니다.<br>"{resource:}" 접두사를 사용하면 {리소스 팩}의 소리를 재생합니다.'
+    split: '동작의 {반환값}을 문자열로 분할하고 그 조각들을 반환합니다.'
+    sprinting: '플레이어가 질주 중인지 확인합니다.'
+    subtitle: '동작의 {반환값}을 {서브타이틀}로 {실행자}에게 전송합니다. 기본 페이드 인, 유지, 페이드 아웃 시간은 {0}, {20}, {0}입니다.'
+    swimming: '플레이어가 수영 중인지 확인하거나 변경합니다.'
+    switch: '현재 {관찰자}를 특정 플레이어로 전환합니다.'
+    tell: '동작의 {반환값}을 {실행자}에게 메시지로 전송합니다.'
+    time: '현재 시스템 시각입니다.<br><br>현재 시각을 밀리초 단위로 반환합니다. 반환값의 시간 단위는 밀리초이지만 값의 정밀도는 기본 운영체제에 따라 다르며 더 클 수 있습니다. 예를 들어 많은 운영체제는 수십 밀리초 단위로 시간을 측정합니다.<br>"컴퓨터 시간"과 협정 세계시(UTC) 사이에 발생할 수 있는 미세한 불일치에 대한 논의는 Date 클래스 설명을 참조하세요.<br><br>{반환값: }현재 시각과 1970년 1월 1일 자정(UTC) 사이의 차이를 밀리초 단위로 나타낸 값입니다.'
+    time_format: '현재 시스템 시각을 지정한 {형식}으로 포맷합니다.<br><br>'
+    title: '동작의 {반환값}을 {타이틀}로 {실행자}에게 전송합니다. 기본 페이드 인, 유지, 페이드 아웃 시간은 {0}, {20}, {0}입니다.'
+    toast: '동작의 {반환값}을 {도전과제 토스트}로 {실행자}에게 전송합니다.<br>반환값으로 {목록}을 지원합니다.<br><br>서버 버전 1.13 이상 필요'
+    type: '가장 일치하는 {문자열}, {정수}, {long}, {실수} 또는 {부울}을 생성하여 반환합니다.<br>문자열에 공백이 있으면 {큰따옴표} 또는 {작은따옴표}로 감싸고, 공백이 없으면 따옴표를 생략할 수 있습니다.<br><br>또는 {특정 타입}으로 포맷할 수 있습니다(동작을 인수로 전달):<br>int, long, float, double, boolean'
+    variable: '전역 변수를 수정하거나 가져옵니다.<br>전역 변수 도움말은 {Chemdah} 문서를 참조하세요.<br><br>가져오기 문법 뒤에 {default}를 사용하면 데이터가 없을 때 기본값을 반환하고, 추가(add) 문법 뒤에 {default}를 사용하면 데이터가 없을 때 해당 값을 기준으로 더합니다.'
+    variables: '모든 변수의 {노드}를 문자열 {목록}으로 병합하여 반환합니다.'
+    warning: '동작의 {반환값}을 {콘솔}에 경고로 전송합니다.'
+    whitelist: '플레이어의 화이트리스트 등록 여부를 확인하거나 변경합니다.'
+    world: '플레이어가 현재 있는 월드의 이름을 가져옵니다.'
+    import: '네임스페이스를 임포트합니다.'
+    release: '네임스페이스를 해제합니다.'
+    block: '좌표의 정수 X, Y, Z 값을 가져옵니다.'
+    cancel: '{퀘스트} 또는 {대화} 시작 시 스크립트 프록시에서 동작을 취소하는 데 사용됩니다.'
+    ceil: '올림'
+    close: '대화 스크립트 프록시에서 대화를 종료하는 데 사용됩니다.'
+    distance: '두 좌표 간의 거리를 가져옵니다. 서로 다른 월드에 있으면 -1을 반환합니다.'
+    equipment_check: '{Chemdah} 아이템 표현식을 사용하여 플레이어의 장비가 특정 아이템인지 확인합니다.<br>표현식 도움말은 {Chemdah} 문서를 참조하세요.<br><br>사용 가능한 슬롯:<br>{주핸드}: hand, mainhand<br>{보조핸드}: offhand<br>{투구}: head, helmet<br>{흉갑}: chest, chestplate<br>{각반}: legs, leggings<br>{부츠}: boots, feet'
+    floor: '내림'
+    inventory_count: '{Chemdah} 아이템 표현식을 사용하여 플레이어의 인벤토리에서 특정 아이템의 개수를 셉니다.<br>표현식 도움말은 {Chemdah} 문서를 참조하세요.'
+    inventory_check: '{Chemdah} 아이템 표현식을 사용하여 플레이어의 인벤토리에 특정 아이템이 있는지 확인합니다. 표현식 도움말은 {Chemdah} 문서를 참조하세요.'
+    inventory_close: '플레이어의 현재 인벤토리를 닫습니다.'
+    inventory_slot_check: '{Chemdah} 아이템 표현식을 사용하여 플레이어의 인벤토리에 있는 특정 슬롯이 특정 아이템인지 확인합니다.<br>표현식 도움말은 {Chemdah} 문서를 참조하세요.'
+    inventory_take: '{Chemdah} 아이템 표현식을 사용하여 플레이어의 인벤토리에 특정 아이템이 있는지 확인하고 이를 제거합니다.<br>표현식 도움말은 {Chemdah} 문서를 참조하세요.'
+    max: 두 개 이상의 값 중 최댓값
+    min: 두 개 이상의 값 중 최솟값
+    mmocore_attribute_point: '플레이어의 {MMOCore} 속성 포인트를 가져옵니다.'
+    mmocore_class: '플레이어의 {MMOCore} 직업 데이터를 가져옵니다.'
+    mmocore_level___exp: '플레이어의 {MMOCore} 레벨 또는 경험치를 가져옵니다.'
+    mmocore_mana: '플레이어의 {MMOCore} 마나를 가져옵니다.'
+    mmocore_skill_point: '플레이어의 {MMOCore} 스킬 포인트를 가져옵니다.'
+    mmocore_stamina: '플레이어의 {MMOCore} 스태미나를 가져옵니다.'
+    mythicmobs_cast: '플레이어가 {MythicMobs} 스킬을 시전하도록 합니다.<br><br>사용 가능한 {Trigger} 타입:<br>DEFAULT, API, ATTACK, BOW_HIT, BLOCK, BLOCK_PLACE, BLOCK_BREAK, <br>COMBAT, CONSUME, CROUCH, UNCROUCH, DAMAGED, DROPCOMBAT, DEATH, <br>DESPAWNED, ENTERCOMBAT, EXPLODE, INTERACT, KILL, KILLPLAYER, <br>PLAYERDEATH, SHOOT, SIGNAL, SPAWN, SPLASH_POTION, SWING, TARGETCHANGE, <br>TARGETED, TELEPORT, TIMER, USE, RIGHTCLICK, READY, CAST, FISH, <br>FISH_BITE, FISH_CATCH_FISH, FISH_CATCH_ENTITY, FISH_GROUND, FISH_REEL, <br>FISH_FAIL, TAME, TAME_FAIL, TRIDENT_THROW, TRIDENT_HIT, CUSTOM'
+    origin: '대화 스크립트 프록시에서 NPC 머리 위의 위치를 가져오는 데 사용됩니다.'
+    particle_normal: '지정한 위치에서 파티클 효과를 재생합니다. 끝에 {@self}를 붙이면 자신에게만 표시됩니다.<br><br>{파티클 표현식 문법:}<br>https://wiki.ptms.ink/index.php?title=Chemdah_通用粒子表达式'
+    position: '선택된 NPC의 위치를 가져옵니다. 여러 개가 선택된 경우 목록을 반환합니다.'
+    profile_data: '플레이어의 변수를 수정하거나 가져옵니다.<br>플레이어 변수 도움말은 {Chemdah} 문서를 참조하세요.<br><br>가져오기 문법 뒤에 {default}를 사용하면 데이터가 없을 때 기본값을 반환하고, 추가(add) 문법 뒤에 {default}를 사용하면 데이터가 없을 때 해당 값을 기준으로 더합니다.'
+    profile_level: '{커스텀 레벨}에서 플레이어의 레벨 또는 경험치를 수정하거나 가져옵니다.<br>커스텀 레벨 도움말은 {Chemdah} 문서를 참조하세요.'
+    quest_group_check: '플레이어가 퀘스트 그룹을 수락했거나 완료했는지 확인합니다.'
+    quest_check: '플레이어의 진행 중이거나 아직 수락하지 않은 퀘스트(선택됨)를 확인합니다.<br><br>사용 가능한 동작:<br>accept-check (수락이 허용되는지 여부) accepted (수락되었는지 여부) completed (완료되었는지 여부)'
+    quest_control: '플레이어의 진행 중이거나 아직 수락하지 않은 퀘스트(선택됨)를 제어합니다.<br><br>사용 가능한 동작:<br>accept (퀘스트 수락) complete (퀘스트 완료) fail (퀘스트 포기) restart (퀘스트 초기화) stop (퀘스트 종료)'
+    quest_progress: '플레이어의 현재(선택된) 퀘스트 또는 (선택된) 퀘스트의 특정 항목의 진행도를 가져옵니다.'
+    quest_select: '이후 작업을 위해 서버에서 유효한 퀘스트를 선택합니다.'
+    quest_data: '플레이어의 현재(선택된) 퀘스트의 변수를 수정하거나 가져옵니다.<br>퀘스트 변수 도움말은 {Chemdah} 문서를 참조하세요.<br><br>가져오기 문법 뒤에 {default}를 사용하면 데이터가 없을 때 기본값을 반환하고, 추가(add) 문법 뒤에 {default}를 사용하면 데이터가 없을 때 해당 값을 기준으로 더합니다.'
+    quest_stats: '(선택된) 퀘스트 또는 (선택된) 퀘스트의 특정 항목의 진행도 표시를 숨기거나 새로 고칩니다.<br>독립형 {}를 사용하면 모든 항목을 나타냅니다.'
+    quest_tasks: '(선택된) 퀘스트의 항목 인덱스를 가져옵니다.'
+    quest_this: '{Chemdah} 퀘스트 스크립트 프록시에서 현재 퀘스트 또는 항목 인덱스를 반환합니다.'
+    quest_track: '플레이어가 (선택된) 퀘스트를 추적하도록 합니다.'
+    quest_tracking: '플레이어가 추적 중인 퀘스트의 이름을 가져옵니다.'
+    quests: '플레이어가 현재 수행 중인 모든 퀘스트를 가져옵니다. {self}를 사용하면 공유(멀티플레이어) 퀘스트를 제외합니다.'
+    schematic: '{#Location}으로 생성한 위치에 지정한 {WorldEdit} 스케매틱을 배치합니다. 회전 및 공기 무시를 지원합니다.'
+    script: '스크립트 파일을 실행하거나 중지합니다.'
+    skillapi_attribute_point: '플레이어의 {SkillAPI} 속성 또는 속성 포인트를 가져옵니다.'
+    skillapi_cast: '플레이어가 {SkillAPI} 스킬을 시전하도록 합니다.<br>'
+    skillapi_class: '플레이어의 {SkillAPI} 직업 데이터를 가져옵니다.'
+    skillapi_exp: '플레이어의 {SkillAPI} 현재 경험치 또는 레벨업에 필요한 경험치를 가져옵니다.'
+    skillapi_level: '플레이어의 {SkillAPI} 레벨 또는 만렙 여부를 가져옵니다.'
+    skillapi_mana: '플레이어의 {SkillAPI} 마나를 가져옵니다.'
+    skillapi_skill_point: '플레이어의 {SkillAPI} 스킬 포인트를 가져옵니다.'
+    talk: '{agent:begin}에서 사용하는 경우:<br>NPC가 곧 보낼 내용을 추가합니다.<br><br>{agent:refuse}, {agent:end}, {then}에서 사용하는 경우:<br>NPC가 특정 내용을 즉시 보내도록 하며, 대화를 마무리할 때 주로 사용됩니다.'
+    trigger: '플레이어의 {Trigger} 퀘스트를 발동합니다.<br>이 퀘스트 타입에 대한 도움말은 {Chemdah} 문서를 참조하세요.'
+    ui: '{UI} 모듈 설정에서만 작동하며, 퀘스트 진행도를 구성하는 데 사용됩니다.<br>UI 모듈 도움말은 {Chemdah} 문서를 참조하세요.'
+    wizard: 'Wizard 가이드를 시작하거나 중지합니다.'
+    workflow_fetch: '오프라인 보상을 정의합니다: {fetch reset} 문이 실행되기 전에 플레이어가 게임을 떠나면, 다음 접속 시 {fetch mark} 안의 문들이 실행됩니다.'
+    animation: '현재 선택된 모든 NPC가 애니메이션을 재생하도록 합니다.<br><br>{알려진 것:}<br>SWING_MAIN_HAND, TAKE_DAMAGE, LEAVE_BED, SWING_OFFHAND<br>CRITICAL_EFFECT, MAGIC_CRITICAL_EFFECT'
+    controller: '현재 선택된 모든 NPC에 컨트롤러를 할당하거나, 제거하거나, 비웁니다.<br><br>{알려진 것:}<br>Move, Gravity, SmoothLook, LookAtPlayer, LookAtPlayerAlways<br>RandomLookGround, RandomStrollLand'
+    create: '특정 위치에 NPC를 생성합니다.'
+    delete: '선택된 모든 NPC를 삭제하고 파괴합니다.'
+    destroy: '현재 선택된 모든 NPC를 파괴합니다.'
+    look: '선택된 모든 NPC가 한 위치를 바라보도록 합니다. 부드러운 회전을 옵션으로 사용할 수 있습니다.'
+    meta: '선택된 모든 NPC의 메타데이터를 수정하거나 초기화합니다.<br><br>{참고:}<br>https://wiki.ptms.ink/index.php?title=AdyeshachPremium:开始:附录:第二节'
+    move: '선택된 모든 NPC가 한 위치로 걸어가도록 합니다. 상대 좌표 사용을 옵션으로 지정할 수 있습니다.'
+    passenger: '선택된 모든 NPC에 탑승자를 추가하거나, 제거하거나, 비웁니다.'
+    remove: '선택된 모든 NPC를 제거합니다. 관리자에서 제거되어 더 이상 관리되지 않지만, 엔티티는 파괴되지 않습니다.'
+    respawn: '현재 선택된 모든 NPC를 리스폰합니다.'
+    select: '동작의 {반환값}을 NPC {ID} 또는 {UUID}로 사용하여 해당 NPC를 선택합니다.'
+    still: '선택된 모든 NPC의 이동을 멈춥니다. {#Move}의 반대입니다.'
+    freeze: '현재 선택된 모든 NPC의 모든 동작을 고정하거나 재개합니다.'
+    tag: '선택된 모든 NPC의 태그를 수정하거나, 제거하거나, 비우거나, 확인합니다.<br>영구 태그를 다루려면 {persistent} 키워드를 사용하세요.<br>영구 태그는 Adyeshach 1.4.21 이상이 필요합니다.'
+    teleport: '선택된 모든 NPC를 지정한 위치로 텔레포트합니다. {#Create}와 동일한 좌표 문법을 사용합니다.'
+    use: '특정 NPC 관리자 또는 임시 관리자를 사용합니다.<br><br>{알려진 것:}<br>public, private'
+    viewer: '동작의 {반환값}을 온라인 플레이어로 하여 선택된 모든 NPC의 뷰어 목록에 추가하거나, 제거하거나, 비웁니다.'
+    modelengine_animation_add: 'ModelEngine 애니메이션을 재생합니다. NPC에 모델이 바인딩되어 있어야 합니다.'
+    modelengine_animation_remove: 'ModelEngine 애니메이션을 제거합니다. NPC에 모델이 바인딩되어 있어야 합니다.'
+    germengine_animation_add: 'GermEngine 애니메이션을 재생합니다. NPC에 모델이 바인딩되어 있어야 합니다.'
+    germengine_animation_remove: 'GermEngine 애니메이션을 제거합니다. NPC에 모델이 바인딩되어 있어야 합니다.'
+    arr-clear: '목록의 모든 요소를 비웁니다.'
+    map-size: 'Map의 항목 수를 가져옵니다. Map이 아니라면 문자열 길이를 가져옵니다.'
+    map-mutable: '가변 맵으로 변환합니다.'
+    map-shuffle: '맵을 섞습니다.'
+    map-reverse: '맵을 뒤집습니다.'
+    map-get: '맵에서 요소를 가져옵니다.'
+    map-put: '맵에 키-값 쌍을 추가합니다.'
+    map-remove: '맵에서 키-값 쌍을 제거합니다.'
+    map-keys: '맵의 키 목록을 가져옵니다.'
+    a-wait: '스크립트 안에서 지정한 시간(초) 동안 기다립니다. 대기 중 플레이어가 접속을 끊으면 스크립트가 종료됩니다.'
+    instance-of: '객체가 지정한 타입의 인스턴스인지 확인합니다. 타입이 존재하지 않으면 false를 반환합니다.'
+    cast: '객체를 지정한 타입으로 캐스팅합니다. 캐스팅에 실패하면 원본 객체를 반환합니다.'
+    get-block-drops: '지정한 블록의 드롭 목록을 가져옵니다. 도구와 파괴한 엔티티를 지정할 수 있습니다.'
+    a-cd: '인챈트 쿨다운을 확인하거나 추가합니다.<br>check: 쿨다운을 확인하며, 선택적으로 플레이어에게 알리고 액션 바로 전송할 수 있습니다<br>add: 쿨다운 시간을 추가합니다'
+    spawn-entity: '지정한 위치에 엔티티를 소환합니다.'
+    real-damage: '엔티티에 고정 피해를 입힙니다.'
+    entity-name: '엔티티의 이름을 가져옵니다. 플레이어는 플레이어 이름을, 그 외에는 커스텀 이름 또는 현지화된 이름을 반환합니다.'
+    remove-entity: '지정한 엔티티를 제거합니다.'
+    add-potion-effect: '엔티티에 포션 효과를 추가합니다.'
+    near-by-entities: '엔티티 주변에 있는 엔티티 목록을 가져옵니다.'
+    a-vec-add: '엔티티에 속도를 더합니다. 안전 모드와 넉백 검사를 활성화할 수 있습니다.'
+    entity-is-behind: '한 엔티티가 다른 엔티티 뒤에 있는지 확인합니다.'
+    launch-arrow: '화살을 발사합니다.'
+    equip-set-item: '엔티티의 장비 아이템을 설정합니다.'
+    equip-get-item: '엔티티의 장비 아이템을 가져옵니다.'
+    build-firework: '지정한 위치에서 폭죽을 생성합니다. 타입(BALL, BALL_LARGE, BURST, CREEPER, STAR), 위력, 반짝임, 잔상, 주 색상, 페이드 색상을 지정할 수 있습니다. 색상은 흔히 쓰는 영어 이름을 받으며, 단일 값 또는 목록으로 지정할 수 있습니다.'
+    detonate-firework: '지정한 폭죽 엔티티를 즉시 폭발시킵니다.'
+    send-lang: '엔티티에게 현지화된 메시지를 보냅니다. 선택적으로 매개변수 배열을 사용할 수 있습니다.'
+    mark: '객체에 메타데이터 마크를 추가합니다.'
+    unmark: '객체의 메타데이터 마크를 제거합니다.'
+    has-mark: '객체에 지정한 메타데이터 마크가 있는지 확인합니다.'
+    set-metadata: '객체에 메타데이터를 설정합니다.'
+    remove-metadata: '객체의 메타데이터를 제거합니다.'
+    has-metadata: '객체에 지정한 메타데이터가 있는지 확인합니다.'
+    get-metadata: '객체의 지정한 인덱스에 있는 메타데이터를 가져옵니다.'
+    give-exp: '플레이어에게 경험치를 지급합니다. 선택적으로 수선(mending)을 적용할 수 있습니다.'
+    a-money: '플레이어의 경제 잔액을 가져옵니다.'
+    take-money: '플레이어에게서 돈을 가져갑니다.'
+    give-money: '플레이어에게 돈을 지급합니다.'
+    has-money: '플레이어가 충분한 돈을 가지고 있는지 확인합니다.'
+    get-vein: '지정한 블록 주변의 광맥을 가져옵니다.'
+    strike-lightning: '지정한 위치에 번개를 칩니다.'
+    create-explosion: '지정한 위치에서 폭발을 일으킵니다. 원인 엔티티, 발화 여부, 블록 파괴 여부를 설정할 수 있습니다.'
+    drop-item: '지정한 위치에 아이템을 떨어뜨립니다. 자연 드롭 방식으로 떨어뜨릴 수도 있습니다.'
+    operation: '등록된 작업(operation)을 실행합니다.'
+    modifiable-var: '인챈트의 수정 가능한 변수 값을 가져옵니다.'
+    modifiable-var-set: '인챈트의 수정 가능한 변수 값을 설정합니다.'
+    arim-weight: '가중치 기반 무작위 선택입니다.'
+    arim-inv: '인벤토리 아이템을 확인합니다.'
+    dungeon: 'DungeonPlus 스크립트를 실행합니다.<br>자세한 내용: https://ersha.gitbook.io/dungeonplus/di-lao/untitled/kether'
+    dungeon-data-area: '던전 구역 안의 플레이어 수를 가져옵니다.'
+    dungeon-data-players: '던전 안의 모든 플레이어를 가져옵니다.'
+    dungeon-data-data: '던전 데이터 값을 가져옵니다.'
+    dungeon-data-mob: '몹의 처치 수를 가져오거나, 처치되었는지 확인합니다.'
+    dungeon-data-world: '던전의 월드 이름을 가져옵니다.'
+    dungeon-data-name: '던전 이름을 가져옵니다.'
+    dungeon-data-options: '던전의 시작 옵션을 가져옵니다.'
+    message: 'Invero 포맷을 지원하여 플레이어에게 메시지를 보냅니다.'
+    invero_money: 'Vault 경제를 제어합니다.'
+    invero_points: 'PlayerPoints 경제를 제어합니다.'
+    connect: '크로스 서버 연결을 수행합니다.'
+    depend: '서버에 지정한 의존성이 있는지 확인합니다. 반환값: true/false'
+    context: 'context /ctx — 메뉴 컨텍스트가 활성화된 상태(즉, 메뉴가 열려 있을 때)에 메뉴 컨텍스트의 변수 데이터를 조작합니다.'
+    persist: '메뉴 컨텍스트와 독립적으로 영구 데이터를 조작합니다.'
+    menu: '메뉴 관련 작업입니다.'
+    icon: '아이콘 작업:<br>relocate<br>update<br>refresh<br>index | sub_index<br>pause_update<br>pause_relocate<br>pause_frames<br>resume_update<br>resume_relocate<br>resume_frames<br>refresh = update (변수 갱신) + relocate (하위 아이콘 재배치)'
+    page: '페이지 패널 작업입니다(페이지가 나뉘는 패널 컨텍스트 필요).'
+    scroll: '스크롤 패널 작업입니다(스크롤 가능한 패널 컨텍스트 필요).'
+    regenerate: '요소 생성기 패널 작업입니다.'
+    storage: '인터랙티브 슬롯 작업입니다(인터랙티브 패널 필요).'
+    node: '노드'
+    item: '아이템을 생성합니다.'
+    item_match: '동작의 {반환값}을 {아이템 패턴}으로 사용하여 플레이어가 해당 아이템을 소지하고 있는지 확인합니다.<br>아이템 패턴은 {TrMenu} 문서를 참조하세요.'
+    metadata: '플레이어의 {메타데이터}를 가져오거나 설정합니다.<br><br>{meta}는 서버 메모리에 임시 저장되고,<br>{data}는 TabooLib의 {LocalPlayer}를 사용해 플레이어 자신의 데이터 파일에 저장됩니다.'
+    trmenu_money: '동작의 {반환값}을 {Vault} 화폐로 사용하여 플레이어가 해당 화폐를 가지고 있는지 확인합니다.'
+    trmenu_playerpoints: '동작의 {반환값}을 {PlayerPoints} 화폐로 사용하여 플레이어가 해당 화폐를 가지고 있는지 확인합니다.'
+    event_cancel: '현재 이벤트를 취소하거나 취소 여부를 설정합니다.'
+    event_wait: '지정한 이벤트를 기다렸다가 커스텀 방식으로 처리합니다.<br>{문법은 여기서 확인:}<br>https://www.yuque.com/lanscarlos/vulpecula-doc/action-event#x7y9W'
+    entity_damage: '엔티티에게 피해를 입힙니다.'
+    entity_potion: '엔티티에 포션 효과를 부여하거나 제거합니다.<br>{문법은 여기서 확인:}<br>https://www.yuque.com/lanscarlos/vulpecula-doc/action-entity#ZzVee'
+    entity_teleport: '엔티티를 지정한 위치로 텔레포트합니다.'
+    regex: '정규 표현식으로 텍스트를 찾거나 치환합니다.<br>{문법은 여기서 확인:}<br>https://www.yuque.com/lanscarlos/vulpecula-doc/action-regex'
+    function_call: '{이 문은 셸 모드에서 아무 작업도 수행하지 않습니다.}<br>main 함수를 포함하여 선언된 모든 함수를 호출합니다. 인수를 지원합니다.'
+    get_cooldown: '{Zaphkiel} 아이템 동작에서:<br>{현재 아이템} 또는 {현재 플레이어}의 쿨다운을 가져옵니다(게임 틱 단위).'
+    update_cooldown: '{Zaphkiel} 아이템 동작에서:<br>동작의 {반환값}을 {현재 아이템} 또는 {현재 플레이어}의 쿨다운(게임 틱 단위)으로 기록합니다.'
+    check_cooldown: '{Zaphkiel} 아이템 동작에서:<br>{현재 아이템} 또는 {현재 플레이어}가 쿨다운 중인지 확인합니다.'
+    effect: '{Zaphkiel} 아이템 동작에서:<br>동작의 {반환값}을 Bukkit 포션 효과로 플레이어에게 적용하거나, 제거하거나, 비웁니다.'
+    item_durability: '{Zaphkiel} 아이템 동작에서:<br>아이템의 현재 내구도를 가져옵니다. {item data durability_current}로 대체할 수 있습니다.'
+    item_durability_operate: '{Zaphkiel} 아이템 동작에서:<br>동작의 {반환값}을 내구도로 사용하여 차감하거나 수리합니다.'
+    item_consume: '{Zaphkiel} 아이템 동작에서: 해당 동작의 아이템을 1개 소모합니다.'
+    item_data: '{Zaphkiel} 아이템 동작에서:<br>아이템의 활성 데이터를 가져오거나 설정합니다.'
+    save: '{Zaphkiel} 아이템 동작에서:<br>캐시를 아이템 스트림에 기록합니다.'
+    build_1: '{Zaphkiel} 아이템 빌드 중:<br>이름 또는 설명의 변수를 수정합니다.'
+    build_2: '{Zaphkiel} 아이템 빌드 중:<br>재질 또는 데이터 값을 수정합니다. 여기서 {data}는 활성 데이터가 아니라 아이템 데이터 값을 의미합니다.'
+
+  ketherSem:
+    all: '모든 조건 {0}'
+    any: '조건 중 하나 {0}'
+    async: '비동기 실행 {0}'
+    await: '{0} 대기'
+    await_all: '모든 작업 {0} 대기'
+    await_any: '작업 중 하나 {0} 대기'
+    call: '{0} 호출'
+    exit: '{0} 종료'
+    goto: '{0}(으)로 점프'
+    if_else: '{0}이(가) 참이면 {1}, 아니면 {2}'
+    not: '{0} 아님'
+    repeat: '{0}회 반복 {1}'
+    sleep: '{0} 동안 대기'
+    while: '{0} 조건 동안 {1} 반복'
+    absorption_amount: '플레이어 흡수량 {0} {1}'
+    action_bar: '액션바 전송 {0}'
+    address: '플레이어 IP 가져오기'
+    allow_flight: '플레이어 비행 허용 {0}'
+    array: '배열 생성 {0}'
+    attack_cooldown: '플레이어 공격 쿨다운 가져오기'
+    bed_spawn: '플레이어 침대 스폰 {0}'
+    'bed_spawn_x,y,z': '플레이어 침대 스폰 {0} 축'
+    blocking: '플레이어 방패 방어 여부'
+    break: '루프 중단'
+    'case & when': '케이스 {0}이(가) {1}과(와) 일치'
+    check: '{0} {1} {2} 검사'
+    color: '색상 코드 변환 {0}'
+    command: '명령어 {0} 실행, 실행자 {1}'
+    compass_target: '플레이어 나침반 대상 {0}'
+    'compass_x,y,z': '플레이어 나침반 {0} 축'
+    conversing: '플레이어 대화 중 여부'
+    date_day: '{0}의 일 가져오기'
+    date_hour: '현재 시'
+    date_minute: '현재 분'
+    date_month: '현재 월'
+    date_second: '현재 초'
+    date_year: '현재 연도'
+    dead: '플레이어 사망 여부'
+    element: '{0}에서 요소 {1} 가져오기'
+    exhaustion: '플레이어 소진 {0} {1}'
+    exp: '플레이어 경험치 {0} {1}'
+    first_played: '플레이어 최초 접속 시간'
+    fly___walk_speed: '플레이어 {0} 속도 {1} {2}'
+    flying: '플레이어 비행 중 {0}'
+    food_level: '플레이어 허기 레벨 {0} {1}'
+    foreach: '{1}의 각 {0}에 대해 {2} 실행'
+    format_time: '시간 {0}을(를) {1} 형식으로 포맷'
+    gamemode: '플레이어 게임모드 {0}'
+    gliding: '플레이어 활공 중 {0}'
+    glowing: '플레이어 발광 {0}'
+    gravity: '플레이어 중력 {0} {1}'
+    health: '플레이어 {0} 체력 {1} {2}'
+    inside_vehicle: '플레이어 탈것 탑승 여부'
+    javascript: 'JS 실행 {0}'
+    join: '목록 {0}을(를) {1}(으)로 연결'
+    jumping: '플레이어 점프 중 {0}'
+    last_played: '플레이어 마지막 {0} 시간'
+    leashed: '엔티티 목줄 착용 여부'
+    level: '플레이어 레벨 {0} {1}'
+    locale: '플레이어 클라이언트 로케일'
+    location: '좌표 생성 {0} {1} {2} {3} yaw {4} pitch {5}'
+    location1: '플레이어 위치 {0}'
+    location_angle: '플레이어 {0} 각도 {1} {2}'
+    'location_x,y,z': '플레이어 {0} {1}'
+    map: '{1}의 요소 {0}에 {2} 적용'
+    math: '수학 연산 {0} {1}'
+    name: '플레이어 {0} 이름'
+    no_damage_tick: '플레이어 무적 틱 {0} {1}'
+    null: '널 (null)'
+    on_guard: '플레이어 착지 여부'
+    op: '플레이어 OP {0}'
+    optional: '옵셔널 {0}, 없으면 {1}'
+    pass: '빈 문자열'
+    pause: '프로그램 일시정지'
+    permission: '권한 검사 {0}'
+    random2: '{0}에서 {1} 사이 무작위 값'
+    range: '{0}부터 {1}까지 {2} 간격 범위'
+    remaining_air: '플레이어 잔여 산소 {0} {1}'
+    riptiding: '플레이어 물살 돌진 여부'
+    round: '{0} 반올림'
+    saturation: '플레이어 포화도 {0} {1}'
+    scale: '{0} 소수점 둘째 자리까지 반올림'
+    size: '{0} 크기 가져오기'
+    sleep_ignored: '플레이어 수면 무시 {0}'
+    sleep_ticks: '플레이어 수면 틱'
+    sleeping: '플레이어 수면 중 여부'
+    sneaking: '플레이어 웅크림 여부'
+    sound: '사운드 재생 {0} 볼륨 {1} 피치 {2}'
+    split: '{0}을(를) {1}(으)로 분할'
+    sprinting: '플레이어 질주 여부'
+    subtitle: '서브타이틀 전송 {0} 페이드 인 {1} 유지 {2} 페이드 아웃 {3}'
+    swimming: '플레이어 수영 중 {0} {1}'
+    switch: '스위치 관찰 대상 {0}'
+    title: '타이틀 전송 {0} 서브타이틀 {1} 페이드 인 {2} 유지 {3} 페이드 아웃 {4}'
+    toast: '토스트 알림 전송 {0} {1} 유형 {2}'
+    warning: '콘솔 경고 {0}'
+    whitelist: '플레이어 화이트리스트 {0}'
+    world: '플레이어 현재 월드'
+    import: '네임스페이스 가져오기 {0}'
+    release: '네임스페이스 해제 {0}'
+    block: '{1}의 블록 좌표 {0} 가져오기'
+    cancel: '현재 동작 취소'
+    ceil: '{0} 올림'
+    close: '대화 종료'
+    distance: '{0}에서 {1}까지 거리'
+    equipment_check: '장비 {0} 검사 (조건 {1}, 개수 {2})'
+    floor: '{0} 내림'
+    inventory_count: '인벤토리 아이템 {0} 개수 세기'
+    inventory_check: '인벤토리 {0} 검사, 개수 {1}'
+    inventory_close: '플레이어 인벤토리 닫기'
+    inventory_slot_check: '인벤토리 슬롯 {0} 검사 (조건 {1}, 개수 {2})'
+    inventory_take: '인벤토리 아이템 {0} 제거, 개수 {1}'
+    max: '최댓값 {0} {1}'
+    min: '최솟값 {0} {1}'
+    mmocore_attribute_point: 'MMOCore 속성 포인트 가져오기'
+    mmocore_class: 'MMOCore 직업 {0} 가져오기'
+    mmocore_level___exp: 'MMOCore {0} 가져오기'
+    mmocore_mana: 'MMOCore 마나 가져오기'
+    mmocore_skill_point: 'MMOCore 스킬 포인트 가져오기'
+    mmocore_stamina: 'MMOCore 스태미나 가져오기'
+    mythicmobs_cast: 'MythicMobs 스킬 {0} 시전, 트리거 {1}'
+    origin: 'NPC 원점 위치 가져오기'
+    particle_normal: '파티클 재생 {0} {1} {2} 본인만 표시 {3}'
+    position: '위치가 지역 {0} 내인지 검사'
+    profile_level: '플레이어 프로필 레벨 {0} {1} {2} {3}'
+    quest_group_check: '퀘스트 그룹 {0} 검사 {1}'
+    quest_check: '퀘스트 검사 {0}'
+    quest_control: '퀘스트 제어 {0}'
+    quest_progress: '퀘스트 진행도 {0} 가져오기, 퀘스트 {1}'
+    quest_select: '퀘스트 선택 {0}'
+    quest_stats: '퀘스트 통계 {0}, 퀘스트 {1}'
+    quest_tasks: '모든 퀘스트 항목 가져오기'
+    quest_this: '현재 퀘스트/항목 가져오기'
+    quest_track: '현재 퀘스트 추적'
+    quest_tracking: '추적 중인 퀘스트 가져오기'
+    quests: '활성 퀘스트 목록 가져오기'
+    schematic: '스키매틱 붙여넣기 {0} {1} {2} 회전 {3} 공기 무시 {4}'
+    script: '스크립트 {0} {1}'
+    skillapi_attribute_point: 'SkillAPI 속성 {0} 가져오기'
+    skillapi_cast: 'SkillAPI 스킬 {0} 시전'
+    skillapi_class: 'SkillAPI 직업 {0} 가져오기'
+    skillapi_exp: 'SkillAPI 경험치 {0} 가져오기'
+    skillapi_level: 'SkillAPI 레벨 가져오기'
+    skillapi_mana: 'SkillAPI 마나 가져오기'
+    skillapi_skill_point: 'SkillAPI 스킬 포인트 가져오기'
+    talk: 'NPC 대화 {0}'
+    trigger: '퀘스트 트리거 {0}'
+    ui: 'UI 진행도 {0} {1}, 제외 {2}'
+    wizard: '위저드 {0}'
+    workflow_fetch: '오프라인 보상 {0} {1}'
+    animation: '애니메이션 재생 {0}'
+    controller: '컨트롤러 {0} {1}'
+    create: 'NPC 생성 {0} {1}, 위치 {2}'
+    delete: 'NPC 삭제 및 파괴'
+    destroy: 'NPC 파괴'
+    look: 'NPC 시선 X {0} Y {1} Z {2} 부드럽게 {3}'
+    move: 'NPC 이동 X {0} Y {1} Z {2} 상대 {3}'
+    passenger: '탑승자 {0} {1}'
+    remove: 'NPC 제거'
+    respawn: 'NPC 리스폰'
+    select: 'NPC 선택 {0}, 기준 {1}'
+    still: '이동 정지'
+    freeze: 'NPC 고정 {0}'
+    tag: '{0} {1}에 태그 {2} 지정'
+    teleport: 'NPC를 {0}(으)로 텔레포트'
+    use: 'NPC 관리자 사용 {0}, 임시 {1}'
+    viewer: '뷰어 {0} {1}'
+    modelengine_animation_add: 'ModelEngine 애니메이션 추가 {0} {1} {2} 비동기 {3}'
+    modelengine_animation_remove: 'ModelEngine 애니메이션 제거 {0}, lerp 무시 {1}'
+    germengine_animation_add: 'GermEngine 애니메이션 전송 {0}'
+    germengine_animation_remove: 'GermEngine 애니메이션 제거 {0}'
+    arr-clear: '배열 비우기 {0}'
+    map-mutable: '가변 맵으로 변환 {0}'
+    map-shuffle: '맵 섞기 {0}'
+    map-reverse: '맵 순서 뒤집기 {0}'
+    map-get: '맵 {1}에서 키 {0} 가져오기'
+    map-put: '맵 {2}에 키 {0}, 값 {1} 넣기'
+    map-remove: '맵 {1}에서 키 {0} 제거'
+    map-keys: '맵 {0}의 모든 키 가져오기'
+    instance-of: '{0}이(가) {1}의 인스턴스인지 검사'
+    cast: '{0}을(를) {1}(으)로 형변환'
+    get-block-drops: '블록 드롭 {0} 가져오기, 도구 {1}, 채굴자 {2}'
+    spawn-entity: '엔티티 {0}을(를) {1}에 소환'
+    real-damage: '진피해 {0}, 양 {1}, 출처 {2}'
+    entity-name: '엔티티 이름 {0} 가져오기'
+    remove-entity: '엔티티 {0} 제거'
+    add-potion-effect: '포션 효과 {0} 추가, 대상 {1}, 지속 시간 {2}, 레벨 {3}, 은은한 효과 {4}, 파티클 {5}, 아이콘 {6}'
+    near-by-entities: '주변 엔티티 {0}, 반경 {1} {2} {3}'
+    a-vec-add: '속도 {0} 추가, 대상 {1}, 안전 모드 {2}, 넉백 검사 {3}'
+    entity-is-behind: '엔티티 {0}이(가) {1} 뒤에 있는지'
+    launch-arrow: '화살 발사 {0}, 속도 {1}'
+    equip-set-item: '장비 설정 {0}, 슬롯 {1}, 대상 {2}'
+    equip-get-item: '{1}의 장비 슬롯 {0} 가져오기'
+    build-firework: '폭죽 생성 {0}, 유형 {1}, 위력 {2}, 깜빡임 {3}, 잔상 {4}, 주 색상 {5}, 페이드 색상 {6}'
+    detonate-firework: '폭죽 폭발 {0}'
+    send-lang: '현지화 메시지 {0} 전송, 대상 {1}, 인자 {2}'
+    mark: '{1}에 표식 {0} 추가'
+    unmark: '{1}에서 표식 {0} 제거'
+    give-exp: '경험치 {0} 지급, 대상 {1}, 수선 {2}'
+    take-money: '돈 차감 {0} {1}'
+    give-money: '돈 지급 {0} {1}'
+    has-money: '돈 보유 여부 {0} {1}'
+    get-vein: '광맥 {0} 가져오기, 최대 개수 {1}'
+    create-explosion: '폭발 생성 {0}, 위력 {1}, 출처 {2}, 불 {3}, 블록 파괴 {4}'
+    drop-item: '아이템 드롭 {0}, 위치 {1}, 자연 드롭 {2}'
+    operation: '연산 실행 {0}, 인자 {1}'
+    modifiable-var: '수정 가능한 변수 {0} 아이템 이름 가져오기'
+    modifiable-var-set: '수정 가능한 변수 {0} 아이템 이름 값 {1} 설정'
+    dungeon: '던전 스크립트 {0} {1}, 인자 {2}, 지역 {3}'
+    dungeon-data-area: '던전 지역 {0} {1}'
+    dungeon-data-players: '던전 내 플레이어'
+    dungeon-data-data: '던전 데이터 {0}'
+    dungeon-data-mob: '던전 몬스터 {0} {1}'
+    dungeon-data-world: '던전 월드 이름'
+    dungeon-data-name: '던전 이름'
+    dungeon-data-options: '던전 옵션 {0}'
+    message: 'Invero 메시지 전송 {0}'
+    invero_money: '경제 {0} {1}'
+    invero_points: '포인트 {0} {1}'
+    connect: '서버 간 이동 {0}, 플레이어 {1}'
+    depend: '의존성 검사 {0}'
+    context: '메뉴 컨텍스트 {0} {1}'
+    persist: '영구 데이터 {0} {1} 범위 {2}'
+    menu: '메뉴 작업 {0} {1}'
+    icon: '아이콘 작업 {0} {1}'
+    page: '페이지 작업 {0}'
+    scroll: '스크롤 작업 {0}'
+    regenerate: '재생성 {0}, 필터 {1}, 정렬 {2}'
+    storage: '인터랙티브 슬롯 {0} {1}'
+    node: '노드 {0}, 인자 {1}'
+    item: '아이템 생성 {0}, 소스 {1}, 개수 {2}'
+    item_match: '아이템 매칭 {0}'
+    trmenu_money: '돈 검사 {0}'
+    trmenu_playerpoints: '포인트 검사 {0}'
+    variable: 'TrMenu 변수 파싱 {0}'
+    event_cancel: '이벤트 취소 {0}'
+    event_wait: '이벤트 대기 {0} {1} {2}'
+    entity_damage: '엔티티 피해 {0}, 양 {1}, 출처 {2}'
+    entity_potion: '엔티티 포션 {0} {1} {2}'
+    entity_teleport: '엔티티 {0}을(를) {1}(으)로 텔레포트'
+    regex: '정규식 {0} {1} {2}'
+    function_call: '함수 호출 {0}, 인자 {1}'
+    get_cooldown: 'ZAP 쿨다운 {0} 가져오기'
+    update_cooldown: 'ZAP 쿨다운 {0} 설정, 대상 {1}'
+    check_cooldown: 'ZAP 쿨다운 {0} 검사'
+    effect: 'ZAP 포션 효과 {0} {1} {2} {3}'
+    item_durability: 'ZAP 아이템 내구도 가져오기'
+    item_durability_operate: 'ZAP 아이템 {0} {1}'
+    item_consume: 'ZAP 아이템 소모'
+    item_data: 'ZAP 아이템 데이터 {0}, 값 {1}'
+    save: 'ZAP 아이템 저장'
+    build_1: 'ZAP 아이템 이름/설명 구성 {0} {1}, 형식 {2}'
+    build_2: 'ZAP 아이템 아이콘/데이터 구성 {0} {1}'
+  objective:
+    'player fish': '플레이어 낚시 / 물고기 상태, 아이템 종류, 경험치 등 조건 지원 / 낚시 시도 횟수 카운트'
+    'player chat': '플레이어가 채팅 메시지 전송 / 메시지 내용, 위치 등 조건 지원 / 채팅 메시지 카운트'
+    'change world': '플레이어가 월드를 이동 / 출발 월드, 도착 월드, 위치 등 조건 지원 / 월드 이동 횟수 카운트'
+    'player kill': '플레이어가 엔티티를 처치 / 무기, 피해자 종류 등 조건 지원 / 처치 횟수 카운트'
+    'food change': '플레이어의 허기가 변할 때 트리거 / 허기 값, 음식 종류 등 조건 지원 / 총 허기 변화량 카운트'
+    'item break': '플레이어의 도구나 방어구 내구도가 다할 때 트리거 / 아이템 종류, 위치 등 조건 지원 / 파손된 아이템 카운트'
+    'custom level': '플레이어의 커스텀 레벨이 요구치를 충족하는지 검사 / 위치, 레벨 ID, 레벨 값 등 조건 지원 / Chemdah 레벨 시스템용'
+    'player move': '플레이어가 이동 / 시작 위치, 도착 위치 등 조건 지원 / 이동 횟수 카운트'
+    'block interact': '플레이어가 블록과 상호작용 / 블록 종류, 상호작용 유형, 방향, 손에 든 아이템 등 조건 지원 / 상호작용 횟수 카운트'
+    'entity tame': '플레이어가 엔티티를 길들임 / 엔티티 종류, 위치 등 조건 지원 / 길들인 엔티티 카운트'
+    'horse jump': '플레이어가 말을 타고 점프할 때 트리거 / 점프 강도, 말 종류 등 조건 지원 / 점프 횟수 카운트'
+    'block break': '플레이어가 블록을 파괴 / 블록 종류, 위치, 드롭 등 조건 지원 / 파괴한 블록 카운트'
+    'bucket fill': '플레이어가 양동이에 액체를 채움 / 위치, 블록 종류, 아이템 등 조건 지원 / 채우기 횟수 카운트'
+    'bucket empty': '플레이어가 양동이의 액체를 비움 / 위치, 블록 종류, 아이템 등 조건 지원 / 비우기 횟수 카운트'
+    'item consume': '플레이어가 아이템을 소비할 때 트리거 / 음식, 포션 등 소비형 아이템 지원 / 소비한 아이템 카운트'
+    'pickup exp': '플레이어가 경험치 구슬을 주울 때 트리거 / 경험치 양, 원인 등 조건 지원 / 획득한 총 경험치 카운트'
+    'player teleport': '플레이어가 텔레포트 / 시작 위치, 도착 위치, 텔레포트 원인 등 조건 지원 / 텔레포트 횟수 카운트'
+    always: '매 게임 틱마다 조건 검사 / 항상 충족되는 조건이 필요한 시나리오용 / 이벤트 트리거 없이 주기적으로 자동 검사'
+    'shoot bow': '플레이어가 활을 쏨 / 활 종류, 장전 강도, 소모한 아이템 등 조건 지원 / 발사 횟수 카운트'
+    'player animation': '플레이어가 애니메이션을 재생할 때 트리거 / 애니메이션 종류 등 조건 지원 / 재생 횟수 카운트'
+    'player attack': '플레이어가 엔티티를 공격 / 대상 엔티티, 무기, 피해량 등 조건 지원 / 공격 횟수 카운트'
+    'player damage by entity': '플레이어가 엔티티 공격으로 피해를 입음 / 공격자 엔티티, 무기, 피해량 등 조건 지원 / 피격 횟수 카운트'
+    'entity interact': '플레이어가 엔티티를 우클릭 / 엔티티 종류, 위치, 손에 든 아이템 등 조건 지원 / 상호작용 횟수 카운트'
+    'bed enter': '플레이어가 침대에 들어감 / 침대 위치, 블록 종류, 원인 등 조건 지원 / 사용 횟수 카운트'
+    'player anvil': '플레이어가 모루를 사용할 때 트리거 / 이름 변경 텍스트, 수리 비용, 결과 아이템 등 조건 지원 / 사용 횟수 카운트'
+    'portal exit': '플레이어가 포탈을 벗어날 때 트리거 / 도착 위치, 시작 위치 등 조건 지원 / 이탈 횟수 카운트'
+    never: '절대 완료될 수 없는 목표 / 플레이스홀더나 특수 로직용 / 항상 false 반환'
+    'pickup arrow': '플레이어가 화살을 주울 때 트리거 / 화살 종류, 개수 등 조건 지원 / 획득한 총 화살 카운트'
+    'entity breed': '플레이어가 동물을 번식시킴 / 동물 종류, 부모, 번식 아이템 등 조건 지원 / 번식 횟수 카운트'
+    'player jump': '플레이어가 점프 / 위치 등 조건 지원 / 점프 횟수 카운트'
+    'player permission': '플레이어가 특정 권한을 가지고 있는지 검사 / 권한 상태를 주기적으로 검사 / 권한이 동적으로 변경되는 시나리오용'
+    'player statistic': '플레이어 통계가 변경될 때 트리거 / 통계 종류, 엔티티 종류, 블록 종류, 값 등 조건 지원 / 증가 횟수 카운트'
+    'entity combust': '플레이어가 엔티티를 태움 / 엔티티 종류, 위치 등 조건 지원 / 발화 횟수 카운트'
+    'player damage by block': '플레이어가 블록으로 피해를 입음 / 블록 종류, 피해량, 위치 등 조건 지원 / 피격 횟수 카운트'
+    'pickup item': '플레이어가 드롭된 아이템을 주울 때 트리거 / 줍은 아이템의 스택 크기 자동 카운트 / 아이템, 개수, 위치 등 조건 지원'
+    'criterion grant': '플레이어가 발전과제 조건을 달성할 때 트리거 (Paper 서버 필요) / 발전과제 ID, 조건 이름 등 조건 지원 / 달성 횟수 카운트'
+    'entity dismount': '플레이어가 엔티티에서 내림 / 엔티티 종류, 위치 등 조건 지원 / 하차 횟수 카운트'
+    'player data': '플레이어의 영구 데이터 값을 검사 / 이벤트 기반 및 주기 검사 모드 모두 지원 / 퀘스트 간 데이터 공유 및 검사용'
+    'exp change': '플레이어가 경험치를 획득 / 경험치 양, 출처 엔티티, 위치 등 조건 지원 / 총 경험치 카운트'
+    'player shear': '플레이어가 양을 가위질함 / 엔티티 종류, 가위 종류, 사용한 손 등 조건 지원 / 가위질 횟수 카운트'
+    'block ignite': '플레이어가 블록을 태움 / 블록 종류, 발화 원인, 위치 등 조건 지원 / 발화 횟수 카운트'
+    'item held': '플레이어가 핫바에서 손에 든 아이템을 전환할 때 트리거 / 이전/새 아이템, 이전/새 슬롯 등 조건 지원 / 전환 횟수 카운트'
+    'entity mount': '플레이어가 엔티티를 탑승 / 엔티티 종류, 위치 등 조건 지원 / 탑승 횟수 카운트'
+    'craft item': '플레이어가 제작대에서 아이템을 제작 / 아이템, 레시피 재료, 위치 등 조건 지원 / 일괄 제작 카운트 지원'
+    'drop item': '플레이어가 아이템을 버릴 때 트리거 / 아이템, 개수, 위치 등 조건 지원 / 버린 아이템 카운트'
+    'armor change': '플레이어가 방어구 장비를 변경 (Paper 서버 필요) / 장비 슬롯, 아이템 등 조건 지원 / 변경 횟수 카운트'
+    'portal enter': '플레이어가 포탈에 들어갈 때 트리거 / 포탈 위치 등 조건 지원 / 진입 횟수 카운트'
+    'enchant item': '플레이어가 인챈트 테이블에서 아이템을 인챈트할 때 트리거 / 아이템, 인챈트 종류, 경험치 비용 등 조건 지원 / 인챈트 횟수 카운트'
+    'block place': '플레이어가 블록을 설치 / 블록 종류, 위치, 손에 든 아이템 등 조건 지원 / 설치 횟수 카운트'
+    'player damage': '플레이어가 피해를 입음 / 피해 유형, 피해량, 위치 등 조건 지원 / 피격 횟수 카운트'
+    'player respawn': '플레이어가 리스폰 / 리스폰 위치, 리스폰 유형 (침대/리스폰 앵커) 등 조건 지원 / 리스폰 횟수 카운트'
+    'player real move': '플레이어가 실제로 한 블록 이상 이동할 때 트리거 / 도착 위치, 시작 위치 등 조건 지원 / 이동 횟수 카운트'
+    'player inventory': '플레이어 인벤토리의 아이템을 검사하거나 소모 / 위치, 아이템 종류, 개수, 소모 여부 등 조건 지원 / 아이템 수집 또는 소모 퀘스트용'
+    'block farm': '플레이어가 괭이로 농경지를 갈음 / 블록 종류, 위치, 괭이 종류 등 조건 지원 / 경작 횟수 카운트'
+    'player conversation': '플레이어가 옵션으로 응답하여 대화를 종료 / 위치, 대화 ID 등 조건 지원 / Chemdah 내장 대화 시스템용'
+    'item mend': '플레이어의 아이템이 수선될 때 트리거 / 수선된 아이템 종류, 수선량 등 조건 지원 / 총 수선량 카운트'
+    'player conversation refused': '플레이어가 대화를 포기하거나 거절 / 위치, 대화 ID 등 조건 지원 / Chemdah 내장 대화 시스템용'
+    'player toggle flight': '플레이어가 비행을 켜거나 끌 때 트리거 / 비행 상태 등 조건 지원 / 전환 횟수 카운트'
+    'furnace extract': '플레이어가 화로에서 아이템을 꺼낼 때 트리거 / 꺼낸 양 자동 카운트 / 아이템, 경험치, 위치 등 조건 지원'
+    'player conversation closed': '플레이어가 대화를 정상적으로 종료 / 위치, 대화 ID 등 조건 지원 / Chemdah 내장 대화 시스템용'
+    'item interact': '플레이어가 아이템으로 상호작용할 때 트리거 / 우클릭, 좌클릭 등 지원 / 손에 든 슬롯과 상호작용 유형 검사 가능'
+    trigger: '외부 명령어나 스크립트로 수동 트리거 / 커스텀 트리거 값 매칭 지원 / 다른 시스템과의 연동용'
+    'bed leave': '플레이어가 침대에서 일어남 / 침대 위치, 블록 종류 등 조건 지원 / 이탈 횟수 카운트'
+    'level change': '플레이어 레벨이 변경 / 레벨 차이, 새 레벨, 이전 레벨 등 조건 지원 / 레벨업 횟수 카운트'
+    'player swap hand': '플레이어가 F 키로 주/부 손 아이템을 교체할 때 트리거 / 주 손과 부 손 아이템 등 조건 지원 / 교체 횟수 카운트'
+    'pressure plate': '플레이어가 압력판을 밟을 때 트리거 / 압력판 위치와 종류 등 조건 지원 / 밟은 횟수 카운트'
+    'quest data': '퀘스트 영구 데이터 값을 검사 / 이벤트 기반 및 주기 검사 모드 모두 지원 / 퀘스트 내 데이터 공유 및 검사용'
+    'health regain': '플레이어의 체력이 회복될 때 트리거 / 회복량, 원인 등 조건 지원 / 총 회복량 카운트'
+    'player resurrect': '플레이어가 불사 토템으로 부활할 때 트리거 / 사용한 아이템 종류 등 조건 지원 / 부활 횟수 카운트'
+    'player advancement': '플레이어가 발전과제를 달성 / 발전과제 ID, 위치 등 조건 지원 / 달성 횟수 카운트'
+    'player command': '플레이어가 명령어를 실행 / 명령어 내용, 위치 등 조건 지원 / 명령어 실행 횟수 카운트'
+    'edit book': '플레이어가 책을 편집하거나 서명할 때 트리거 / 서명 여부, 페이지, 제목, 내용 등 조건 지원 / 편집 횟수 카운트'
+    'player death': '플레이어가 사망 / 공격자, 무기, 사망 메시지 등 조건 지원 / 사망 횟수 카운트'
+    'anpc interact': 'Adyeshach NPC와 상호작용 / NPC ID, 종류, 위치, 손에 든 아이템, 주/부 손 등 조건 지원 / Adyeshach 플러그인 필요'
+    'anpc damage': 'Adyeshach NPC에게 피해를 입힘 / NPC ID, 종류, 위치, 사용한 아이템 등 조건 지원 / Adyeshach 플러그인 필요'
+    'mythicmobs kill': 'MythicMobs 몬스터를 처치 / 몬스터 이름, 레벨, 위치 등 조건 지원 / MythicMobs 플러그인 필요'
+    'placeholder api': 'PlaceholderAPI 변수 값 가져오기 / 모든 PAPI 변수 지원 / PlaceholderAPI 플러그인 필요'
+  objectiveLabel:
+    'player fish': '플레이어 낚시'
+    'player chat': '플레이어 채팅'
+    'change world': '월드 이동'
+    'player kill': '엔티티 처치'
+    'food change': '허기 변화'
+    'item break': '아이템 파손'
+    'custom level': '커스텀 레벨'
+    'player move': '플레이어 이동'
+    'block interact': '블록 상호작용'
+    'entity tame': '엔티티 길들이기'
+    'horse jump': '말 점프'
+    'block break': '블록 파괴'
+    'bucket fill': '양동이 채우기'
+    'bucket empty': '양동이 비우기'
+    'item consume': '아이템 소비'
+    'pickup exp': '경험치 획득'
+    'player teleport': '플레이어 텔레포트'
+    always: '항상'
+    'shoot bow': '활 쏘기'
+    'player animation': '플레이어 애니메이션'
+    'player attack': '플레이어 공격'
+    'player damage by entity': '엔티티로부터 피해'
+    'entity interact': '엔티티 상호작용'
+    'bed enter': '침대 사용'
+    'player anvil': '모루 사용'
+    'portal exit': '포탈 이탈'
+    never: '없음'
+    'pickup arrow': '화살 줍기'
+    'entity breed': '엔티티 번식'
+    'player jump': '플레이어 점프'
+    'player permission': '플레이어 권한'
+    'player statistic': '플레이어 통계'
+    'entity combust': '엔티티 발화'
+    'player damage by block': '블록으로부터 피해'
+    'pickup item': '아이템 줍기'
+    'criterion grant': '조건 달성'
+    'entity dismount': '엔티티 하차'
+    'player data': '플레이어 데이터'
+    'exp change': '경험치 변화'
+    'player shear': '양 가위질'
+    'block ignite': '블록 발화'
+    'item held': '아이템 전환'
+    'entity mount': '엔티티 탑승'
+    'craft item': '아이템 제작'
+    'drop item': '아이템 버리기'
+    'armor change': '방어구 변경'
+    'portal enter': '포탈 진입'
+    'enchant item': '아이템 인챈트'
+    'block place': '블록 설치'
+    'player damage': '플레이어 피해'
+    'player respawn': '플레이어 리스폰'
+    'player real move': '실제 이동'
+    'player inventory': '플레이어 인벤토리'
+    'block farm': '농경지 경작'
+    'player conversation': '플레이어 대화'
+    'item mend': '아이템 수선'
+    'player conversation refused': '대화 거절'
+    'player toggle flight': '비행 전환'
+    'furnace extract': '화로 꺼내기'
+    'player conversation closed': '대화 종료'
+    'item interact': '아이템 상호작용'
+    trigger: '트리거'
+    'bed leave': '침대 나오기'
+    'level change': '레벨 변화'
+    'player swap hand': '손 교체'
+    'pressure plate': '압력판'
+    'quest data': '퀘스트 데이터'
+    'health regain': '체력 회복'
+    'player resurrect': '플레이어 부활'
+    'player advancement': '플레이어 발전과제'
+    'player command': '플레이어 명령어'
+    'edit book': '책 편집'
+    'player death': '플레이어 사망'
+    'anpc interact': 'Adyeshach NPC 상호작용'
+    'anpc damage': 'Adyeshach NPC 피해'
+    'mythicmobs kill': 'MythicMobs 처치'
+    'placeholder api': 'PlaceholderAPI'
+  addon:
+    automation: '퀘스트 시작 흐름 자동화 / 40틱마다 온라인 플레이어를 확인하여 자동 수락 및 예약 퀘스트 처리'
+    ui: 'UI에서 퀘스트 표시 방식 구성 / 퀘스트 표시 여부, 아이콘, 설명 제어'
+    depend: '퀘스트 선행 조건 설정 / 단일 퀘스트 및 퀘스트 그룹 의존성 지원 / 항목 간 의존성 지원 / 문자열, 목록 또는 쉼표·세미콜론으로 구분된 문자열 사용 가능'
+    stats: '퀘스트 및 항목 진행도 표시 / BossBar 진행 바, 커스텀 스타일, 스크립트 계산 지원 / 임시 또는 영구 표시로 구성 가능'
+    restart: '퀘스트 재시작 가능 여부 제어 / Kether 스크립트로 재시작 조건 정의'
+    track: '퀘스트 목표 위치 추적 및 경로 안내 제공 / 비콘, 랜드마크, 내비게이션, 스코어보드 표시 지원 / 플레이어는 한 번에 하나의 퀘스트만 추적 가능'
+    party: '퀘스트 파티 기능 관리 / 퀘스트 공유, 협동 완료, 인원 제한 지원 / 팀 던전, 다인 협동 등에 사용'
+    timeout: '퀘스트 시간 제한 설정 / 고정 기간 및 주기적 시점 지원'
+    reset-data-on-accepted: '퀘스트 수락 시 특정 데이터 초기화 여부 제어 / IPlayerData 인터페이스를 구현한 항목에만 적용 / 카운트, 진행도, 상태 데이터 초기화용'
+    optional: '퀘스트 항목을 선택 사항으로 표시 / 선택 항목은 퀘스트 완료에 영향을 주지 않음 / 보너스 보상, 사이드 퀘스트 등에 사용'
+    control: '다양한 퀘스트 제한 관리 / 동시 보유, 반복, 쿨다운 제한 및 스크립트 프록시 지원 / Map 목록으로 구성하며 각 Map이 하나의 제한 규칙'
+  addonLabel:
+    automation: '퀘스트 자동화'
+    ui: '퀘스트 UI'
+    depend: '퀘스트 의존성'
+    stats: '퀘스트 통계'
+    restart: '퀘스트 재시작'
+    track: '퀘스트 추적'
+    party: '퀘스트 파티'
+    timeout: '퀘스트 시간 제한'
+    reset-data-on-accepted: '수락 시 데이터 초기화'
+    optional: '선택 항목'
+    control: '퀘스트 제어'
+  hook:
+    accepted: '퀘스트 수락 후 실행'
+    accept: '퀘스트 수락 전 실행 (false 반환 시 취소)'
+    accept_cancelled: '퀘스트 수락 취소 후 실행'
+    complete: '퀘스트 완료 전 실행 (false 반환 시 취소)'
+    completed: '퀘스트 완료 후 실행'
+    fail: '퀘스트 실패 전 실행'
+    failed: '퀘스트 실패 후 실행'
+    restart: '퀘스트 초기화 전 실행'
+    restarted: '퀘스트 초기화 후 실행'
+    continued: '퀘스트 항목 계속 진행 후 실행'
+  scope:
+    '@ all': '모든 범위 유형'
+    '@ party': '파티 범위'
+    '@ custom': '커스텀 범위'
+
+tips:
+  - "훌륭한 소고기 감자요리를 만드는 중..."
+  - "8센트짜리 비행기를 날리는 중..."
+  - "《블록코프 탈출》을 준비하는 중..."
+  - "퀘스트 작성 중..."
+  - "✶ Thinking..."
+  - "백만 팬 라이브 방송을 준비하는 중..."
+  - "AmeChan과 바다를 보러 가는 중..."
+  - "통증 쇼크..."
+  - "zero에게 작별을 고하는 중..."
+  - "혼란을 바로잡고 함께 앞으로 나아가는 중..."
+  - "일본 생콜라를 통채로 마시는 중..."
+  - "부랴트 반란을 해결하는 중..."
+  - "만중일심..."
+  - "대아시아 전쟁을 일으키는 중..."
+  - "리튬카본 서방정을 복용하는 중..."
+  - "천사처럼 미소 짓는 중..."
+  - "프리 서버 조직을 만드는 중..."
+  - "손에는 쿤진카오를 들고 입으로는 탕탕탕을 외치는 중..."
+
+checks:
+  title: "설정 검사"
+  subtitle: "Debug · 프로젝트의 모든 설정 문제"
+  scan: "다시 검사"
+  scanning: "검사 중…"
+  search: "메시지 / 파일 / 항목 / 키 검색…"
+  noProject: "먼저 에디터에서 프로젝트 폴더(또는 설정 파일)를 연 뒤 이 창을 열어 주세요."
+  empty: "발견된 문제가 없습니다."
+  emptyFiltered: "현재 필터에 일치하는 문제가 없습니다."
+  stats: "{files}개 설정 파일 검사 완료 · 문제 {total}개"
+  statsProgress: "검사 중 {done}/{files}…"
+  groupBy: "파일별로 그룹화"
+  expandAll: "모두 펼치기"
+  collapseAll: "모두 접기"
+  openInEditor: "에디터에서 열기"
+  copyAll: "모두 복사"
+  copied: "클립보드에 복사됨"
+  close: "닫기"
+  colMessage: "문제"
+  colLocation: "위치"
+  severity: "심각도"
+  line: "{n}번째 줄"
+  notCE: "CraftEngine 파일이 아님(YAML 문법만 검사)"
+  assetsIndex: "에셋 인덱스: {state}"
+  assetsReady: "준비됨 · {ns}개 네임스페이스"
+  assetsOff: "비활성화됨"
+
+diagnostics:
+  title: "설정 점검"
+  openPanel: "설정 점검 패널 열기"
+  summary: "ERROR {e} · WARN {w} · WEAK {k} · INFO {i}"
+  noIssues: "발견된 문제 없음 ✓"
+  allFiltered: "현재 필터에 일치하는 문제가 없습니다"
+  yamlSyntax: "YAML 문법 오류: {msg}"
+  yamlTab: "YAML은 탭 들여쓰기를 허용하지 않습니다 — 공백을 사용하세요"
+  strippedTags: "알 수 없는 !! 타입 태그 {n}개를 무시했습니다(CraftEngine은 지원하지 않음)"
+  unknownSection: "최상위 섹션 \"{key}\"은(는) 알려진 목록에 없습니다 — CraftEngine이 무시할 수 있습니다"
+  aliasSection: "최상위 섹션 \"{key}\"은(는) 별칭입니다. CraftEngine은 인식하지만 표준 표기는 \"{canon}\"입니다"
+  badEntryId: "항목 ID \"{id}\"에 허용되지 않는 문자가 있습니다(영문/숫자/밑줄/하이픈/점만 허용)"
+  badEntryIdNs: "항목 ID \"{id}\"은(는) 유효한 namespace:path 형식이 아닙니다"
+  unknownNamespace: "네임스페이스 \"{ns}\"이(가) 스캔된 리소스팩에 없습니다"
+  entryNotMap: "항목 본문이 매핑이 아닙니다 — CraftEngine은 설정 객체를 기대합니다"
+  emptySection: "섹션 \"{key}\"이(가) 비어 있습니다"
+  unknownKey: "인식되지 않은 키 \"{key}\": CraftEngine 키 레지스트리와 에디터 스키마에 없습니다. 사용자 정의/확장 필드라면 무시해도 됩니다"
+  unknownType: "인식되지 않은 타입 \"{type}\": CraftEngine 타입 레지스트리에 없습니다"
+  notNumber: "\"{label}\"은(는) 숫자여야 하지만 현재 {value}입니다"
+  notBool: "\"{label}\"은(는) true/false여야 하지만 현재 {value}입니다"
+  notInOptions: "\"{label}\"의 값 {value}은(는) 에디터가 나열한 옵션에 없습니다(CraftEngine은 다른 값도 허용)"
+  expectList: "\"{label}\"은(는) 보통 문자열 목록이지만 현재는 매핑입니다"
+  expectMap: "\"{label}\"은(는) 보통 키/값 매핑이지만 현재는 {actual}입니다"
+  expectScalar: "\"{label}\"은(는) 에디터 스키마에서 텍스트이지만 현재는 {actual}입니다"
+  premium: "\"{key}\"은(는) 유료 전용 기능입니다"
+  legacyKey: "\"{key}\"은(는) 구식 키입니다. 새 표기는 \"{new}\"이며 둘 다 있으면 충돌할 수 있습니다"
+  emptyValue: "\"{key}\"은(는) 빈 문자열이며, 설정하지 않은 것과 같습니다"
+  cmdDuplicate: "custom_model_data {n}이(가) 항목 \"{other}\"과(와) 중복됩니다 — 둘 다 같은 모델로 렌더링됩니다"
+  unknownRef: "알 수 없는 {label} ID: {id} (바닐라 레지스트리에 없음)"
+  unknownGlobal: "정의되지 않은 전역 변수 <global:{id}>"
+  unknownImage: "정의되지 않은 이미지 <image:{id}> (images 섹션에 해당 항목 없음)"
+  imageCellOutOfRange: "이미지 셀이 범위를 벗어났습니다: {id}의 그리드는 {rows}행 × {cols}열인데 {row}행 {col}열이 참조되었습니다"
+  materialDefault: "material이 설정되지 않았습니다 — config.yml의 기본 재질이 사용됩니다"
+  imageFileRequired: "images 항목에 file이 없습니다(또는 ref로 기존 이미지를 참조하세요)"
+  imageHeightAscent: "height({h})는 ascent({a}) 이상이어야 합니다 — 그렇지 않으면 Minecraft가 글꼴 정의를 거부합니다"
+  badGridSize: "grid_size는 \"행,열\" 형식이어야 합니다(예: 2,3)"
+  charsRowMismatch: "chars의 모든 행 길이가 같아야 합니다(1행은 {n}자, {row}행은 {m}자)"
+  imageFileExt: "file에 .png 확장자가 없습니다. 플러그인이 자동으로 붙입니다"
+  emojiKeywords: "이 emoji 항목에는 keywords가 없어 플레이어가 키워드로 트리거할 수 없습니다"
+  emojiContent: "이 emoji 항목에는 image도 content/template도 없어 아무것도 표시되지 않습니다"
+  emojiScene: "장면 \"{scene}\"은(는) 에디터 목록에 없습니다(일반: chat/book/anvil/sign/command)"
+  badAutoState: "auto_state 그룹 \"{name}\"이(가) 존재하지 않습니다(CraftEngine은 해당 상태 그룹을 무시합니다)"
+  autoStateId: "확장 형태의 auto_state에는 id도 함께 제공해야 합니다. 그렇지 않으면 블록마다 별도의 상태 그룹을 갖게 됩니다"
+  propTypeMissing: "블록 상태 속성에 type이 없습니다(CraftEngine이 unknown_type을 발생시킵니다)"
+  propTypeUnknown: "알 수 없는 블록 상태 속성 타입 \"{type}\" (사용 가능: {list})"
+  propStringValues: "string 타입 속성에는 values 목록이 필요합니다"
+  propIntRange: "int 타입 속성에는 range 제공을 권장합니다(예: 0~15)"
+  rotationStep: "rotation {v}은(는) 90의 배수가 아닙니다(CraftEngine은 90/180/270만 허용)"
+  patternRowMismatch: "pattern의 모든 행 길이가 같아야 합니다(1행은 {n}열, {row}행은 {m}열)"
+  ingredientUnused: "ingredients의 키 \"{key}\"가 pattern에 나타나지 않아 사용되지 않습니다"
+  recipeTypeMissing: "레시피에 type이 없습니다"
+  recipeResultMissing: "레시피에 result가 없습니다"
+  categoryIcon: "이 카테고리에는 아이콘이 없어 메뉴에 표시되지 않습니다"
+  equipmentType: "이 장비에는 type이 없습니다(component / trim)"
+  brightnessIncomplete: "brightness에는 block_light와 sky_light가 모두 필요합니다. 없으면 효과가 없습니다"
+  typeMissing: "\"type\" 필드가 없습니다(CraftEngine은 보통 타입 식별자가 필요합니다)"
+  vanillaRefNotFound: "{id}이(가) 바닐라 에셋 인덱스에 없습니다(다른 리소스팩이 제공한다면 무시하세요)"
+  someField: "이 필드"
+  shapeList: "목록"
+  shapeMap: "키/값 매핑"
+  shapeText: "텍스트"
+  shapeNumber: "숫자"
+  shapeBool: "불리언"
+
+preview:
+  title: "미리보기"
+  windowTitle: "MC 장면 미리보기"
+  windowMax: "최대화 / 복원"
+  windowResize: "드래그하여 크기 조절"
+  open: "시뮬레이션된 게임 내 장면에서 미리보기"
+  unavailable: "미리보기 모듈이 로드되지 않았습니다"
+  sceneAuto: "자동"
+  sceneChat: "채팅"
+  sceneLore: "아이템 Lore"
+  sceneGui: "GUI"
+  sceneImage: "폰트 이미지"
+  sceneFurniture: "가구"
+  furnitureVariant: "변형"
+  furnitureElements: "요소"
+  furnitureHitboxes: "히트박스"
+  furnitureBoxConfig: "설정 항목 {n}개"
+  furnitureSeats: "좌석"
+  furnitureBlueprint: "외부 모델"
+  furnitureNoVariants: "<red>이 가구에는 variants가 없습니다(최소 하나 필요)</red>"
+  furnYaw: "시점"
+  furnYawLeft: "시점 왼쪽 45° 회전 (Q)"
+  furnYawRight: "시점 오른쪽 45° 회전 (E)"
+  furnYawDrag: "캔버스에서 좌우로 드래그해 시점 회전 (Shift 홀드 시 15° 스냅)"
+  furnReset: "초기화"
+  furnZoom: "줌"
+  furnZoomIn: "확대 (+)"
+  furnZoomOut: "축소 (-)"
+  furnFill: "채우기"
+  furnLabels: "레이블"
+  furnGrid: "그리드"
+  furnSelected: "선택된 히트박스"
+  hbTypeInteraction: "인터랙션"
+  hbTypeShulker: "셜커"
+  hbTypeHappyGhast: "즐거운 가스트"
+  hbTypeCustom: "사용자 지정"
+  rows: "행"
+  scale: "배율"
+  guiScale: "GUI 배율"
+  scaleAuto: "자동"
+  customText: "사용자 지정 텍스트"
+  customTextHint: "MiniMessage 및 <image:ns:id> 지원, 예: <image:internal:item_browser>"
+  shift: "오프셋"
+  shiftInsert: "<shift:N> 삽입"
+  shiftInsertHint: "커서 위치에 <shift:N>을 삽입한 뒤 -10/-1/+1/+10으로 미세 조정 (Alt+←/→ = ∓1, Alt+Shift+←/→ = ∓10)"
+  resolveTags: "CE 텍스트 태그 해석"
+  resolveMiniMessage: "MiniMessage 태그 해석"
+  resolveCeTags: "CE 태그 해석"
+  resolveGlobals: "전역 변수 해석"
+  resolveImages: "폰트 이미지 렌더링"
+  shadow: "텍스트 그림자"
+  darkBg: "어두운 배경"
+  copyImage: "이미지 복사"
+  showSource: "텍스트 보기"
+  copied: "클립보드에 복사됨"
+  copyFailed: "복사 실패: {msg}"
+  reloading: "리소스 다시 검사 중…"
+  renderFailed: "렌더링 실패: {msg}"
+  sceneLabel: "장면"
+  assetsOk: "에셋 인덱싱됨({n}개 항목)"
+  assetsLoading: "에셋 인덱싱 중…"
+  assetsMissing: "Minecraft 에셋 디렉터리가 설정되지 않았습니다 — 내장 대체 글리프를 사용합니다"
+  imageGallery: "폰트 이미지 갤러리"
+  noImages: "이 프로젝트에서 images 항목을 찾을 수 없습니다"
+  sourceHint: "이 미리보기에서 사용하는 원본 텍스트(미해석)"
+  globalsHint: "프로젝트 전역 변수"
+  sceneItem: "핫바"
+  sceneGlyphGui: "상자 GUI"
+  glyphChatIntro: "채팅 안의 폰트 이미지"
+  glyphInline: "텍스트와 같은 줄에 배치"
+  glyphRepeat: "반복"
+  glyphColored: "색 변경"
+  sceneItemModel: "모델"
+  sceneInventory: "인벤토리 GUI"
+  modelContext: "display 컨텍스트"
+  furnEdit: "편집"
+  furnEditHint: "미리보기에서 히트박스 / 좌석 / 요소 앵커를 바로 드래그 (변경 사항이 에디터에 반영됨)"
+  furnPitchUp: "시점 높이기 (피치 +15°)"
+  furnPitchDown: "시점 낮추기 (피치 -15°)"
+  furnPitchHint: "30° = 아이소메트릭, 90° = 수직 부감"
+  invSlotLabel: "슬롯"
+  invSlotHotbar: "핫바"
+  invSlotMain: "인벤토리"
+  invSlotCraft: "제작"
+  invSlotArmor: "방어구"
+  invSlotResult: "결과"

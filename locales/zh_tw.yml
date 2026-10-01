@@ -1,0 +1,2164 @@
+# ChoTenEditor 繁體中文（台灣）
+app:
+  title: "CHOTEN EDITOR"
+  loading: "正在載入..."
+
+titlebar:
+  minimize: "最小化"
+  maximize: "最大化"
+  close: "關閉"
+
+windowManager:
+  maxRestore: "最大化 / 還原"
+  close: "關閉"
+  resize: "拖曳調整大小"
+
+common:
+  openProject: "📁 開啟專案"
+  newFile: "📄 新檔案"
+  save: "💾 儲存"
+  settings: "⚙️ 設定"
+  remote: "🌐 遠端"
+  ai: "✨ AI"
+  ok: "確定"
+  cancel: "取消"
+  delete: "刪除"
+  reload: "重新載入"
+  back: "返回"
+  close: "關閉"
+  approve: "批准"
+  reject: "拒絕"
+
+minimessage:
+  title: "MiniMessage 編輯器"
+  editBtn: "MiniMessage 編輯器"
+  preview: "預覽"
+  previewEmpty: "（空預覽）"
+  parseError: "解析錯誤"
+  restrictedTip: "受限的標籤，可能無法在所有地方使用"
+  useColor: "使用顏色"
+  previewBg: "切換黑白底色"
+  detailTitle: "詳細新增"
+  detailContent: "文字內容"
+  detailType: "類型"
+  detailAdd: "新增"
+  detailFont: "字型"
+  detailNamespace: "namespace（可空）"
+  detailColor: "顏色（如 #ff0000 或 red）"
+  detailGradientA: "漸層色 1"
+  detailGradientB: "漸層色 2"
+  detailUrl: "連結"
+  detailCommand: "指令"
+  detailHoverText: "懸停文字"
+  editBtnTip: "左鍵: 詳細新增 · 右鍵: 快速新增"
+  tooltipWrap: "為選取的文字加上"
+  tooltipInsert: "在游標處插入"
+  tag_bold: "粗體"
+  tag_italic: "斜體"
+  tag_underline: "底線"
+  tag_strikethrough: "刪除線"
+  tag_obfuscated: "隨機混淆"
+  tag_reset: "重設格式"
+  tag_newline: "換行"
+  tag_rainbow: "彩虹"
+  tag_gradient: "漸層"
+  tag_color: "顏色"
+  tag_font: "字型"
+  tag_open_url: "點擊開啟連結"
+  tag_run_command: "點擊執行指令"
+  tag_suggest_command: "點擊填入指令"
+  tag_hover_text: "懸停顯示文字"
+  phFont: "字型名稱 (如 unifont)"
+  phNamespace: "命名空間 (如 minecraft)"
+  phColor: "#ff0000 或 red"
+  phGradientA: "漸層起始色 (如 #ff0000)"
+  phGradientB: "漸層結束色 (如 #ffff00)"
+  phUrl: "https://..."
+  phCommand: "/指令"
+  phHoverText: "懸停文字"
+  color_black: "黑色"
+  color_dark_blue: "深藍"
+  color_dark_green: "深綠"
+  color_dark_aqua: "深青"
+  color_dark_red: "深紅"
+  color_dark_purple: "深紫"
+  color_gold: "金色"
+  color_gray: "灰色"
+  color_dark_gray: "深灰"
+  color_blue: "藍色"
+  color_green: "綠色"
+  color_aqua: "青色"
+  color_red: "紅色"
+  color_light_purple: "粉紫"
+  color_yellow: "黃色"
+  color_white: "白色"
+
+ui:
+  ok: "確定"
+  cancel: "取消"
+  confirmTitle: "請確認"
+  alertTitle: "提示"
+  promptTitle: "請輸入"
+
+sidebar:
+  files: "專案檔案"
+  previousFile: "上一個檔案"
+  tabLocal: "本機"
+  tabRemote: "遠端"
+  loading: "載入中..."
+  emptyDir: "空資料夾"
+  navBack: "後退 (回到剛才開啟的位置)"
+  navForward: "前進"
+  navPrev: "上一個檔案"
+  navNext: "下一個檔案"
+
+menu:
+  file: "檔案"
+  edit: "編輯"
+  debug: "除錯"
+  settings: "設定"
+  help: "說明"
+  newFile: "📄 新增檔案"
+  openFile: "📂 開啟檔案…"
+  openProject: "📁 開啟專案…"
+  recent: "🕘 最近開啟"
+  save: "💾 儲存"
+  closeTab: "關閉目前分頁"
+  closeAllTabs: "關閉全部分頁"
+  undo: "復原"
+  redo: "重做"
+  cut: "剪下"
+  copy: "複製"
+  paste: "貼上"
+  selectAll: "全選"
+  noDebug: "無可用除錯功能"
+  checks: "檢查"
+  checksDebug: "🐞 Debug · 全部設定問題…"
+  settingsItem: "⚙️ 設定…"
+  remote: "🌐 遠端模式…"
+  ai: "✨ AI Studio…"
+  about: "ℹ️ 關於 ChoTenEditor"
+  recentProjects: "最近專案"
+  recentFiles: "最近檔案"
+  clearRecent: "🗑 清空歷史記錄"
+  empty: "尚無記錄"
+  allFiles: "全部檔案"
+  experimentalRemoteWarning: "遠端模式屬於極不穩定且未經測試的功能，僅限除錯使用，可能對您的檔案有極大風險！如需啟用，請在設定內的實驗性一欄內啟用。你已經被警告過了！"
+  experimentalAIStudioWarning: "AI Studio 屬於極不穩定且未經測試的功能，僅限除錯使用，可能對您的檔案有極大風險！如需啟用，請在設定內的實驗性一欄內啟用。你已經被警告過了！"
+
+editor:
+  sourceMode: "原始碼"
+  visualMode: "視覺化"
+  typeAuto: "自動偵測"
+  typeConversation: "對話"
+  typeQuest: "任務"
+  typeCraftEngine: "CraftEngine"
+  visualEmptyTitle: "視覺化編輯"
+  visualEmptyHint: "開啟 .yml / .yaml 檔案後可切換至視覺化編輯"
+
+status:
+  ready: "準備就緒"
+  projectOpened: "專案已開啟: {name}"
+  projectTypesConversationQuest: " [對話 + 任務]"
+  projectTypesConversation: " [對話檔案]"
+  projectTypesQuest: " [任務檔案]"
+  directory: "目錄: {path}"
+  file: "檔案: {name}"
+  fileType: "檔案: {name} [{type}]"
+  interpreterTypeAuto: "直譯器類型: 自動偵測"
+  interpreterType: "直譯器類型: {type}"
+  noFileOpen: "沒有開啟的檔案"
+  visualMode: "視覺化編輯器模式"
+  sourceMode: "原始碼編輯器模式"
+  fileModified: "檔案已修改"
+  fileSaved: "檔案已儲存: {path}"
+  fileCreated: "檔案已建立: {path}"
+  typeOverrideCleared: "類型覆寫已清除"
+  typeOverrideSet: "直譯器類型已設定為: {type} (範圍: {scope})"
+  ceOwner: " · CE專案: {root} · Pack: {pack}"
+
+typeScope:
+  file: "檔案"
+  directory: "目錄"
+  project: "專案"
+
+welcome:
+  title: "歡迎使用 ChoTenEditor!"
+  version: "目前版本為 {version}"
+  descPre: "本編輯器旨在提供通用的 Minecraft 外掛設定編輯，支援 "
+  descPost: " 任務與對話、CraftEngine 物品/方塊/家具等基礎編輯，以及 Kether 腳本。"
+  channelsTitle: "如有任何問題、意見，歡迎透過以下管道回饋："
+  channelQq: "📢 QQ群："
+  channelDiscord: "🌐 Discord："
+  channelQqAddPre: "💬 新增 QQ "
+  channelQqAddPost: " 註明來意"
+  settingsHint: "您可在設定頁面再次找到回饋管道。"
+  noTip: "不再提示"
+  dismissHint: "勾選\"不再提示\"後，本彈出視窗只會在版本更新時再次顯示。"
+
+remote:
+  title: "🌐 遠端模式"
+  asServer: "作為伺服器"
+  asClient: "連接遠端"
+  serverHost: "伺服器位址"
+  port: "連接埠"
+  password: "連線密碼"
+  setPasswordPlaceholder: "設定連線密碼"
+  ipPlaceholder: "IP 位址"
+  serverPasswordPlaceholder: "伺服器設定的密碼"
+  startServer: "啟動伺服器"
+  stopServer: "停止伺服器"
+  connect: "連線"
+  disconnect: "中斷連線"
+  disconnectAll: "中斷全部連線"
+  clients: "已連線的用戶端"
+  securityCode: "安全碼"
+  securityHint: "請將此安全碼告知伺服器管理員以完成連線確認"
+  confirmTitle: "🔌 新的連線請求"
+  clientIp: "用戶端 IP："
+  securityCodeLabel: "安全碼："
+  confirmWarningPre: "⚠️ 請確保對方提供的安全碼與上述安全碼一致，否則對方可能無法正確連線。隨意確認連線可能導致資料外洩或損失，"
+  confirmWarningStrong: "請仔細核對安全碼"
+  confirmWarningPost: "，對此造成的損失本軟體概不負責。"
+  confirmAccept: "確認連線"
+  fileChangeTitle: "📝 檔案變更請求"
+  client: "用戶端："
+  filePath: "檔案路徑："
+  fileDeleteTitle: "🗑️ 檔案刪除請求"
+  approveDelete: "批准刪除"
+  invalidMessageFormat: "無效訊息格式"
+  wrongPassword: "密碼錯誤"
+  versionMismatch: "用戶端版本 ({client}) 與伺服器版本 ({server}) 不符，請在設定中開啟\"允許不同版本\""
+  authenticateFirst: "請先驗證"
+  connectionRejectedByAdmin: "管理員拒絕了連線請求"
+  disconnectedByAdmin: "管理員中斷了連線"
+  unknownMessageType: "未知訊息類型: {type}"
+  noReadPermission: "無權限讀取此檔案"
+  noEditPermission: "無權限編輯此檔案"
+  guestNoEditPermission: "訪客模式，無編輯權限"
+  noPathSpecified: "未指定路徑"
+  noDeletePermission: "無權限刪除此檔案"
+  guestNoDeletePermission: "訪客模式，無刪除權限"
+  deleteRejectedByAdmin: "管理員拒絕了刪除請求"
+  authTimeout: "驗證逾時"
+  authRejected: "驗證被拒絕"
+  changeRejectedByAdmin: "變更被管理員拒絕"
+
+dialog:
+  apiInitFailed: "API 初始化失敗"
+  apiInitFailedMsg: "Electron API 未能正確初始化。請檢查主控台錯誤。"
+  apiError: "API 錯誤"
+  deleteFailed: "刪除失敗"
+  openProjectFailed: "開啟專案失敗"
+  loadDirFailed: "讀取目錄失敗"
+  loadDirError: "載入目錄失敗"
+  openFileFailed: "開啟檔案失敗"
+  readFailed: "讀取失敗"
+  error: "錯誤"
+  createFileFailed: "建立檔案失敗"
+  invalidFileName: "檔案名稱不能包含路徑分隔符或相對路徑"
+  saveFileFailed: "儲存檔案失敗"
+
+error:
+  openDirectoryApi: "openDirectory API 不可用"
+  readdirApi: "readdir API 不可用"
+  readFileApi: "readFile API 不可用"
+  remoteApiUnavailable: "遠端 API 不可用"
+  cannotReadFile: "無法讀取檔案"
+  cannotReadRemote: "無法從遠端伺服器讀取檔案"
+  codemirrorMissing: "codeMirrorEditor 不存在"
+  unknown: "未知錯誤"
+
+tabs:
+  unsaved: "未儲存的變更"
+  unsavedMsg: "檔案 <strong>{name}</strong> 有未儲存的變更。<br>是否儲存？"
+  unsavedMsgNoName: "是否儲存？"
+  unsynced: "尚未同步的變更"
+  unsyncedMsg: "檔案 <strong>{name}</strong> 的視覺化編輯尚未同步至原始碼。<br>同步後再切換可保留這些變更。"
+  unsyncedMsgNoName: "視覺化編輯尚未同步至原始碼。<br>同步後再切換可保留這些變更。"
+  syncAndContinue: "同步並繼續"
+  save: "儲存"
+  discard: "不儲存"
+  cancel: "取消"
+
+unsupported:
+  title: "不支援的格式"
+  msg: "目前不支援 {ext} 格式，確定要載入嗎？"
+  forceLoad: "強制載入"
+
+confirm:
+  deleteFile: "確定要刪除 \"{name}\" 嗎？"
+
+prompt:
+  newFileName: "輸入檔案名稱 (例如: config.yml):"
+
+alert:
+  openProjectFirst: "請先開啟一個專案"
+  noFileOpen: "沒有開啟的檔案"
+
+tab:
+  unsavedTitle: "{name} (未儲存)"
+
+tabMenu:
+  closeCurrent: "關閉目前"
+  closeSaved: "關閉已儲存"
+  closeLeft: "關閉左側"
+  closeRight: "關閉右側"
+  closeAll: "關閉全部"
+
+breadcrumb:
+  root: "根目錄"
+
+visual:
+  onlyYaml: "僅支援 .yml / .yaml 檔案的視覺化編輯。"
+  interpreterMissing: "直譯器未載入"
+  interpreterMissingMsg: "ChemdahInterpreter 模組未正確載入。請檢查主控台錯誤。"
+  renderFailed: "視覺化渲染失敗"
+  editInSource: "請在原始碼模式中編輯。"
+
+rm:
+  apiError: "錯誤: 遠端 API 不可用"
+  errorPrefix: "錯誤: {msg}"
+  startingServer: "正在啟動伺服器..."
+  serverStarted: "伺服器已啟動，連接埠: {port}"
+  startFailed: "啟動失敗: {msg}"
+  serverStopped: "伺服器已停止"
+  connecting: "正在連線..."
+  sendCodeToAdmin: "已連線，請將安全碼告知管理員"
+  connected: "✅ 已連線到伺服器"
+  connectFailed: "連線失敗: {msg}"
+  disconnected: "已中斷連線"
+  newClient: "新用戶端連線: {ip}"
+  requestingDelete: "正在請求刪除檔案..."
+  loadingRemoteDir: "正在載入遠端目錄..."
+  readingRemoteFile: "正在讀取遠端檔案..."
+  savingRemoteFile: "正在儲存遠端檔案..."
+  fileUpdated: "檔案已更新: {path}"
+  fileDeleted: "檔案已刪除: {path}"
+  fileSavedOk: "檔案儲存成功: {path}"
+  fileSaveFailed: "檔案儲存失敗: {msg}"
+  saveTimeout: "伺服器 10 秒內未確認儲存結果，請重試"
+  waitingApproveWrite: "等待管理員批准檔案變更..."
+  fileReadOk: "已讀取遠端檔案"
+  fileReadFailed: "讀取遠端檔案失敗: {msg}"
+  listLoaded: "已載入遠端檔案清單"
+  listLoadFailed: "載入遠端檔案清單失敗: {msg}"
+  deleteFailed: "刪除失敗: {msg}"
+  waitingApproveDelete: "等待管理員批准刪除..."
+  serverClosed: "伺服器已關閉"
+  permUpdated: "權限已更新: {level}"
+  securityCode: "安全碼: {code}"
+  disconnect: "中斷連線"
+
+perm:
+  guest: "訪客"
+  confirm: "變更需確認"
+  full: "完全控制"
+
+settings:
+  cePreview: "啟用 MC 場景預覽"
+  cePreviewHint: "在物品 / 方塊 / 傢俱 / 字型圖像條目的表單頂部顯示預覽按鈕，可仿照遊戲內場景（聊天、物品 Lore、9x1~9x6 GUI）渲染字型圖像與文字標籤"
+  ceDiagnostics: "啟用設定檔錯誤檢查"
+  ceDiagnosticsHint: "像 IDE 一樣檢查 CraftEngine 設定檔，按 ERROR / WARN / WEAK_WARN / INFO 四級報告未知鍵、型別錯誤、非法列舉、越界參照等問題"
+  mcAssetsPath: "Minecraft 資源目錄"
+  mcAssetsPathPlaceholder: "E:/MC/Windose/.minecraft/versions/26.3/26.3/assets"
+  mcAssetsPathHint: "原版資源目錄（含 minecraft 子目錄的 assets 資料夾）。用於補全原版物品/方塊/貼圖/模型/音效/粒子/附魔等 ID，並讓預覽使用真實的原版字型與 GUI 貼圖。"
+  browse: "瀏覽…"
+  detect: "自動偵測"
+  mcAssetsSet: "已設定 Minecraft 資源目錄"
+  mcAssetsBrowseFailed: "選擇目錄失敗"
+  mcAssetsUnavailable: "目前版本不支援資源索引"
+  mcAssetsNotFound: "未找到 Minecraft 資源目錄，請手動填寫"
+  mcAssetsScanning: "正在索引資源…"
+  mcAssetsInvalid: "資源目錄無效: {err}"
+  mcAssetsStatus: "已索引命名空間 {ns}：物品 {items} · 貼圖 {tex} · 模型 {models}"
+  title: "設定"
+  titlePage: "⚙️ 設定"
+  backToEditor: "返回編輯器"
+  tabGeneral: "一般"
+  tabAppearance: "個人化"
+  tabEditor: "編輯器"
+  tabAI: "AI 製作"
+  tabRemote: "遠端設定"
+  tabShortcuts: "快速鍵"
+  tabExperimental: "實驗性"
+  aboutAuthor: "🎨 關於作者"
+  ceSearch: "搜尋…"
+  ceNoMatch: "無符合項目"
+  fontSearchPlaceholder: "輸入或搜尋字型…"
+  fontComboHint: "自動偵測系統已安裝的字型，輸入時補全"
+  sectionLanguage: "🌐 語言"
+  language: "語言"
+  languageModalTitle: "選擇語言"
+  languagePickerOpen: "點擊選擇語言"
+  languageRestartHint: "變更語言後需要重新啟動軟體才能生效。"
+  languageRestartPending: "⚠ 已選擇 {lang}，重新啟動軟體後生效。"
+  languageRestartTitle: "需要重新啟動軟體"
+  languageRestartMessage: "語言已儲存為 {lang}。請重新啟動 Choten Editor 後查看新語言介面。"
+  languageCancelPending: "取消變更"
+  languageReverted: "已還原為目前介面語言。"
+  sectionItemKeyStyle: "📦 物品鍵格式"
+  itemKeyStyle: "物品根層級鍵格式"
+  itemKeyStyleSnake: "新版底線 (custom_model_data)"
+  itemKeyStyleKebab: "舊版連字號 (custom-model-data)"
+  itemKeyStyleHint: "新建物品條目的根層級鍵寫法；已有檔案自動跟隨其本身寫法。"
+  sectionTheme: "🎨 主題設定"
+  themeSelect: "選擇主題"
+  themeDark: "深色 (Dark)"
+  themeLight: "淺色 (Light)"
+  themeAuto: "自動 (Auto)"
+  sectionBackground: "🖼️ 背景圖片"
+  sectionFonts: "🔤 字型設定"
+  uiFont: "介面字型"
+  editorFontFamily: "編輯器字型"
+  fontSystemDefault: "系統預設"
+  editorFontDefault: "預設 (Fira Code)"
+  bgDisclaimer: "背景圖片來自網路，僅供預覽，如有侵權請聯繫刪除"
+  bgSelect: "選擇背景"
+  bgNoneThumb: "無"
+  bgNoneName: "無背景"
+  bgOpacity: "背景不透明度"
+  bgUpload: "📤 上傳背景"
+  sectionColors: "🎭 自訂顏色"
+  colorGroupMain: "主要顏色"
+  colorPrimary: "主色"
+  colorSuccess: "成功色"
+  colorWarning: "警告色"
+  colorError: "錯誤色"
+  colorGroupBg: "背景顏色"
+  colorBgPrimary: "主背景"
+  colorBgSecondary: "次背景"
+  colorGroupText: "文字顏色"
+  colorTextPrimary: "主要文字"
+  colorTextSecondary: "次要文字"
+  sectionCheckbox: "☑️ 核取方塊設定"
+  checkboxColorTitle: "核取方塊顏色（預設隨主題色變化）"
+  checkboxColorOff: "未勾選顏色"
+  checkboxColorOn: "勾選顏色"
+  checkboxMarkOn: "勾選時顯示 √ 標記"
+  checkboxMarkOff: "未勾選時顯示 X 標記"
+  hidePremiumHints: "隱藏進階版專屬功能提示"
+  hideVersionHints: "隱藏版本限制提示"
+  sectionSyntax: "📝 語法突顯顏色"
+  syntaxGroup: "語法標記顏色"
+  syntaxKeyword: "關鍵字"
+  syntaxString: "字串"
+  syntaxNumber: "數字"
+  syntaxComment: "註解"
+  syntaxFunction: "函式"
+  syntaxOperator: "運算子"
+  syntaxPunctuation: "標點符號"
+  syntaxProperty: "屬性名稱"
+  sectionCategories: "🎯 分類顏色"
+  categoriesGroup: "Kether 積木分類顏色"
+  sectionPresets: "🎪 預設主題"
+  presetDarkDefault: "深色經典"
+  presetLightClean: "淺色清爽"
+  sectionEditor: "📝 編輯器設定"
+  editorFontSize: "字型大小 (px)"
+  editorTabSize: "Tab 縮排大小"
+  tabSize2: "2 空格"
+  tabSize4: "4 空格"
+  tabSize8: "8 空格"
+  editorLineNumbers: "顯示行號"
+  show: "顯示"
+  hide: "隱藏"
+  editorLineWrapping: "自動換行"
+  enable: "啟用"
+  disable: "停用"
+  editorTheme: "編輯器主題"
+  themeDefault: "預設"
+  editorAutoSync: "自動同步變更"
+  off: "關閉"
+  on: "開啟"
+  autoSyncHint: "開啟後，編輯器內容將在每次修改後自動儲存"
+  editorDevtools: "啟動時開啟 F12 偵錯畫面"
+  prewarmTitle: "啟動預熱"
+  prewarmFiles: "預熱上次開啟的專案檔案"
+  prewarmMax: "上限"
+  prewarmHint: "啟動時將上次開啟的檔案內容讀入記憶體快取，秒切分頁"
+  prewarmKether: "預熱 Kether 動作"
+  prewarmKetherHint: "啟動時載入 Kether 動作定義檔，開啟積木編輯器時無需等待"
+  elementPickerTitle: "CE 元素預載"
+  elementPicker: "預載偵測到的 CE 元素"
+  elementPickerHint: "開啟 CraftEngine 檔案時自動掃描專案 configuration 目錄中的物品/方塊/傢俱/分類/範本，在對應輸入框右側顯示按鈕，可快速填入"
+  aiTitle: "AI 製作"
+  aiEndpoint: "API 位址"
+  aiEndpointHint: "相容 OpenAI 格式的 API 位址"
+  aiModel: "模型"
+  aiModelCustom: "自訂"
+  aiCustomModel: "自訂模型名稱"
+  aiCustomModelPlaceholder: "輸入模型名稱"
+  aiApiKey: "API 金鑰"
+  aiNewKeyPlaceholder: "輸入新金鑰"
+  aiAddKey: "新增"
+  aiSystemPrompt: "系統提示詞"
+  aiPromptDefault: "預設"
+  aiPromptCustom: "自訂"
+  aiCustomPrompt: "自訂提示詞內容"
+  aiCustomPromptPlaceholder: "輸入自訂系統提示詞..."
+  aiSavePrompt: "儲存為自訂提示詞"
+  aiManagePrompts: "管理提示詞"
+  aiNewPromptNamePlaceholder: "新提示詞名稱"
+  aiNewPromptDescPlaceholder: "描述"
+  aiMaxTokens: "最大輸出 Token"
+  aiTemperature: "溫度 (Temperature)"
+  remoteTitle: "遠端模式"
+  remotePassword: "遠端連線密碼"
+  remotePasswordPlaceholder: "設定遠端連線密碼"
+  remotePasswordHint: "遠端模式下啟動伺服器時預設使用的連線密碼"
+  remoteAllowDifferentVersions: "允許不同版本的用戶端連線"
+  remoteAllowDifferentVersionsHint: "關閉後，只有版本相符的用戶端才能連線伺服器"
+  sectionExperimental: "🧪 實驗性功能"
+  experimentalWarning: "⚠️ 實驗性功能僅供開發人員使用，屬於極不穩定且未經測試的功能，僅限除錯使用，可能對您的檔案有極大風險！您已經被警告過了！"
+  experimentalRemote: "啟用遠端模式"
+  experimentalRemoteHint: "啟用後可透過選單列 → 設定 → 遠端模式… 進入遠端協作面板"
+  experimentalAIStudio: "啟用 AI Studio"
+  experimentalAIStudioHint: "啟用後可透過選單列 → 設定 → AI 製作… 進入 AI 面板"
+  blockTitle: "積木顯示"
+  blockFontSize: "積木字型大小 (px)"
+  sectionShortcuts: "⌨️ 快速鍵設定"
+  shortcutSave: "儲存檔案"
+  shortcutNewFile: "新增檔案"
+  shortcutOpenProject: "開啟專案"
+  shortcutToggleMode: "切換編輯模式"
+  resetShortcuts: "重設快速鍵"
+  editShortcuts: "編輯快速鍵"
+  editShortcutDone: "完成"
+  shortcutHint: "請按下新的組合鍵 (Esc 取消)"
+  shortcutConflict: "與「{{name}}」衝突"
+  sectionFeedback: "💬 回饋管道"
+  feedbackIntro: "如有任何問題、意見，歡迎透過以下管道回饋："
+  feedbackQqGroup: "📢 QQ群："
+  feedbackQq: "💬 QQ："
+  feedbackJoinQq: "加入群組"
+  feedbackJoinDiscord: "加入 Discord"
+  feedbackAddFriend: "加入好友"
+  sectionSave: "💾 儲存與重設"
+  saveSettings: "✓ 儲存設定"
+  resetSettings: "↻ 還原預設"
+  exportSettings: "⬇ 匯出設定"
+  importSettings: "⬆ 匯入設定"
+  sectionPreview: "👁️ 控制項預覽"
+  previewPrimary: "主要按鈕"
+  previewSecondary: "次要按鈕"
+  previewDanger: "危險按鈕"
+  previewAccent: "強調按鈕"
+  previewCheckbox: "核取方塊範例"
+  previewInputPlaceholder: "輸入框範例…"
+  previewSelect1: "選項一"
+  previewSelect2: "選項二"
+  previewSelect3: "選項三"
+  previewMainText: "這是主要文字的樣式顯示"
+  previewSecondaryText: "這是次要文字的樣式顯示"
+  previewDemoDialog: "📦 開啟範例對話框"
+  previewDialogTitle: "範例對話框"
+  previewDialogBody: "這是應用程式自繪的對話框，隨主題色與自訂顏色即時變化。"
+  previewDialogInput: "請輸入一些文字來測試輸入框："
+  previewDialogResult: "你輸入了：{value}"
+  loading: "載入中..."
+  noPrompts: "尚無提示詞"
+  aiNoKeys: "尚未新增金鑰"
+  badgeBuiltIn: "內建"
+  badgeUser: "使用者"
+  badgeOverridden: "(已覆寫)"
+  badgeLocal: "本機"
+  promptNameRequired: "請輸入提示詞名稱"
+  promptContentRequired: "請輸入提示詞內容"
+  promptSaved: "提示詞已儲存"
+  promptSaveFailed: "儲存失敗: {msg}"
+  promptSavedLocal: "提示詞已儲存（本機）"
+  promptDeleted: "提示詞已刪除"
+  promptDeleteFailed: "刪除失敗: {msg}"
+  deletePromptConfirm: "刪除提示詞 \"{name}\" ？"
+  promptInfoCustom: "使用下方自訂輸入框中的內容作為系統提示詞"
+  promptInfoBuiltin: "內建提示詞"
+  promptInfoUser: "使用者自訂提示詞"
+  promptInfoOverridden: " (已被使用者版本覆寫)"
+  promptInfoLocal: "本機自訂提示詞"
+  promptNameUser: "{name} (使用者)"
+  promptNameLocal: "{name} (本機)"
+  keyRequired: "請輸入金鑰"
+  keyExists: "金鑰已存在"
+  keyAdded: "金鑰已新增"
+  keyDeleted: "金鑰已刪除"
+  bgUploadSuccess: "背景上傳成功"
+  bgUploadFailed: "上傳失敗: {msg}"
+  bgUploadError: "上傳背景失敗"
+  saved: "設定已儲存"
+  resetConfirm: "確定要重設為預設設定嗎？"
+  resetDone: "已重設設定"
+  exportDone: "設定已成功匯出"
+  invalidConfig: "無效的設定檔"
+  importDone: "設定已匯入"
+  importFailed: "匯入失敗: {msg}"
+  imageFilter: "圖片檔案"
+  remotePasswordSet: "已設定密碼"
+
+ai:
+  title: "AI 製作"
+  followSettings: "按照設定"
+  customModel: "自訂模型"
+  settings: "設定"
+  clearChat: "清除對話"
+  currentFile: "目前檔案: {name}"
+  noContextFile: "無上下文檔案"
+  inputPlaceholder: "輸入你的需求... (Enter 傳送, Shift+Enter 換行)"
+  send: "傳送"
+  stop: "停止"
+  needApiKey: "請先在設定中設定 API 金鑰。"
+  thinking: "思考中..."
+  error: "錯誤"
+  regenerate: "重新產生"
+  requestFailed: "請求失敗: {msg}"
+  apiError: "API 錯誤 {status}: {body}"
+  apiUnavailable: "AI 功能不可用（electronAPI未載入）"
+  stopped: "已停止"
+  pendingOps: "待確認的檔案操作 ({count})"
+  opCreate: "建立"
+  opEdit: "編輯"
+  opDelete: "刪除"
+  view: "檢視"
+  accept: "✓ 確認"
+  reject: "✕ 拒絕"
+  original: "原始內容"
+  updated: "修改後"
+  willDelete: "此檔案將被刪除"
+  opFailedNoApi: "❌ 檔案操作失敗: electronAPI 不可用"
+  openFileFirst: "⚠️ 請先開啟一個檔案以確定專案目錄"
+  created: "✅ 已建立: {path}"
+  edited: "✅ 已編輯: {path}"
+  deleted: "✅ 已刪除: {path}"
+  createFailed: "❌ 建立失敗: {msg}"
+  editFailed: "❌ 編輯失敗: {msg}"
+  editOriginalNotFound: "⚠️ 未在 {path} 中找到要替換的原始內容, 編輯已取消"
+  deleteFailed: "❌ 刪除失敗: {msg}"
+  emptyHint: "💡 輸入你的需求，AI 將協助你撰寫和修改程式碼"
+  clearConfirm: "確定清除所有對話紀錄？"
+  cleared: "對話已清除"
+
+kether:
+  builtinText: "文字值"
+  builtinList: "清單"
+  builtinBrace: "動作組"
+  slotHelp: "點擊或拖曳到此處以新增動作<br>CTRL+點擊 快速新增文字<br>SHIFT+點擊 快速新增動作組<br>CTRL+SHIFT+點擊 快速新增清單"
+  back: "← 返回"
+  title: "Kether 積木編輯器"
+  actionCount: "{count} 個動作"
+  blocks: "🧊 積木"
+  code: "📝 程式碼"
+  confirm: "✓ 確定"
+  undo: "復原 (Ctrl+Z)"
+  redo: "重做 (Ctrl+Shift+Z)"
+  autoSync: "自動同步積木到 Kether 程式碼"
+  minimize: "最小化"
+  maximize: "最大化"
+  close: "關閉"
+  searchActions: "搜尋動作..."
+  workspaceInfo: "入口 ({entries}) · 積木 ({blocks})"
+  blockColor: "積木顏色"
+  provider: "提供者"
+  category: "分類"
+  displayName: "顯示名稱"
+  nameCnEn: "中文+英文"
+  nameCn: "僅中文"
+  nameEn: "僅英文"
+  quoteBtn: "引號按鈕"
+  semanticDisplay: "語意化顯示"
+  on: "開啟"
+  off: "關閉"
+  addBlock: "+ 新增積木"
+  newEntry: "📥 新入口"
+  newDef: "📦 新定義"
+  clear: "🗑 清空"
+  codePreview: "▶ 程式碼預覽"
+  codePreviewOpen: "▼ 程式碼預覽"
+  empty: "(空)"
+  stash: "暫存"
+  stashArea: "📦 暫存區"
+  stashDrop: "拖入積木暫存"
+  saved: "💾 已儲存"
+  common: "常用"
+  custom: "自訂"
+  catCommon: "⭐ 常用"
+  catAll: "全部"
+  deleteCommonConfirm: "刪除常用積木 \"{name}\"？"
+  noCommonBlocks: "暫無常用積木<br><small>右鍵積木可新增為常用</small>"
+  cancel: "取消"
+  insert: "插入"
+  copyBlock: "📋 複製積木"
+  viewDetail: "📖 檢視描述"
+  addFavorite: "⭐ 新增為常用積木"
+  noMatchActions: "無符合的動作"
+  customSymbol: "✎ 自訂"
+  customSymbolPlaceholder: "自訂符號"
+  itemEdit: "視覺化物品編輯"
+  posEdit: "視覺化座標編輯"
+  emptyState: "點擊 <strong>+ 新增積木</strong> 開始"
+  emptyStateHint: "或切換到程式碼模式直接輸入"
+  then: "執行"
+  else: "否則"
+  addCondition: "+ 新增條件"
+  deleteBranch: "刪除此分支"
+  addWhenBranch: "+ 新增 when 分支"
+  customBlock: "⧉ 自訂"
+  ketherCode: "Kether 程式碼..."
+  removeQuote: "點擊取消引號"
+  addQuote: "點擊新增引號"
+  textValue: "文字值..."
+  unquoted: "# 無引號"
+  value: "值..."
+  list: "[ ] 清單"
+  actionGroup: "{ } 動作組"
+  entry: "入口"
+  normal: "一般"
+  entrySlotHint: "+ 拖入或點擊新增積木"
+  blockDetail: "積木詳情"
+  fieldName: "名稱"
+  fieldProvider: "提供者"
+  fieldType: "類型"
+  private: "私有"
+  public: "公有"
+  fieldCategory: "分類"
+  fieldSyntax: "語法"
+  fieldExample: "範例"
+  fieldSemantic: "語意"
+  fieldDescription: "描述"
+  selectAction: "選擇動作"
+  search: "搜尋..."
+  noMatch: "無符合"
+  ctxDetail: "📋 檢視描述"
+  ctxCopy: "📋 複製"
+  ctxPaste: "📄 貼上"
+  ctxSave: "💾 儲存語句"
+  ctxDelete: "🗑 刪除"
+  saveStmtPrompt: "儲存語句名稱:"
+  saveStmtDefault: "積木"
+  codeTitle: "Kether 程式碼"
+  parseToBlocks: "🔄 解析為積木"
+
+chemdah:
+  noDialogues: "暫無對話條目"
+  dialoguesHeader: "對話條目"
+  addDialogue: "+ 新增對話"
+  cardView: "📋 卡片檢視"
+  mindmapView: "🌐 心智圖"
+  syncToSource: "同步到原始碼"
+  autoSync: "自動同步"
+  syncHint: "修改將在點擊\"同步到原始碼\"後套用到編輯器"
+  dialogueNav: "對話導覽"
+  fileOptions: "檔案選項"
+  theme: "主題"
+  customTheme: "自訂..."
+  customThemePlaceholder: "輸入自訂主題名稱"
+  title: "標題"
+  optionalTitle: "可選標題"
+  flags: "標籤 (Flags)"
+  addFlag: "+ 新增標籤"
+  custom: "自訂..."
+  switch: "SWITCH"
+  dialogue: "對話"
+  noCondition: "無條件"
+  optionCount: "{count} 個選項"
+  deleteDialogue: "刪除此對話"
+  dialogueIdPrefix: "對話ID: {id}"
+  npcId: "NPC ID"
+  npcIdPlaceholder: "例如: adyeshach BoFeng"
+  whenBranches: "條件分支 (When)"
+  addBranch: "+ 新增分支"
+  noWhenBranches: "無條件分支（將使用預設跳轉）"
+  npcText: "NPC 對話文字"
+  npcTextPlaceholder: "NPC 對話內容..."
+  format: "格式"
+  tags: "標籤"
+  ifCondition: "如果 (if)"
+  conditionPlaceholder: "條件運算式或 true"
+  openJump: "跳轉 (open)"
+  targetDialoguePlaceholder: "目標對話名稱"
+  deleteBranch: "刪除分支"
+  playerOptions: "玩家選項"
+  addOption: "+ 新增選項"
+  noOptions: "暫無玩家選項"
+  condition: "條件"
+  optionTextPlaceholder: "選項文字"
+  thenScript: "執行腳本 (KETHER)"
+  ketherScriptPlaceholder: "KETHER 腳本內容..."
+  deleteOption: "刪除選項"
+  newDialoguePrefix: "新對話_{count}"
+  newQuestPrefix: "新任務_{count}"
+  defaultReply: "好的"
+  customTagPrompt: "輸入自訂標籤名稱:"
+  syncedToSource: "已從視覺化編輯器同步到原始碼"
+  empty: "(空)"
+  entryNode: "入口節點"
+  orphanNode: "孤立節點"
+  nodeCount: "{count} 個節點"
+  edgeCount: "{count} 個連接"
+  entryCount: "{count} 個入口"
+  mindmapHint: "🔄 滾輪縮放 · 拖曳平移 · 點擊節點跳轉 · 雙擊重置"
+  emptyObject: "空物件"
+  yamlError: "YAML 解析錯誤"
+  yamlErrorHint: "請在原始碼模式中修復語法錯誤後重試。"
+  questList: "任務清單"
+  addQuest: "+ 新增任務"
+  noQuests: "暫無任務資料"
+  questNav: "任務導覽"
+  subtaskCount: "{count} 個子任務"
+  deleteQuest: "刪除此任務"
+  basicInfo: "基本資訊"
+  questId: "任務ID"
+  questIdPlaceholder: "任務唯一ID"
+  displayName: "顯示名稱"
+  questNamePlaceholder: "任務顯示名稱"
+  type: "類型"
+  description: "描述"
+  questDescPlaceholder: "任務描述..."
+  depend: "前置任務 (depend)"
+  dependPlaceholder: "以逗號分隔的任務ID"
+  statsVisible: "Stats 進度可見"
+  show: "顯示"
+  hide: "隱藏"
+  optional: "可選條目"
+  yes: "是"
+  no: "否"
+  subtasks: "子任務"
+  noSubtasks: "暫無子任務"
+  agentScripts: "任務生命週期腳本 (Agent)"
+  addHook: "+ 新增鉤子"
+  noHooks: "尚未設定 Agent 鉤子"
+  ketherScript: "KETHER 腳本..."
+  deleteHook: "刪除此鉤子"
+  addons: "元件 (Addon)"
+  noAddons: "尚未設定 Addon 元件"
+  search: "搜尋..."
+  addSelected: "新增所選"
+  select: "選擇"
+  addSelectedCount: "新增所選 ({count})"
+  cancel: "取消"
+  itemEditor: "視覺化物品編輯器"
+  namespaceNotice: "⚠ 該命名空間為附屬支援，部分伺服器可能不支援"
+  namespace: "命名空間"
+  itemId: "物品 ID"
+  itemIdPlaceholder: "如 diamond、diamond_sword 或 *"
+  wildcard: "萬用字元"
+  display: "顯示"
+  nameField: "名稱 (name)"
+  exact: "= (精確)"
+  notEqual: "!= (不等)"
+  ignoreColor: "# (忽略顏色)"
+  contains: "( ) (包含)"
+  namePlaceholder: "名稱文字"
+  lore: "Lore（每行一條）"
+  attributes: "屬性"
+  amountPlaceholder: "數量"
+  damagePlaceholder: "耐久/傷害值"
+  valuePlaceholder: "數值"
+  enchants: "附魔"
+  add: "+ 新增"
+  noEnchants: "尚未新增附魔"
+  nbt: "NBT"
+  noNbt: "尚未新增 NBT"
+  preview: "預覽"
+  confirm: "確認"
+  enchantIdPlaceholder: "附魔ID (如 damage_all)"
+  level: "等級"
+  nbtPathPlaceholder: "NBT路徑 (如 craftengine:id)"
+  value: "值"
+  minecraftVanilla: "minecraft (原版)"
+  nativeSupport: "原生支援"
+  addonSupport: "附屬支援（使用時顯示警告）"
+  taskManager: "子任務管理 — {name}"
+  totalSubtasks: "共 {count} 個子任務"
+  subtaskTab: "第{index}個子任務"
+  subtaskPrefix: "子任務 {count}"
+  addSubtask: "+ 新增子任務"
+  addSubtaskHint: "點擊左側\"新增子任務\"按鈕新增"
+  close: "關閉"
+  selectObjectiveType: "選擇子任務目標類型"
+  selectTaskObjectiveType: "選擇任務目標類型"
+  searchObjectivePlaceholder: "搜尋 objective 類型..."
+  noSubtaskSelected: "未選擇子任務"
+  selectType: "選擇類型..."
+  delete: "刪除"
+  subtaskId: "子任務 ID"
+  name: "名稱"
+  objectiveType: "任務目標類型 (objective)"
+  customObjectivePlaceholder: "自訂 objective type"
+  objectiveCondition: "條件"
+  position: "座標 (position)"
+  posEdit: "視覺化座標編輯"
+  itemEdit: "視覺化物品編輯"
+  ketherScriptField: "KETHER 腳本 ($)"
+  goal: "目標 (goal)"
+  amountField: "數量 (amount)"
+  subtaskAgentScripts: "子任務 Agent 腳本"
+  addonManager: "元件管理 — {name}"
+  totalAddons: "共 {count} 個元件"
+  addAddon: "+ 新增元件"
+  addAddonHint: "點擊左側\"新增元件\"按鈕新增"
+  noAddonComponents: "暫無元件"
+  selectAddon: "選擇 Addon 元件"
+  searchAddonPlaceholder: "搜尋元件名稱..."
+  customKeyValues: "自訂鍵值對"
+  enabled: "啟用"
+  deleteItem: "刪除此項"
+  addNode: "+ 新增節點"
+  noConfigurableFields: "該元件無可設定欄位"
+  selectAgentHook: "選擇 Agent 鉤子"
+  searchHookPlaceholder: "搜尋鉤子名稱..."
+  customScopePrompt: "輸入自訂作用域："
+  customScopeLabel: "@ 自訂"
+  selectScopeForHook: "選擇 {hook} 的作用域"
+  searchScopePlaceholder: "搜尋作用域..."
+  customHookPrompt: "輸入鉤子名稱 + 作用域（如: completed @ all）:"
+  scopeGroup: "作用域"
+  posEditor: "座標運算式編輯器"
+  world: "世界"
+  required: "必填"
+  xyz: "座標 X Y Z"
+  mode: "模式"
+
+  exactPos: "精確座標"
+  radiusPos: "範圍內 (~ 半徑)"
+  areaPos: "區域內 (> 座標)"
+  multiPos: "多個座標 (&)"
+  radius: "半徑"
+  radiusPlaceholder: "例: 10"
+  areaTo: "區域到 X Y Z"
+  toX: "到 X"
+  toY: "到 Y"
+  toZ: "到 Z"
+  multiCoords: "多個座標"
+  addCoord: "+ 新增座標"
+  ok: "確定"
+  worldRequired: "請填寫世界名稱"
+  selectTypeTitle: "選擇 Chemdah 解釋器類型"
+  typeUnknownMsg: "無法自動識別檔案類型{detected}。請手動選擇解釋器類型："
+  detectedAs: "（偵測為：{type}）"
+  interpreterType: "解釋器類型"
+  typeConversation: "對話 (Conversation)"
+  typeQuest: "任務 (Quest)"
+  scopeLabel: "作用範圍"
+  scopeFile: "僅此檔案"
+  scopeDirectory: "目前資料夾下全部檔案"
+  scopeProject: "整個專案"
+  typeUnknown: "無法識別"
+  typeConversationFull: "對話檔案 (Conversation)"
+  typeQuestFull: "任務檔案 (Quest)"
+  unknownTypeTitle: "無法識別的檔案類型"
+  unknownTypeMsg: "目前檔案不屬於 conversation 或 quest 類型。"
+  unknownTypeHint: "請在原始碼模式中編輯，或使用"
+  manualSelect: "手動選擇類型"
+  rendering: "重新渲染中..."
+  visualEditTitle: "視覺化編輯"
+  visualEditHint: "請選擇解釋器類型後重試，或在原始碼模式中編輯。"
+
+craftengine:
+  premiumHint: "此功能為CraftEngine外掛的高級版專屬功能 - 如果您正在使用社群版，此設定可能沒有作用。"
+  versionHint: "此功能有版本限制: {versions}"
+  hintDetail: "提示詳情"
+  hintModeEditor: "編輯器方式"
+  hintModeWiki: "Wiki 原文"
+  yvObject: "物件"
+  yvList: "清單"
+  yvEmpty: "空"
+  yvOf: "為"
+  yvCase: "情況"
+  syncedToSource: "已同步到原始碼"
+  fieldEmpty: "（空）"
+  type_config: "外掛設定"
+  listEmpty: "暫無條目 — 點擊下方按鈕新增"
+  listAdd: "新增"
+  mapAdd: "+ 新增鍵值"
+  unionEmpty: "不指定"
+  unionClear: "清除"
+  customValue: "簡單值…"
+  componentAdd: "新增元件…"
+  componentCustom: "自訂 (鍵值對)"
+  componentsEmpty: "此條目還沒有 data 元件 — 從下方下拉式選單選擇新增"
+  componentConditionTitle: "條件"
+  condAdd: "新增條件"
+  modelSimplified: "簡化模型"
+  modelTree: "模型樹"
+  modelPath: "模型路徑"
+  popupEdit: "編輯"
+  popupEmpty: "未設定"
+  popupDetailed: "詳細"
+  popupOk: "確定"
+  popupCancel: "取消"
+  jsonEditor: "JSON 編輯器"
+  jsonEditorHint: "以 JSON 格式編輯該欄位，修改後立即生效"
+  material: "材質 (material)"
+  customModelData: "自訂模型資料 (custom-model-data)"
+  texture: "紋理 (texture)"
+  category: "分類 (category)"
+  dataLabel: "物品資料 (data)"
+  displayName: "顯示名稱 (item-name)"
+  itemName: "物品名稱 (display-name)"
+  lore: "Lore 文字 (lore)"
+  dataJsonHint: "物品資料完整 JSON 編輯"
+  model: "模型 (model)"
+  modelJsonHint: "模型資料完整 JSON 編輯"
+  behaviorType: "行為類型 (behavior.type)"
+  behavior: "行為設定 (behavior)"
+  settings: "設定 (settings)"
+  events: "事件 (events)"
+  updater: "更新器 (updater)"
+  state: "方塊狀態 (state)"
+  states: "多狀態設定 (states)"
+  statesHint: "方塊多狀態映射，以 JSON 編輯"
+  hardness: "硬度 (hardness)"
+  resistance: "抗性 (resistance)"
+  behaviors: "行為清單 (behaviors)"
+  loot: "戰利品 (loot)"
+  variants: "變體 (variants)"
+  variantsHint: "變體元素 / 碰撞箱 / 座位設定"
+  settingsItem: "物品 (item)"
+  hitTimes: "擊打次數 (hit-times)"
+  settingsSounds: "音效 (sounds)"
+  recipeType: "配方類型 (type)"
+  pattern: "配方圖案 (pattern)"
+  patternHint: "每行一個圖案字串"
+  ingredients: "材料 (ingredients)"
+  ingredientsHint: "鍵值對：字元 = 物品"
+  result: "結果 (result)"
+  resultId: "物品 (id)"
+  resultCount: "數量 (count)"
+  experience: "經驗 (experience)"
+  time: "耗時 (time)"
+  base: "基礎物品 (base)"
+  addition: "附加物品 (addition)"
+  templateType: "鍛造模板 (template_type)"
+  group: "群組 (group)"
+  unlockOnIngredient: "獲取材料解鎖 (unlock_on_ingredient_obtained)"
+  unlockOnJoin: "加入即解鎖 (unlock_on_join)"
+  otherFields: "其他欄位"
+  customTabWarning: "自訂標籤頁僅適用於外掛檔案編輯中有標籤頁沒有提供的選項時才應該使用"
+  type_item: "物品 (Item)"
+  type_block: "方塊 (Block)"
+  type_furniture: "家具 (Furniture)"
+  type_recipe: "配方 (Recipe)"
+  type_generic: "通用 (Generic)"
+  yamlError: "無法解析 YAML"
+  yamlErrorHint: "檔案語法有誤，無法視覺化編輯。請在原始碼模式中修復後重試。"
+  noSections: "未找到可編輯的分段"
+  noEntries: "該分段暫無條目"
+  addEntry: "+ 新增條目"
+  emptySection: "空分段"
+  selectEntry: "選擇左側條目進行編輯"
+  ownerLoading: "正在定位專案歸屬..."
+  syncToSource: "同步到原始碼"
+  autoSync: "自動同步"
+  ownerBadge: "專案: {root} · Pack: {pack}"
+  ownerNone: "未找到 CE 專案歸屬"
+  pickerBtn: "快速填入"
+  pickerSearch: "搜尋..."
+  pickerEmpty: "暫無記錄，點擊右上角 ⟳ 重新掃描"
+  pickerNoMatch: "沒有符合項目"
+  pickerScanning: "正在掃描專案元素..."
+  pickerRescan: "重新掃描"
+  pickerCount: "共 {n} 項 · 點擊填入 · 多行輸入可連續新增"
+  newEntryTitle: "新建條目"
+  section: "分段"
+  entryNamespace: "命名空間 (namespace)"
+  entryPath: "路徑 (path)"
+  confirmAdd: "新增"
+  confirmDelete: "刪除"
+  deleteEntry: "刪除條目"
+  deleteConfirmTitle: "刪除確認"
+  deleteConfirmMsg: "確定要刪除條目 {key} 嗎？此操作無法復原。"
+  entryNamespaceInvalid: "命名空間僅允許小寫字母、數字與底線"
+  entryPathInvalid: "路徑僅允許字母、數字、底線、點、斜線與連字號"
+  entryExists: "條目 {key} 已存在"
+  entryId: "條目 ID"
+  entryIdInvalid: "ID 僅允許字母、數字、底線、點與連字號"
+  keyOnlyHint: "該分段條目沒有 namespace:path 前綴，直接填寫 ID 即可"
+  type_equipment: "裝備 (Equipment)"
+  type_image: "貼圖 (Image)"
+  type_category: "分類 (Category)"
+  type_sound: "聲音 (Sound)"
+  type_emoji: "表情 (Emoji)"
+  type_jukeboxSong: "唱片 (Jukebox Song)"
+  type_painting: "畫 (Painting)"
+  type_globalVariable: "全域變數 (Global Variable)"
+  type_translation: "翻譯 (Translation)"
+  type_lang: "用戶端翻譯 (Lang)"
+  type_lootSource: "掉落來源 (Loot Source)"
+  type_placedFeature: "結構生成 (Placed Feature)"
+  type_template: "模板 (Template)"
+  type: "類型 (type)"
+  allItems: "全部物品 (all_items)"
+  arguments: "參數 (arguments)"
+  ascent: "上浮 (ascent)"
+  assetId: "貼圖 ID (asset_id)"
+  author: "作者 (author)"
+  biome: "生態域 (biome)"
+  char: "字元 (char)"
+  chars: "字元集 (chars)"
+  chatCompletion: "聊天補全 (chat_completion)"
+  clientBoundMaterial: "用戶端材質 (client-bound-material)"
+  column: "列 (column)"
+  comparatorOutput: "比較器輸出 (comparator_output)"
+  conditions: "條件 (conditions)"
+  content: "內容 (content)"
+  description: "描述 (description)"
+  dimension: "維度 (dimension)"
+  dimensionType: "維度類型 (dimension_type)"
+  equipment: "裝備 (equipment)"
+  equipmentType: "類型 (type)"
+  feature: "結構 (feature)"
+  featureHint: "字串或物件均可，如 default:tree 或 {type: ...}"
+  file: "檔案 (file)"
+  font: "字型 (font)"
+  food: "食物 (food)"
+  globalVariableMap: "全域變數 (鍵值對)"
+  gridSize: "網格大小 (grid_size)"
+  height: "高度 (height)"
+  hidden: "隱藏 (hidden)"
+  icon: "圖示 (icon)"
+  image: "貼圖 (image)"
+  keywords: "關鍵字 (keywords)"
+  kvWholeHint: "整條資料為鍵值對；值為 JSON 時自動解析"
+  templateContent: "模板內容 (YAML)"
+  templateContentHint: "模板為任意鍵值對集合：支援深層嵌套、$$ 版本條件鍵、!!type 類型標記"
+  layers: "圖層 (layers)"
+  layersHint: "可用圖層: {names}；值可為材質路徑或 JSON 物件"
+  length: "時長 (length)"
+  list: "物品清單 (list)"
+  lootSourceType: "來源類型 (type)"
+  mapColor: "地圖顏色 (map-color)"
+  merges: "合併 (merges)"
+  name: "名稱 (name)"
+  overrides: "覆蓋 (overrides)"
+  overwrite: "覆蓋模式 (overwrite)"
+  permission: "權限 (permission)"
+  placement: "放置規則 (placement)"
+  priority: "優先順序 (priority)"
+  range: "播放範圍 (range)"
+  ref: "參照 (ref)"
+  replace: "替換 (replace)"
+  row: "行 (row)"
+  showInOpTab: "OP 標籤頁顯示 (show_in_op_tab)"
+  sound: "聲音 (sound)"
+  sounds: "聲音清單 (sounds)"
+  soundsHint: "每行一條：純字串或 JSON 物件"
+  subtitle: "字幕 (subtitle)"
+  tags: "標籤 (tags)"
+  target: "目標 (target)"
+  targets: "目標清單 (targets)"
+  template: "模板 (template)"
+  title: "標題 (title)"
+  translationMap: "翻譯表 (鍵值對)"
+  width: "寬度 (width)"
+  world: "世界 (world)"
+  entryKey: "條目 Key (namespace:path)"
+  entryKeyHint: "重新命名後立即生效；global_variables / translations / lang 分段無前綴"
+  tabBasic: "基礎內容"
+  tabModel: "模型"
+  tabItemData: "物品資料"
+  tabBehavior: "行為"
+  tabEvents: "事件"
+  eventsAdd: "+ 新增事件"
+  eventsBack: "← 返回清單"
+  eventsTrigger: "觸發器 (on)"
+  eventsTriggerRequired: "請輸入觸發器名稱"
+  eventsTriggerHint: "多個觸發器用空格或逗號分隔，如 attack left_click"
+  eventsTriggerPh: "attack right_click…"
+  eventsFunctions: "函式清單 (functions)"
+  eventsFunctionsHint: "按順序執行；函式內可嵌套條件和事件"
+  eventsScalarPh: "原始字串 (自訂/進階)"
+  eventsContent: "事件內容"
+  eventsCount: "{count} 個事件"
+  eventsEmpty: "暫無事件，點擊右上角新增"
+  newEventTitle: "新建事件"
+  newEventHint: "多個觸發器可用空格或逗號分隔，如 attack left_click"
+  eventExists: "事件 {name} 已存在"
+  eventDeleteMsg: "確定要刪除事件 {name} 嗎？此操作無法復原。"
+  specTitle: "特殊設定"
+  specHasVersions: "版本條件 {n} 項"
+  specHasType: "值類型 {type}"
+  specLoc: "位置"
+  specVersions: "版本條件"
+  specVersionsDesc: "按 Minecraft 版本提供不同值：$1.21.4 固定 · $1.20.1~1.21.4 範圍 · $>=1.21.4 比較 · $fallback 回退"
+  specNoVersions: "暫無版本條件 — 在下方新增"
+  specFixed: "固定"
+  specRange: "範圍"
+  specCompare: "比較"
+  specFallback: "回退"
+  specAdd: "新增"
+  specKeyPh: "版本號，如 1.21.4"
+  specValPh: "值"
+  specEmptyVal: "空值將刪除該條件"
+  specDel: "刪除"
+  specType: "值類型 (!!type)"
+  specTypeNone: "無類型"
+  specTypeHint: "將值標記為指定類型，寫回原始碼時保留 !!type 前綴"
+  specCurVal: "目前值"
+
+content:
+  categories:
+    实体操作: "實體操作"
+    数据与变量: "資料與變數"
+    文本与运算: "文字與運算"
+    游戏机制: "遊戲機制"
+    系统管理: "系統管理"
+    逻辑判断: "邏輯判斷"
+    世界与坐标: "世界與座標"
+    物品管理: "物品管理"
+    脚本控制: "腳本控制"
+    界面与显示: "介面與顯示"
+    时间与日期: "時間與日期"
+    基本: "基本"
+  param:
+    symbol: "符號"
+    action: "動作"
+    int: "整數"
+    double: "小數"
+    number: "數字"
+    string: "文字"
+    token: "參數"
+    player: "玩家"
+    item: "物品"
+    location: "位置"
+    world: "世界"
+    time: "時間"
+    message: "訊息"
+    permission: "權限"
+    list: "清單"
+    条件: "條件"
+    执行: "執行"
+    否则: "否則"
+    次数: "次數"
+    变量: "變數"
+    条件列表: "條件清單"
+
+  kether:
+    all: '檢查動作清單中的所有{回傳值}是否為{是}。'
+    any: '檢查動作清單中是否有任一{回傳值}為{是}。'
+    async: '以{非同步}排程執行動作，不受生命週期約束。<br>當程式結束時，所有未完成的{#Async}動作會立即關閉。'
+    await: 等待動作完成。
+    await_all: '等待{動作清單}中的{所有動作}完成。'
+    await_any: '等待{動作清單}中的{任一動作}完成。'
+    call: '{此語句在 Shell 模式下不執行任何操作。}<br>呼叫任何已宣告的函式，包括 {main} 函式。'
+    exit: 結束程式。
+    goto: '{此語句在 Shell 模式下不執行任何操作。}<br>跳轉至任何已宣告的函式（包括 {main} 函式）或特定的對話結構。'
+    if_else: '基礎邏輯語句。<br>當動作的{回傳值}為{是}時，執行第二個動作；否則執行第三個動作。'
+    literal: '建立並回傳一個{字串}。<br>當字串包含空格時，需以{雙引號}或{單引號}包覆；無空格時可省略引號。<br><br>{注意：}<br>即使是 {literal 100} 也不是整數，必要時請使用 {#Type} 動作。'
+    not: '檢查動作的{回傳值}是否為{否}，即反轉結果。'
+    repeat: 重複執行動作數次。
+    sleep: 使工作執行緒阻塞一段時間。
+    variable_get: 取得變數。
+    variable_set: '將變數設為{基本型別}或動作的{回傳值}。'
+    while: '基礎邏輯語句。<br>當第一個動作的{回傳值}為{是}時，重複執行第二個動作，直到其變為{否}為止。'
+    absorption_amount: '取得或設定玩家的吸收生命值。'
+    action_bar: '將動作的{回傳值}以{動作欄}訊息傳送給{執行者}。'
+    address: '取得玩家的 IP 位址。'
+    allow_flight: 檢查或變更玩家是否允許飛行。
+    array: '將動作清單的所有{回傳值}作為一個{集合}回傳。'
+    attack_cooldown: '取得玩家的攻擊冷卻時間。'
+    bed_spawn: '取得或變更玩家的床重生點；該方塊必須是床。'
+    'bed_spawn_x,y,z': '取得玩家床重生點的單一軸座標。'
+    blocking: 檢查玩家是否正在格擋。
+    break: '在迴圈語句（{ForEach, Join, Map, While}）中使用時，結束迴圈主體。'
+    'case & when': '比 #IF 功能更豐富的複雜選擇語句。<br>完整的選擇語句至少需要一個分支，即{when 區塊}。<br><br>每個標準分支由 {when} {{condition}} -> {{expression}} 組成。<br>也可以使用 {else} {{expression}} 作為預設分支。<br><br>{範例如下：}<br>set number to 3<br>set numberProvided to case &number [<br>&nbsp;&nbsp;&nbsp;&nbsp;when 1 -> "One"<br>&nbsp;&nbsp;&nbsp;&nbsp;when 2 -> "Two"<br>&nbsp;&nbsp;&nbsp;&nbsp;when 3 -> "Three"<br>&nbsp;&nbsp;&nbsp;&nbsp;else "One"<br>]<br>log inline "You provide {{ &numberProvided }}"<br><br>{結果為：}<br>You provide Three<br><br>{也可以像其他語句一樣使用：}<br>set number to 3<br>case &number [<br>&nbsp;&nbsp;&nbsp;&nbsp;when 1 -> log "One"<br>&nbsp;&nbsp;&nbsp;&nbsp;when 2 -> log "Two"<br>&nbsp;&nbsp;&nbsp;&nbsp;when 3 -> log "Three"<br>&nbsp;&nbsp;&nbsp;&nbsp;else log "One"<br>]<br><br>{或搭配多條語句使用：}<br>set number to 1<br>case &number [<br>&nbsp;&nbsp;&nbsp;&nbsp;when 1 -> {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;log "Monday"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;log "First day of the week"<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;when [ 2 3 4 5 6 7 ] -> {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;log "Sunday"<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;else log "Other days"<br>]<br><br>{或用於邏輯判斷：}<br>set number to 1<br>case &number [<br>&nbsp;&nbsp;&nbsp;&nbsp;when < 10 -> {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;log "Small"<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;when > 10 -> {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;log "Big"<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;else log "Other"<br>]'
+    check: '以多種比較模式比較兩個動作的{回傳值}。<br><br>1. 等於（{==}、{is}）：兩個值在{字面上}相同。<br>2. 不等於（{!=}、{not}）：兩個值在{字面上}不同。<br>3. 相似等於（{=?}、{is?}）：忽略{大小寫}時，兩個值在{字面上}相同。<br>4. 絕對等於（{=!}、{is!}）：兩個值在{記憶體}中相同。<br>5. 大於（{>}、{gt}）：第一個值{大於}第二個值。<br>6. 大於等於（{>=}）：第一個值{大於}或{等於}第二個值。<br>7. 小於（{<}、{lt}）：第一個值{小於}第二個值。<br>8. 小於等於（{<=}）：第一個值{小於}或{等於}第二個值。<br>9. 右包含左（in）：第二個值是否包含第一個值。<br>10. 左包含右（has）：第一個值是否包含第二個值。<br><br>{注意：}<br>使用{等於}條件比較時，會自動為兩個參數附加 {#Type} 推斷動作。'
+    color: '替換動作的{回傳值}中所有{顏色代碼}。<br>支援 {TabooLib} 提供的進階顏色代碼。'
+    command: '將動作的{回傳值}作為指令執行，預設以{玩家}作為執行者。'
+    compass_target: '取得或變更玩家的羅盤目標。'
+    'compass_x,y,z': '取得玩家羅盤目標的單一軸座標。'
+    conversing: '檢測 Conversable 物件是否正在進行對話。<br><br>{回傳：}<br>若對話正在進行則為 True'
+    date_day: '年、月或週中的第幾天。<br>年：({1} ~ {365})<br>月：({1} ~ {31})<br>週：({1} ~ {7})'
+    date_hour: '目前小時（{0} ~ {23}）。'
+    date_minute: '目前分鐘（{0} ~ {59}）。'
+    date_month: '目前月份（{1} ~ {12}）。'
+    date_second: '目前秒數（{0} ~ {59}）。'
+    date_year: '目前年份（{MIN_YEAR} ~ {MAX_YEAR}）。'
+    dead: 檢查玩家是否死亡。
+    element: '從動作的{回傳值}（一個{清單}）中取得指定索引處的元素。'
+    exhaustion: '取得或變更玩家的耗竭值。'
+    exp: '取得或變更玩家的經驗資料；僅{玩家經驗}可被修改。'
+    first_played: 回傳玩家首次遊玩的時間。
+    fly___walk_speed: '取得或變更玩家的飛行或行走速度。'
+    flying: 檢查或變更玩家是否正在飛行。
+    food_level: '取得或變更玩家的飢餓值。'
+    foreach: '走訪第一個動作{回傳值}中的所有{成員}，將每個成員作為{暫存變數}傳遞給第二個動作。'
+    format_time: '以指定的{格式}格式化特定時間。<br><br>'
+    gamemode: '取得或變更玩家的遊戲模式。<br><br>可用模式：<br>{生存}: SURVIVAL, 0<br>{創造}: CREATIVE, 1<br>{冒險}: ADVENTURE, 2<br>{旁觀者}: SPECTATOR, 3'
+    gliding: 檢查或變更玩家是否正在滑翔。
+    glowing: 檢查或變更玩家是否正在發光。
+    gravity: 檢查或變更玩家是否受重力影響。
+    health: '取得或變更玩家的生命值或最大生命值。'
+    inline: '替換動作的{回傳值}中所有{行內腳本}。 <br>行內腳本使用 {{{} ... {}}} 將腳本程式碼插入字串中。'
+    inside_vehicle: 檢查玩家是否在載具中。
+    javascript: '執行 {JavaScript} 程式碼並{回傳}結果。<br>目前程式的所有變數都會傳入，同時傳入的還有事件（{event}）、發送者（{sender}）與伺服器（{server}）。'
+    join: '將動作清單的所有{回傳值}連接成一個{字串}，預設以{空格}作為分隔符。'
+    jumping: 檢查或變更玩家是否正在跳躍。
+    last_played: '回傳玩家上次遊玩／登入的時間。'
+    leashed: 回傳實體目前是否被拴繩拴住。
+    level: '取得或變更玩家的等級。'
+    locale: '取得玩家用戶端的語言。'
+    location: 建構一個位置。
+    location1: '取得或變更玩家的位置。'
+    location_angle: '取得或變更玩家的角度。'
+    'location_x,y,z': '取得或修改位置的 X、Y、Z、Yaw 或 Pitch。'
+    map: '走訪第一個動作{回傳值}中的所有{成員}，將每個成員作為{暫存變數}傳遞給第二個動作。<br>最後，將第二個動作的所有{回傳值}作為一個{集合}回傳。<br><br>與 {#ForEach} 不同，{#Map} 會收集每個非空結果。<br><br>回傳一個清單，其中包含對原始集合的每個元素套用指定轉換函式後的結果。'
+    math: '以{數學運算子}處理動作清單的所有{回傳值}。<br><br>支援的運算子：<br>{加}: +, add, plus<br>{減}: -, sub, minus<br>{乘}: *, mul, times<br>{除}: /, div, divided<br>'
+    name: '取得玩家的遊戲名稱、顯示名稱或清單名稱。'
+    no_damage_tick: '取得或變更玩家的無敵刻數。'
+    null: '回傳一個 {null} 值。'
+    on_guard: 檢查玩家是否在地面；此資料來自用戶端，可能被竄改。
+    op: 檢查或變更玩家是否具有 OP。
+    optional: '檢查動作的{回傳值}是否為非空值。'
+    pass: '回傳一個{空字串}。'
+    pause: '強制暫停程式的{生命週期}；在程式關閉前無法解除暫停。'
+    permission: '檢查{執行者}是否擁有動作的{回傳值}所表示的權限。'
+    placeholderapi: '替換動作的{回傳值}中所有 {PlaceholderAPI} 佔位符。'
+    print: '將動作的{回傳值}作為訊息傳送至{主控台}。'
+    random: '在範圍內隨機回傳一個{浮點數}，或從動作的{回傳值}中隨機回傳一個{成員}。<br>定義範圍時，可省略第二個參數，表示從 0 到該範圍中選取。'
+    random2: '在範圍內隨機回傳一個{浮點數}或{整數}；與 #{random} 不同的是，其範圍由動作的回傳值給定。'
+    range: '建立一個數值{集合}；省略{步進值}或使用{整數}步進值時，建立整數集合，否則建立浮點數集合。<br>集合的型別取決於步進值的型別，而非範圍數字的型別。'
+    remaining_air: '取得或變更玩家的剩餘氧氣量。'
+    riptiding: 檢查玩家是否正在使用激流（三叉戟）。
+    round: '將動作的{回傳值}視為{浮點數}四捨五入至最接近的{整數}。'
+    saturation: '取得或變更玩家的飽和度。'
+    scale: '將動作的{回傳值}格式化為保留兩位小數的{浮點數}。'
+    size: '取得作為{清單}的動作{回傳值}之長度。'
+    sleep_ignored: '回傳玩家是否被標記為忽略睡眠。若所有玩家都在睡覺或已設定此標記，時間將推進到第二天。若所有玩家都設定了此標記但實際上沒有人在床上，則不會發生任何事。'
+    sleep_ticks: '回傳玩家的睡眠刻數。'
+    sleeping: 檢查玩家是否正在睡覺。
+    sneaking: 檢查玩家是否正在潛行。
+    sound: '將文字作為音效播放；預設音量與音調皆為 {1.0}。<br>使用「{resource:}」作為前綴，可播放{資源包}中的音效。'
+    split: '將動作的{回傳值}作為字串進行分割，並回傳分割後的部分。'
+    sprinting: 檢查玩家是否正在疾跑。
+    subtitle: '將動作的{回傳值}以{副標題}形式傳送給{執行者}；預設的淡入、停留、淡出時間為 {0}、{20}、{0}。'
+    swimming: 檢查或變更玩家是否正在游泳。
+    switch: '將目前的{觀察者}切換為特定玩家。'
+    tell: '將動作的{回傳值}作為訊息傳送給{執行者}。'
+    time: '目前系統時間。<br><br>以毫秒回傳目前時間。注意，雖然回傳值的時間單位是毫秒，但其數值的精細度取決於底層作業系統，可能更大。例如，許多作業系統以數十毫秒為單位測量時間。<br>關於「電腦時間」與協調世界時（UTC）之間可能產生的細微差異，請參閱 Date 類別的說明。<br><br>{回傳： }以毫秒為單位，量測目前時間與 1970 年 1 月 1 日 UTC 午夜之間的差值。'
+    time_format: '以指定的{格式}格式化目前系統時間。<br><br>'
+    title: '將動作的{回傳值}以{標題}形式傳送給{執行者}；預設的淡入、停留、淡出時間為 {0}、{20}、{0}。'
+    toast: '將動作的{回傳值}以{成就快顯通知}形式傳送給{執行者}。<br>回傳值支援{清單}。<br><br>需要伺服器版本高於 1.13'
+    type: '建立並回傳最符合的{字串}、{整數}、{長整數}、{浮點數}或{布林值}。<br>當字串包含空格時，需以{雙引號}或{單引號}包覆；無空格時可省略引號。<br><br>或以{指定型別}格式化（傳入動作作為參數）：<br>int, long, float, double, boolean'
+    variable: '修改或讀取全域變數。<br>全域變數的說明請參閱 {Chemdah} 文件。<br><br>在讀取（get）語法後使用 {default}，當資料缺失時回傳預設值；在新增（add）語法後使用 {default}，當資料缺失時以該值為基礎進行新增。'
+    variables: '回傳所有變數的{節點}合併成的字串{清單}。'
+    warning: '將動作的{回傳值}作為警告傳送至{主控台}。'
+    whitelist: 檢查或變更玩家是否在白名單中。
+    world: 取得玩家目前所在世界的名稱。
+    import: 匯入命名空間。
+    release: 釋放命名空間。
+    block: '取得位置的整數 X、Y、Z 座標值。'
+    cancel: '用於{任務}或{對話}開頭的腳本代理中，以取消該行為。'
+    ceil: 無條件進位
+    close: 用於對話腳本代理中，以結束對話。
+    distance: 取得兩個位置之間的距離；若位於不同世界則回傳 -1。
+    equipment_check: '使用 {Chemdah} 物品運算式檢查玩家的裝備是否為特定物品。<br>運算式的說明請參閱 {Chemdah} 文件。<br><br>可用部位：<br>{主手}: hand, mainhand<br>{副手}: offhand<br>{頭盔}: head, helmet<br>{胸甲}: chest, chestplate<br>{護腿}: legs, leggings<br>{靴子}: boots, feet'
+    floor: 無條件捨去
+    inventory_count: '使用 {Chemdah} 物品運算式統計玩家物品欄中特定物品的數量。<br>運算式的說明請參閱 {Chemdah} 文件。'
+    inventory_check: '使用 {Chemdah} 物品運算式檢查玩家的物品欄是否包含特定物品。運算式的說明請參閱 {Chemdah} 文件。'
+    inventory_close: '關閉玩家目前開啟的物品欄。'
+    inventory_slot_check: '使用 {Chemdah} 物品運算式檢查玩家物品欄中特定欄位是否為某件物品。<br>運算式的說明請參閱 {Chemdah} 文件。'
+    inventory_take: '使用 {Chemdah} 物品運算式檢查玩家物品欄是否包含特定物品並將其移除。<br>運算式的說明請參閱 {Chemdah} 文件。'
+    max: 兩個及以上數值中的最大值
+    min: 兩個及以上數值中的最小值
+    mmocore_attribute_point: '取得玩家的 {MMOCore} 屬性點數。'
+    mmocore_class: '取得玩家的 {MMOCore} 職業資料。'
+    mmocore_level___exp: '取得玩家的 {MMOCore} 等級或經驗。'
+    mmocore_mana: '取得玩家的 {MMOCore} 魔力值。'
+    mmocore_skill_point: '取得玩家的 {MMOCore} 技能點數。'
+    mmocore_stamina: '取得玩家的 {MMOCore} 體力值。'
+    mythicmobs_cast: '使玩家施放 {MythicMobs} 技能。<br><br>可用的 {Trigger} 類型：<br>DEFAULT, API, ATTACK, BOW_HIT, BLOCK, BLOCK_PLACE, BLOCK_BREAK, <br>COMBAT, CONSUME, CROUCH, UNCROUCH, DAMAGED, DROPCOMBAT, DEATH, <br>DESPAWNED, ENTERCOMBAT, EXPLODE, INTERACT, KILL, KILLPLAYER, <br>PLAYERDEATH, SHOOT, SIGNAL, SPAWN, SPLASH_POTION, SWING, TARGETCHANGE, <br>TARGETED, TELEPORT, TIMER, USE, RIGHTCLICK, READY, CAST, FISH, <br>FISH_BITE, FISH_CATCH_FISH, FISH_CATCH_ENTITY, FISH_GROUND, FISH_REEL, <br>FISH_FAIL, TAME, TAME_FAIL, TRIDENT_THROW, TRIDENT_HIT, CUSTOM'
+    origin: '用於對話腳本代理中，取得 NPC 頭頂上方的位置。'
+    particle_normal: '在指定位置播放粒子效果；在結尾附加 {@self} 可僅對自己顯示。<br><br>{粒子運算式語法：}<br>https://wiki.ptms.ink/index.php?title=Chemdah_通用粒子表达式'
+    position: 取得所選 NPC 的位置；若選取多個則回傳清單。
+    profile_data: '修改或讀取玩家的變數。<br>玩家變數的說明請參閱 {Chemdah} 文件。<br><br>在讀取（get）語法後使用 {default}，當資料缺失時回傳預設值；在新增（add）語法後使用 {default}，當資料缺失時以該值為基礎進行新增。'
+    profile_level: '修改或讀取玩家在{自訂等級}中的等級或經驗。<br>自訂等級的說明請參閱 {Chemdah} 文件。'
+    quest_group_check: 檢查玩家是否已接受或完成某個任務群組。
+    quest_check: '檢查玩家進行中或尚未接受的任務（已選取）。<br><br>可用行為：<br>accept-check（是否允許接受） accepted（是否已接受） completed（是否已完成）'
+    quest_control: '控制玩家進行中或尚未接受的任務（已選取）。<br><br>可用行為：<br>accept（接受任務） complete（完成任務） fail（放棄任務） restart（重置任務） stop（結束任務）'
+    quest_progress: 取得玩家目前（已選取）任務的進度，或（已選取）任務中特定條目的進度。
+    quest_select: 選取伺服器上任意有效任務，以供後續操作使用。
+    quest_data: '修改或讀取玩家目前（已選取）任務中的變數。<br>任務變數的說明請參閱 {Chemdah} 文件。<br><br>在讀取（get）語法後使用 {default}，當資料缺失時回傳預設值；在新增（add）語法後使用 {default}，當資料缺失時以該值為基礎進行新增。'
+    quest_stats: '隱藏或重新整理（已選取）任務或（已選取）任務中特定條目的進度顯示。<br>使用獨立的 {} 代表所有條目。'
+    quest_tasks: 取得（已選取）任務的條目索引。
+    quest_this: '在 {Chemdah} 任務腳本代理中，回傳目前任務或條目索引。'
+    quest_track: 使玩家追蹤（已選取）任務。
+    quest_tracking: 取得玩家正在追蹤的任務名稱。
+    quests: '取得玩家目前正在進行的所有任務；使用 {self} 可忽略共用（多人）任務。'
+    schematic: '在 {#Location} 建構的位置生成指定的 {WorldEdit} 結構檔案。支援旋轉與忽略空氣。'
+    script: 執行或停止腳本檔案。
+    skillapi_attribute_point: '取得玩家的 {SkillAPI} 屬性或屬性點數。'
+    skillapi_cast: '使玩家施放 {SkillAPI} 技能。<br>'
+    skillapi_class: '取得玩家的 {SkillAPI} 職業資料。'
+    skillapi_exp: '取得玩家的 {SkillAPI} 目前經驗或升級所需經驗。'
+    skillapi_level: '取得玩家的 {SkillAPI} 等級，或是否已達最高等級。'
+    skillapi_mana: '取得玩家的 {SkillAPI} 魔力值。'
+    skillapi_skill_point: '取得玩家的 {SkillAPI} 技能點數。'
+    talk: '當用於 {agent:begin} 時：<br>新增 NPC 即將發送的內容。<br><br>當用於 {agent:refuse}、{agent:end}、{then} 時：<br>使 NPC 立即發送特定內容，常用於為對話收尾。'
+    trigger: '觸發玩家的 {Trigger} 任務。<br>此任務類型的說明請參閱 {Chemdah} 文件。'
+    ui: '僅在 {UI} 模組設定檔中生效，用於建構任務進度。<br>UI 模組的說明請參閱 {Chemdah} 文件。'
+    wizard: 啟動或停止 Wizard 引導。
+    workflow_fetch: '定義離線補償：若玩家在 {fetch reset} 語句執行前離開遊戲，則會在其下次加入時執行 {fetch mark} 中的語句。'
+    animation: '使目前所有已選取的 NPC 播放動畫。<br><br>{已知的有：}<br>SWING_MAIN_HAND, TAKE_DAMAGE, LEAVE_BED, SWING_OFFHAND<br>CRITICAL_EFFECT, MAGIC_CRITICAL_EFFECT'
+    controller: '為目前所有已選取的 NPC 指派控制器，或移除、清空它們。<br><br>{已知的有：}<br>Move, Gravity, SmoothLook, LookAtPlayer, LookAtPlayerAlways<br>RandomLookGround, RandomStrollLand'
+    create: 在特定位置建立一個 NPC。
+    delete: 刪除並銷毀所有已選取的 NPC。
+    destroy: 銷毀目前所有已選取的 NPC。
+    look: '使所有已選取的 NPC 看向某個位置，可選擇是否平滑轉向。'
+    meta: '修改所有已選取 NPC 的中繼資料，或將其重置。<br><br>{另請參閱：}<br>https://wiki.ptms.ink/index.php?title=AdyeshachPremium:开始:附录:第二节'
+    move: '使所有已選取的 NPC 走向某個位置，可選擇使用相對座標。'
+    passenger: '為所有已選取的 NPC 新增乘客，或移除、清空乘客。'
+    remove: '移除所有已選取的 NPC。它們會從管理器中移除且不再受管理，但實體不會被銷毀。'
+    respawn: 重生目前所有已選取的 NPC。
+    select: '以動作的{回傳值}作為 NPC 的 {ID} 或 {UUID} 來選取它。'
+    still: '使所有已選取的 NPC 停止移動；與 {#Move} 相反。'
+    freeze: 凍結或恢復目前所有已選取 NPC 的所有行為。
+    tag: '修改所有已選取 NPC 的標籤，或移除、清空、檢查標籤。<br>使用 {persistent} 關鍵字可操作持久化標籤。<br>注意，持久化標籤需要 Adyeshach 1.4.21 或以上版本。'
+    teleport: '將所有已選取的 NPC 傳送至指定位置，位置語法與 {#Create} 相同。'
+    use: '使用特定的 NPC 管理器，或使用臨時管理器。<br><br>{已知的有：}<br>public, private'
+    viewer: '將動作的{回傳值}作為線上玩家加入所有已選取 NPC 的觀看者清單，或移除、清空觀看者。'
+    modelengine_animation_add: 播放 ModelEngine 動畫；該 NPC 必須已綁定模型。
+    modelengine_animation_remove: 移除 ModelEngine 動畫；該 NPC 必須已綁定模型。
+    germengine_animation_add: 播放 GermEngine 動畫；該 NPC 必須已綁定模型。
+    germengine_animation_remove: 移除 GermEngine 動畫；該 NPC 必須已綁定模型。
+    arr-clear: 清空清單中的所有元素。
+    map-size: '取得 Map 中的條目數量；若不是 Map 則取得字串長度。'
+    map-mutable: 轉換為可變動的 Map。
+    map-shuffle: 隨機打亂 Map。
+    map-reverse: 反轉 Map。
+    map-get: 從 Map 中取得元素。
+    map-put: 將鍵值對附加至 Map。
+    map-remove: 從 Map 中移除鍵值對。
+    map-keys: 取得 Map 中所有鍵的清單。
+    a-wait: 在腳本中等待指定時間（秒）。若玩家在等待期間離線，腳本將被終止。
+    instance-of: 檢查物件是否為指定型別的實例。若該型別不存在則回傳 false。
+    cast: 將物件轉型為指定型別。若轉型失敗則回傳原物件。
+    get-block-drops: 取得指定方塊的掉落物清單。可指定工具與破壞者實體。
+    a-cd: '檢查或新增附魔冷卻。<br>check：檢查冷卻，可選擇通知玩家並透過動作欄發送<br>add：新增冷卻時間'
+    spawn-entity: 在指定位置生成實體。
+    real-damage: 對實體造成真實傷害。
+    entity-name: '取得實體的名稱。對玩家回傳玩家名稱，否則回傳自訂名稱或在地化名稱。'
+    remove-entity: 移除指定實體。
+    add-potion-effect: 為實體新增藥水效果。
+    near-by-entities: 取得實體附近的其他實體清單。
+    a-vec-add: 為實體增加速度向量。可啟用安全模式與擊退檢查。
+    entity-is-behind: 檢查某實體是否在另一實體的後方。
+    launch-arrow: 發射一支箭。
+    equip-set-item: '設定實體的裝備物品。'
+    equip-get-item: '取得實體的裝備物品。'
+    build-firework: '在指定位置生成煙火。可指定類型（BALL, BALL_LARGE, BURST, CREEPER, STAR）、威力、閃爍、軌跡、主顏色與淡出顏色。顏色接受常見英文名稱，可為單一顏色或清單。'
+    detonate-firework: 立即引爆指定的煙火實體。
+    send-lang: '向實體發送在地化訊息，可選擇附加參數陣列。'
+    mark: 為物件新增中繼資料標記。
+    unmark: '移除物件的中繼資料標記。'
+    has-mark: 檢查物件是否具有指定的中繼資料標記。
+    set-metadata: 在物件上設定中繼資料。
+    remove-metadata: '移除物件的中繼資料。'
+    has-metadata: 檢查物件是否具有指定的中繼資料。
+    get-metadata: '取得物件在指定索引處的中繼資料。'
+    give-exp: 給予玩家經驗值。可選擇套用修補（Mending）。
+    a-money: '取得玩家的經濟餘額。'
+    take-money: 從玩家處扣除金錢。
+    give-money: 給予玩家金錢。
+    has-money: 檢查玩家是否擁有足夠的金錢。
+    get-vein: 取得指定方塊周圍的礦脈。
+    strike-lightning: 在指定位置擊落閃電。
+    create-explosion: '在指定位置產生爆炸。可設定來源實體、是否引燃，以及是否破壞方塊。'
+    drop-item: '在指定位置掉落物品，可選擇以自然掉落方式進行。'
+    operation: 執行已註冊的操作。
+    modifiable-var: '取得附魔的可修改變數值。'
+    modifiable-var-set: '設定附魔的可修改變數值。'
+    arim-weight: 加權隨機。
+    arim-inv: 物品欄物品檢查。
+    dungeon: '執行 DungeonPlus 腳本。<br>更多細節：https://ersha.gitbook.io/dungeonplus/di-lao/untitled/kether'
+    dungeon-data-area: 取得地城區域中的玩家數量。
+    dungeon-data-players: 取得地城中的所有玩家。
+    dungeon-data-data: 取得地城資料值。
+    dungeon-data-mob: 取得怪物被擊殺的次數，或檢查其是否已被擊殺。
+    dungeon-data-world: '取得地城的世界名稱。'
+    dungeon-data-name: 取得地城名稱。
+    dungeon-data-options: '取得地城的啟動選項。'
+    message: 向玩家發送訊息，支援 Invero 格式。
+    invero_money: 控制 Vault 經濟。
+    invero_points: 控制 PlayerPoints 經濟。
+    connect: 跨伺服器連線。
+    depend: '檢查伺服器是否具有指定依賴。回傳：true/false'
+    context: 'context /ctx — 當有選單上下文作用中（即選單已開啟）時，對選單上下文中的變數資料進行操作。'
+    persist: 獨立於選單上下文，對持久化資料進行操作。
+    menu: 選單相關操作。
+    icon: '圖示操作：<br>relocate<br>update<br>refresh<br>index | sub_index<br>pause_update<br>pause_relocate<br>pause_frames<br>resume_update<br>resume_relocate<br>resume_frames<br>refresh = update (更新變數) + relocate (重定向子圖示)'
+    page: 分頁面板操作（需要分頁面板上下文）。
+    scroll: 捲動面板操作（需要可捲動面板上下文）。
+    regenerate: 元素生成器面板操作。
+    storage: 互動式槽位操作（需要互動式面板）。
+    node: 節點
+    item: 建構一個物品。
+    item_match: '以動作的{回傳值}作為{物品匹配模式}，檢查玩家是否持有該物品。<br>物品匹配模式的說明請參閱 {TrMenu} 文件。'
+    metadata: '取得或設定玩家的{中繼資料}。<br><br>{meta} 會暫時儲存在伺服器記憶體中，<br>而 {data} 則使用 TabooLib 的 {LocalPlayer} 儲存在玩家自己的資料檔中。'
+    trmenu_money: '以動作的{回傳值}作為 {Vault} 貨幣，檢查玩家是否擁有足夠金額。'
+    trmenu_playerpoints: '以動作的{回傳值}作為 {PlayerPoints} 貨幣，檢查玩家是否擁有足夠點數。'
+    event_cancel: 取消目前事件，或設定事件是否被取消。
+    event_wait: '等待指定事件並進行自訂處理。<br>{語法請見此處：}<br>https://www.yuque.com/lanscarlos/vulpecula-doc/action-event#x7y9W'
+    entity_damage: 對實體造成傷害。
+    entity_potion: '為實體給予或移除藥水效果。<br>{語法請見此處：}<br>https://www.yuque.com/lanscarlos/vulpecula-doc/action-entity#ZzVee'
+    entity_teleport: 將實體傳送至指定位置。
+    regex: '使用正規表示式尋找或取代文字。<br>{語法請見此處：}<br>https://www.yuque.com/lanscarlos/vulpecula-doc/action-regex'
+    function_call: '{此語句在 Shell 模式下不執行任何操作。}<br>呼叫任何已宣告的函式，包括 main 函式。支援傳入參數。'
+    get_cooldown: '在 {Zaphkiel} 物品行為中：<br>取得{目前物品}或{目前玩家}的冷卻時間（以遊戲刻為單位）。'
+    update_cooldown: '在 {Zaphkiel} 物品行為中：<br>將動作的{回傳值}寫入為{目前物品}或{目前玩家}的冷卻時間（以遊戲刻為單位）。'
+    check_cooldown: '在 {Zaphkiel} 物品行為中：<br>檢查{目前物品}或{目前玩家}是否在冷卻中。'
+    effect: '在 {Zaphkiel} 物品行為中：<br>將動作的{回傳值}作為 Bukkit 藥水效果套用至玩家，或移除、清空效果。'
+    item_durability: '在 {Zaphkiel} 物品行為中：<br>取得物品的目前耐久度；可用 {item data durability_current} 取代。'
+    item_durability_operate: '在 {Zaphkiel} 物品行為中：<br>以動作的{回傳值}作為耐久度進行扣除或修復。'
+    item_consume: '在 {Zaphkiel} 物品行為中：從該行為中消耗 1 個物品。'
+    item_data: '在 {Zaphkiel} 物品行為中：<br>取得或設定物品的活躍資料。'
+    save: '在 {Zaphkiel} 物品行為中：<br>將快取寫入物品流。'
+    build_1: '在 {Zaphkiel} 物品建構期間：<br>修改名稱或描述中的變數。'
+    build_2: '在 {Zaphkiel} 物品建構期間：<br>修改材質或資料值；此處的 {data} 指物品的資料值，而非活躍資料。'
+
+  ketherSem:
+    all: '所有條件 {0}'
+    any: '任一條件 {0}'
+    async: '非同步執行 {0}'
+    await: '等待 {0}'
+    await_all: '等待所有動作 {0}'
+    await_any: '等待任一動作 {0}'
+    call: '呼叫 {0}'
+    exit: '退出 {0}'
+    goto: '跳轉至 {0}'
+    if_else: '若 {0} 則 {1} 否則 {2}'
+    not: '非 {0}'
+    repeat: '重複 {0} 次 {1}'
+    sleep: '等待 {0}'
+    while: '當 {0} 時迴圈 {1}'
+    absorption_amount: '玩家吸收值 {0} {1}'
+    action_bar: '發送動作列訊息 {0}'
+    address: '取得玩家 IP'
+    allow_flight: '玩家允許飛行 {0}'
+    array: '建立陣列 {0}'
+    attack_cooldown: '取得玩家攻擊冷卻'
+    bed_spawn: '玩家床鋪重生點 {0}'
+    'bed_spawn_x,y,z': '玩家床鋪重生點 {0} 軸'
+    blocking: '玩家是否正在舉盾'
+    break: '中斷迴圈'
+    'case & when': '案例 {0} 符合 {1}'
+    check: '檢查 {0} {1} {2}'
+    color: '格式化顏色 {0}'
+    command: '以 {1} 身分執行指令 {0}'
+    compass_target: '玩家指南針目標 {0}'
+    'compass_x,y,z': '玩家指南針 {0} 軸'
+    conversing: '玩家是否正在對話'
+    date_day: '取得 {0} 中的日期'
+    date_hour: '目前小時'
+    date_minute: '目前分鐘'
+    date_month: '目前月份'
+    date_second: '目前秒數'
+    date_year: '目前年份'
+    dead: '玩家是否死亡'
+    element: '從 {0} 取得元素 {1}'
+    exhaustion: '玩家疲勞值 {0} {1}'
+    exp: '玩家經驗 {0} {1}'
+    first_played: '玩家首次遊玩時間'
+    fly___walk_speed: '玩家 {0} 速度 {1} {2}'
+    flying: '玩家飛行中 {0}'
+    food_level: '玩家飢餓值 {0} {1}'
+    foreach: '對 {1} 中的每個 {0} 執行 {2}'
+    format_time: '以 {1} 格式化時間 {0}'
+    gamemode: '玩家遊戲模式 {0}'
+    gliding: '玩家滑翔中 {0}'
+    glowing: '玩家發光 {0}'
+    gravity: '玩家重力 {0} {1}'
+    health: '玩家 {0} 生命值 {1} {2}'
+    inside_vehicle: '玩家是否在載具中'
+    javascript: '執行 JS {0}'
+    join: '以 {1} 串接清單 {0}'
+    jumping: '玩家跳躍中 {0}'
+    last_played: '玩家最後 {0} 時間'
+    leashed: '實體是否被拴住'
+    level: '玩家等級 {0} {1}'
+    locale: '玩家用戶端語言'
+    location: '建構位置 {0} {1} {2} {3} 偏航角 {4} 俯仰角 {5}'
+    location1: '玩家位置 {0}'
+    location_angle: '玩家 {0} 角度 {1} {2}'
+    'location_x,y,z': '玩家 {0} {1}'
+    map: '對 {1} 的 {0} 套用 {2}'
+    math: '數學運算 {0} {1}'
+    name: '玩家 {0} 名稱'
+    no_damage_tick: '玩家無敵刻 {0} {1}'
+    null: '空值'
+    on_guard: '玩家是否在地面'
+    op: '玩家 OP {0}'
+    optional: '可選 {0} 否則 {1}'
+    pass: '空字串'
+    pause: '暫停程式'
+    permission: '檢查權限 {0}'
+    random2: '隨機 {0} 至 {1}'
+    range: '範圍 {0} 至 {1} 步進 {2}'
+    remaining_air: '玩家剩餘氧氣 {0} {1}'
+    riptiding: '玩家是否正在激流推進'
+    round: '四捨五入 {0}'
+    saturation: '玩家飽和度 {0} {1}'
+    scale: '縮放至 2 位小數 {0}'
+    size: '取得大小 {0}'
+    sleep_ignored: '玩家略過睡眠 {0}'
+    sleep_ticks: '玩家睡眠刻數'
+    sleeping: '玩家是否在睡覺'
+    sneaking: '玩家是否在潛行'
+    sound: '播放音效 {0} 音量 {1} 音調 {2}'
+    split: '以 {1} 分割 {0}'
+    sprinting: '玩家是否在衝刺'
+    subtitle: '發送副標題 {0} 淡入 {1} 停留 {2} 淡出 {3}'
+    swimming: '玩家游泳 {0} {1}'
+    switch: '切換觀察值 {0}'
+    title: '發送標題 {0} 副標題 {1} 淡入 {2} 停留 {3} 淡出 {4}'
+    toast: '發送快顯通知 {0} {1} 類型 {2}'
+    warning: '主控台警告 {0}'
+    whitelist: '玩家白名單 {0}'
+    world: '玩家目前世界'
+    import: '匯入命名空間 {0}'
+    release: '釋放命名空間 {0}'
+    block: '取得 {1} 的方塊位置 {0}'
+    cancel: '取消目前行為'
+    ceil: '向上取整 {0}'
+    close: '關閉對話'
+    distance: '{0} 與 {1} 的距離'
+    equipment_check: '檢查裝備 {0} 為 {1} 數量 {2}'
+    floor: '向下取整 {0}'
+    inventory_count: '統計背包物品 {0}'
+    inventory_check: '檢查背包 {0} 數量 {1}'
+    inventory_close: '關閉玩家背包'
+    inventory_slot_check: '檢查背包欄位 {0} 為 {1} 數量 {2}'
+    inventory_take: '移除背包物品 {0} 數量 {1}'
+    max: '最大值 {0} {1}'
+    min: '最小值 {0} {1}'
+    mmocore_attribute_point: '取得 MMOCore 屬性點數'
+    mmocore_class: '取得 MMOCore 職業 {0}'
+    mmocore_level___exp: '取得 MMOCore {0}'
+    mmocore_mana: '取得 MMOCore 魔力'
+    mmocore_skill_point: '取得 MMOCore 技能點數'
+    mmocore_stamina: '取得 MMOCore 體力'
+    mythicmobs_cast: '施放 MythicMobs 技能 {0} 觸發器 {1}'
+    origin: '取得 NPC 原始位置'
+    particle_normal: '播放粒子效果 {0} {1} {2} 僅自己可見 {3}'
+    position: '檢查位置是否在區域 {0} 內'
+    profile_level: '玩家設定檔等級 {0} {1} {2} {3}'
+    quest_group_check: '檢查任務群組 {0} {1}'
+    quest_check: '檢查任務 {0}'
+    quest_control: '控制任務 {0}'
+    quest_progress: '取得任務進度 {0} 任務 {1}'
+    quest_select: '選擇任務 {0}'
+    quest_stats: '任務統計 {0} 任務 {1}'
+    quest_tasks: '取得所有任務條目'
+    quest_this: '取得目前任務／條目'
+    quest_track: '追蹤目前任務'
+    quest_tracking: '取得追蹤中的任務'
+    quests: '取得進行中任務清單'
+    schematic: '貼上建築結構 {0} {1} {2} 旋轉 {3} 忽略空氣 {4}'
+    script: '腳本 {0} {1}'
+    skillapi_attribute_point: '取得 SkillAPI 屬性 {0}'
+    skillapi_cast: '施放 SkillAPI 技能 {0}'
+    skillapi_class: '取得 SkillAPI 職業 {0}'
+    skillapi_exp: '取得 SkillAPI 經驗 {0}'
+    skillapi_level: '取得 SkillAPI 等級'
+    skillapi_mana: '取得 SkillAPI 魔力'
+    skillapi_skill_point: '取得 SkillAPI 技能點數'
+    talk: 'NPC 對話 {0}'
+    trigger: '觸發任務 {0}'
+    ui: 'UI 進度 {0} {1} 排除 {2}'
+    wizard: '精靈 {0}'
+    workflow_fetch: '離線補償 {0} {1}'
+    animation: '播放動畫 {0}'
+    controller: '控制器 {0} {1}'
+    create: '建立 NPC {0} {1} 於 {2}'
+    delete: '刪除並銷毀 NPC'
+    destroy: '銷毀 NPC'
+    look: 'NPC 注視 X {0} Y {1} Z {2} 平滑 {3}'
+    move: 'NPC 移動至 X {0} Y {1} Z {2} 相對 {3}'
+    passenger: '乘客 {0} {1}'
+    remove: '移除 NPC'
+    respawn: '重生 NPC'
+    select: '以 {1} 選擇 NPC {0}'
+    still: '停止移動'
+    freeze: '凍結 NPC {0}'
+    tag: '將 {0} {1} 標記為 {2}'
+    teleport: '將 NPC 傳送至 {0}'
+    use: '使用 NPC 管理器 {0} 暫時性 {1}'
+    viewer: '檢視器 {0} {1}'
+    modelengine_animation_add: 'ModelEngine 動畫新增 {0} {1} {2} 非同步 {3}'
+    modelengine_animation_remove: 'ModelEngine 動畫移除 {0} 忽略插值 {1}'
+    germengine_animation_add: 'GermEngine 動畫發送 {0}'
+    germengine_animation_remove: 'GermEngine 動畫移除 {0}'
+    arr-clear: '清空陣列 {0}'
+    map-mutable: '轉換為可變映射 {0}'
+    map-shuffle: '打亂映射 {0}'
+    map-reverse: '反轉映射 {0}'
+    map-get: '從 {1} 取得映射鍵 {0}'
+    map-put: '將映射鍵值對 {0} 值 {1} 放入 {2}'
+    map-remove: '從 {1} 移除映射鍵 {0}'
+    map-keys: '取得映射所有鍵 {0}'
+    instance-of: '檢查 {0} 是否為 {1} 的實例'
+    cast: '將 {0} 轉型為 {1}'
+    get-block-drops: '取得方塊掉落物 {0} 工具 {1} 破壞者 {2}'
+    spawn-entity: '於 {1} 生成實體 {0}'
+    real-damage: '真實傷害 {0} 數值 {1} 來源 {2}'
+    entity-name: '取得實體名稱 {0}'
+    remove-entity: '移除實體 {0}'
+    add-potion-effect: '為 {1} 新增藥水效果 {0} 持續時間 {2} 等級 {3} 環境粒子 {4} 粒子 {5} 圖示 {6}'
+    near-by-entities: '附近實體 {0} 半徑 {1} {2} {3}'
+    a-vec-add: '為 {1} 新增速度向量 {0} 安全模式 {2} 擊退檢查 {3}'
+    entity-is-behind: '實體 {0} 是否在 {1} 後方'
+    launch-arrow: '發射箭矢 {0} 速度 {1}'
+    equip-set-item: '為 {2} 設定裝備 {0} 欄位 {1}'
+    equip-get-item: '從 {1} 取得裝備欄位 {0}'
+    build-firework: '生成煙火 {0} 類型 {1} 威力 {2} 閃爍 {3} 軌跡 {4} 主色 {5} 淡出色 {6}'
+    detonate-firework: '引爆煙火 {0}'
+    send-lang: '向 {1} 發送在地化訊息 {0} 參數 {2}'
+    mark: '為 {1} 新增標記 {0}'
+    unmark: '從 {1} 移除標記 {0}'
+    give-exp: '給予 {1} 經驗 {0} 修補 {2}'
+    take-money: '扣除金錢 {0} {1}'
+    give-money: '給予金錢 {0} {1}'
+    has-money: '是否擁有金錢 {0} {1}'
+    get-vein: '取得礦脈 {0} 最大數量 {1}'
+    create-explosion: '產生爆炸 {0} 威力 {1} 來源 {2} 起火 {3} 破壞方塊 {4}'
+    drop-item: '於 {1} 掉落物品 {0} 自然掉落 {2}'
+    operation: '執行操作 {0} 參數 {1}'
+    modifiable-var: '取得可修改變數 {0} 物品名稱'
+    modifiable-var-set: '設定可修改變數 {0} 物品名稱值 {1}'
+    dungeon: '地城腳本 {0} {1} 參數 {2} 區域 {3}'
+    dungeon-data-area: '地城區域 {0} {1}'
+    dungeon-data-players: '地城中的玩家'
+    dungeon-data-data: '地城資料 {0}'
+    dungeon-data-mob: '地城怪物 {0} {1}'
+    dungeon-data-world: '地城世界名稱'
+    dungeon-data-name: '地城名稱'
+    dungeon-data-options: '地城選項 {0}'
+    message: '發送 Invero 訊息 {0}'
+    invero_money: '經濟 {0} {1}'
+    invero_points: '點數 {0} {1}'
+    connect: '跨伺服器 {0} 玩家 {1}'
+    depend: '檢查相依性 {0}'
+    context: '選單上下文 {0} {1}'
+    persist: '持久化資料 {0} {1} 範圍 {2}'
+    menu: '選單操作 {0} {1}'
+    icon: '圖示操作 {0} {1}'
+    page: '頁面操作 {0}'
+    scroll: '滾動操作 {0}'
+    regenerate: '重新生成 {0} 篩選 {1} 排序 {2}'
+    storage: '互動欄位 {0} {1}'
+    node: '節點 {0} 參數 {1}'
+    item: '以 {1} 建構物品 {0} 數量 {2}'
+    item_match: '符合物品 {0}'
+    trmenu_money: '檢查金錢 {0}'
+    trmenu_playerpoints: '檢查點數 {0}'
+    variable: '解析 TrMenu 變數 {0}'
+    event_cancel: '取消事件 {0}'
+    event_wait: '等待事件 {0} {1} {2}'
+    entity_damage: '實體傷害 {0} 數值 {1} 來源 {2}'
+    entity_potion: '實體藥水 {0} {1} {2}'
+    entity_teleport: '將實體 {0} 傳送至 {1}'
+    regex: '正規表示式 {0} {1} {2}'
+    function_call: '呼叫函式 {0} 參數 {1}'
+    get_cooldown: '取得 ZAP 冷卻 {0}'
+    update_cooldown: '設定 ZAP 冷卻 {0} 目標 {1}'
+    check_cooldown: '檢查 ZAP 冷卻 {0}'
+    effect: 'ZAP 藥水效果 {0} {1} {2} {3}'
+    item_durability: '取得 ZAP 物品耐久度'
+    item_durability_operate: 'ZAP 物品 {0} {1}'
+    item_consume: '消耗 ZAP 物品'
+    item_data: 'ZAP 物品資料 {0} 為 {1}'
+    save: '儲存 ZAP 物品'
+    build_1: '建構 ZAP 物品名稱／描述 {0} {1} 為 {2}'
+    build_2: '建構 ZAP 物品圖示／資料 {0} {1}'
+  objective:
+    'player fish': '玩家釣魚 / 支援針對魚獲狀態、物品類型、經驗等條件 / 統計釣魚次數'
+    'player chat': '玩家發送聊天訊息 / 支援針對訊息內容、位置等條件 / 統計聊天訊息數'
+    'change world': '玩家切換世界 / 支援針對來源世界、目標世界、位置等條件 / 統計切換次數'
+    'player kill': '玩家擊殺實體 / 支援針對武器、受害者類型等條件 / 統計擊殺數'
+    'food change': '玩家飢餓值變化時觸發 / 支援針對飢餓值、食物類型等條件 / 統計飢餓值總變化量'
+    'item break': '玩家工具或盔甲耐久度耗盡時觸發 / 支援針對物品類型、位置等條件 / 統計損壞物品數'
+    'custom level': '檢查玩家自訂等級是否達到要求 / 支援針對位置、等級 ID、等級數值等條件 / 適用於 Chemdah 等級系統'
+    'player move': '玩家移動 / 支援針對起始位置、目標位置等條件 / 統計移動次數'
+    'block interact': '玩家與方塊互動 / 支援針對材質、互動類型、方向、手持物品等條件 / 統計互動次數'
+    'entity tame': '玩家馴服實體 / 支援針對實體類型、位置等條件 / 統計馴服實體數'
+    'horse jump': '玩家騎馬跳躍時觸發 / 支援針對跳躍強度、馬匹類型等條件 / 統計跳躍次數'
+    'block break': '玩家破壞方塊 / 支援針對材質、位置、掉落物等條件 / 統計破壞方塊數'
+    'bucket fill': '玩家以流體裝滿水桶 / 支援針對位置、材質、物品等條件 / 統計裝填次數'
+    'bucket empty': '玩家倒出水桶中的流體 / 支援針對位置、材質、物品等條件 / 統計倒出次數'
+    'item consume': '玩家消耗物品時觸發 / 支援食物、藥水等消耗品 / 統計消耗物品數'
+    'pickup exp': '玩家拾取經驗球時觸發 / 支援針對經驗數量、原因等條件 / 統計拾取經驗總量'
+    'player teleport': '玩家傳送 / 支援針對起始位置、目標位置、傳送原因等條件 / 統計傳送次數'
+    always: '每個遊戲刻檢查一次條件 / 適用於需要條件持續滿足的情境 / 無事件觸發，自動定期檢查'
+    'shoot bow': '玩家射箭 / 支援針對弓的類型、蓄力強度、消耗物品等條件 / 統計射擊次數'
+    'player animation': '玩家播放動畫時觸發 / 支援針對動畫類型等條件 / 統計播放次數'
+    'player attack': '玩家攻擊實體 / 支援針對目標實體、武器、傷害等條件 / 統計攻擊次數'
+    'player damage by entity': '玩家受到實體攻擊傷害 / 支援針對攻擊者實體、武器、傷害等條件 / 統計受擊次數'
+    'entity interact': '玩家右鍵點擊實體 / 支援針對實體類型、位置、手持物品等條件 / 統計互動次數'
+    'bed enter': '玩家進入床鋪 / 支援針對床的位置、材質、原因等條件 / 統計進入次數'
+    'player anvil': '玩家使用鐵砧時觸發 / 支援針對重新命名文字、修復成本、結果物品等條件 / 統計使用次數'
+    'portal exit': '玩家離開傳送門時觸發 / 支援針對目標與起始位置等條件 / 統計離開次數'
+    never: '永遠無法完成的目標 / 適用於佔位或特殊邏輯 / 永遠回傳 false'
+    'pickup arrow': '玩家拾取箭矢時觸發 / 支援針對箭矢類型、數量等條件 / 統計拾取總數'
+    'entity breed': '玩家繁殖動物 / 支援針對動物類型、親代、繁殖物品等條件 / 統計繁殖次數'
+    'player jump': '玩家跳躍 / 支援針對位置等條件 / 統計跳躍次數'
+    'player permission': '檢查玩家是否擁有特定權限 / 定期檢查權限狀態 / 適用於權限動態變化的情境'
+    'player statistic': '玩家統計值變化時觸發 / 支援針對統計類型、實體類型、材質類型、數值等條件 / 統計遞增次數'
+    'entity combust': '玩家點燃實體 / 支援針對實體類型、位置等條件 / 統計點燃次數'
+    'player damage by block': '玩家受到方塊傷害 / 支援針對方塊類型、傷害、位置等條件 / 統計受擊次數'
+    'pickup item': '玩家拾取掉落物品時觸發 / 自動統計拾取物品的堆疊數量 / 支援針對物品、數量、位置等條件'
+    'criterion grant': '玩家完成進度標準時觸發（需要 Paper 伺服器）/ 支援針對進度 ID、標準名稱等條件 / 統計完成次數'
+    'entity dismount': '玩家離開騎乘的實體 / 支援針對實體類型、位置等條件 / 統計離開次數'
+    'player data': '檢查玩家持久化資料值 / 同時支援事件驅動與定期檢查模式 / 適用於跨任務資料共用與檢查'
+    'exp change': '玩家獲得經驗 / 支援針對經驗數量、來源實體、位置等條件 / 統計經驗總量'
+    'player shear': '玩家剪羊毛 / 支援針對實體類型、剪刀類型、使用的手等條件 / 統計剪切次數'
+    'block ignite': '玩家點燃方塊 / 支援針對材質、點燃原因、位置等條件 / 統計點燃次數'
+    'item held': '玩家切換快捷欄手持物品時觸發 / 支援針對新舊物品、新舊欄位等條件 / 統計切換次數'
+    'entity mount': '玩家騎乘實體 / 支援針對實體類型、位置等條件 / 統計騎乘次數'
+    'craft item': '玩家在工作台合成物品 / 支援針對物品、配方材料、位置等條件 / 支援批次合成統計'
+    'drop item': '玩家丟棄物品時觸發 / 支援針對物品、數量、位置等條件 / 統計丟棄次數'
+    'armor change': '玩家更換盔甲裝備（需要 Paper 伺服器）/ 支援針對裝備欄位、物品等條件 / 統計更換次數'
+    'portal enter': '玩家進入傳送門時觸發 / 支援針對傳送門位置等條件 / 統計進入次數'
+    'enchant item': '玩家在附魔台附魔物品時觸發 / 支援針對物品、附魔類型、經驗消耗等條件 / 統計附魔次數'
+    'block place': '玩家放置方塊 / 支援針對材質、位置、手持物品等條件 / 統計放置次數'
+    'player damage': '玩家受到傷害 / 支援針對傷害類型、傷害值、位置等條件 / 統計受擊次數'
+    'player respawn': '玩家重生 / 支援針對重生位置、重生類型（床／重生錨）等條件 / 統計重生次數'
+    'player real move': '玩家實際移動一格方塊時觸發 / 支援針對目標與起始位置等條件 / 統計移動次數'
+    'player inventory': '檢查或消耗玩家背包中的物品 / 支援針對位置、物品類型、數量、消耗等條件 / 適用於物品收集或消耗任務'
+    'block farm': '玩家用鋤頭耕耘農地 / 支援針對材質、位置、鋤頭類型等條件 / 統計耕耘次數'
+    'player conversation': '玩家透過選項回覆結束對話 / 支援針對位置、對話 ID 等條件 / 適用於 Chemdah 內建對話系統'
+    'item mend': '玩家物品被修復時觸發 / 支援針對修復物品類型、修復量等條件 / 統計修復總量'
+    'player conversation refused': '玩家放棄或拒絕對話 / 支援針對位置、對話 ID 等條件 / 適用於 Chemdah 內建對話系統'
+    'player toggle flight': '玩家切換飛行狀態時觸發 / 支援針對飛行狀態等條件 / 統計切換次數'
+    'furnace extract': '玩家從熔爐取出物品時觸發 / 自動統計取出數量 / 支援針對物品、經驗、位置等條件'
+    'player conversation closed': '玩家正常結束對話 / 支援針對位置、對話 ID 等條件 / 適用於 Chemdah 內建對話系統'
+    'item interact': '玩家使用物品互動時觸發 / 支援右鍵、左鍵等方式 / 可檢查手持欄位與互動類型'
+    trigger: '由外部指令或腳本手動觸發 / 支援自訂觸發值比對 / 適用於與其他系統串接'
+    'bed leave': '玩家離開床鋪 / 支援針對床的位置、材質等條件 / 統計離開次數'
+    'level change': '玩家等級變化 / 支援針對等級差、新等級、舊等級等條件 / 統計升級次數'
+    'player swap hand': '玩家按 F 交換主副手物品時觸發 / 支援針對主副手物品等條件 / 統計交換次數'
+    'pressure plate': '玩家踩上壓力板時觸發 / 支援針對壓力板位置與類型等條件 / 統計踩踏次數'
+    'quest data': '檢查任務持久化資料值 / 同時支援事件驅動與定期檢查模式 / 適用於任務內部資料共用與檢查'
+    'health regain': '玩家生命值恢復時觸發 / 支援針對恢復量、原因等條件 / 統計恢復總量'
+    'player resurrect': '玩家使用不死圖騰復活時觸發 / 支援針對使用物品類型等條件 / 統計復活次數'
+    'player advancement': '玩家完成進度 / 支援針對進度 ID、位置等條件 / 統計完成次數'
+    'player command': '玩家執行指令 / 支援針對指令內容、位置等條件 / 統計指令執行次數'
+    'edit book': '玩家編輯或簽署書本時觸發 / 支援針對簽署狀態、頁面、標題、內容等條件 / 統計編輯次數'
+    'player death': '玩家死亡 / 支援針對攻擊者、武器、死亡訊息等條件 / 統計死亡次數'
+    'anpc interact': '與 Adyeshach NPC 互動 / 支援針對 NPC ID、類型、位置、手持物品、主副手等條件 / 需要 Adyeshach 插件'
+    'anpc damage': '對 Adyeshach NPC 造成傷害 / 支援針對 NPC ID、類型、位置、使用物品等條件 / 需要 Adyeshach 插件'
+    'mythicmobs kill': '擊殺 MythicMobs 怪物 / 支援針對怪物名稱、等級、位置等條件 / 需要 MythicMobs 插件'
+    'placeholder api': '取得 PlaceholderAPI 變數值 / 支援所有 PAPI 變數 / 需要 PlaceholderAPI 插件'
+  objectiveLabel:
+    'player fish': '玩家釣魚'
+    'player chat': '玩家聊天'
+    'change world': '切換世界'
+    'player kill': '玩家擊殺'
+    'food change': '飢餓值變化'
+    'item break': '物品損壞'
+    'custom level': '自訂等級'
+    'player move': '玩家移動'
+    'block interact': '方塊互動'
+    'entity tame': '馴服實體'
+    'horse jump': '騎馬跳躍'
+    'block break': '破壞方塊'
+    'bucket fill': '裝填水桶'
+    'bucket empty': '倒出水桶'
+    'item consume': '消耗物品'
+    'pickup exp': '拾取經驗'
+    'player teleport': '玩家傳送'
+    always: '永遠'
+    'shoot bow': '射箭'
+    'player animation': '玩家動畫'
+    'player attack': '玩家攻擊'
+    'player damage by entity': '受實體傷害'
+    'entity interact': '實體互動'
+    'bed enter': '進入床鋪'
+    'player anvil': '使用鐵砧'
+    'portal exit': '離開傳送門'
+    never: '永不'
+    'pickup arrow': '拾取箭矢'
+    'entity breed': '繁殖實體'
+    'player jump': '玩家跳躍'
+    'player permission': '玩家權限'
+    'player statistic': '玩家統計'
+    'entity combust': '實體點燃'
+    'player damage by block': '受方塊傷害'
+    'pickup item': '拾取物品'
+    'criterion grant': '進度標準達成'
+    'entity dismount': '離開實體'
+    'player data': '玩家資料'
+    'exp change': '經驗變化'
+    'player shear': '剪羊毛'
+    'block ignite': '點燃方塊'
+    'item held': '切換手持物品'
+    'entity mount': '騎乘實體'
+    'craft item': '合成物品'
+    'drop item': '丟棄物品'
+    'armor change': '更換盔甲'
+    'portal enter': '進入傳送門'
+    'enchant item': '附魔物品'
+    'block place': '放置方塊'
+    'player damage': '玩家受傷'
+    'player respawn': '玩家重生'
+    'player real move': '玩家實際移動'
+    'player inventory': '玩家背包'
+    'block farm': '耕耘方塊'
+    'player conversation': '玩家對話'
+    'item mend': '物品修復'
+    'player conversation refused': '對話被拒絕'
+    'player toggle flight': '切換飛行'
+    'furnace extract': '熔爐取出'
+    'player conversation closed': '對話關閉'
+    'item interact': '物品互動'
+    trigger: '手動觸發'
+    'bed leave': '離開床鋪'
+    'level change': '等級變化'
+    'player swap hand': '交換主副手'
+    'pressure plate': '壓力板'
+    'quest data': '任務資料'
+    'health regain': '生命恢復'
+    'player resurrect': '玩家復活'
+    'player advancement': '玩家進度'
+    'player command': '玩家指令'
+    'edit book': '編輯書本'
+    'player death': '玩家死亡'
+    'anpc interact': 'Adyeshach NPC 互動'
+    'anpc damage': 'Adyeshach NPC 傷害'
+    'mythicmobs kill': '擊殺 MythicMobs'
+    'placeholder api': 'PlaceholderAPI'
+  addon:
+    automation: '自動化開啟任務流程 / 每 40 遊戲刻檢查線上玩家，處理自動接受與排程任務'
+    ui: '設定任務在 UI 中的呈現方式 / 控制任務可見性、圖示與描述'
+    depend: '設定任務前置需求 / 支援單一任務與任務群組依賴 / 支援條目之間的依賴 / 可為字串、清單或以逗號／分號分隔的字串'
+    stats: '顯示任務與條目進度 / 支援 BossBar 進度條、自訂樣式與腳本計算 / 可設定為暫時或持久顯示'
+    restart: '控制任務是否可重新開始 / 透過 Kether 腳本定義重啟條件'
+    track: '追蹤任務目標位置並提供路徑指引 / 支援信標、地標、導航與計分板顯示 / 每位玩家同時只能追蹤一個任務'
+    party: '管理任務的隊伍功能 / 支援任務共享、協作完成與人數限制 / 適用於團隊地城、多人合作等'
+    timeout: '為任務設定逾時 / 支援固定時長與週期性時間點'
+    reset-data-on-accepted: '控制任務被接受時是否重置特定資料 / 僅影響實作 IPlayerData 介面的條目 / 適用於重置計數、進度與狀態資料'
+    optional: '將任務條目標記為可選 / 可選條目不影響任務完成 / 適用於額外獎勵、支線任務等'
+    control: '管理任務的各種限制 / 支援共存、重複、冷卻限制與腳本代理 / 以 Map 清單設定，每個 Map 代表一條控制規則'
+  addonLabel:
+    automation: '任務自動化'
+    ui: '任務 UI'
+    depend: '任務依賴'
+    stats: '任務統計'
+    restart: '任務重啟'
+    track: '任務追蹤'
+    party: '任務隊伍'
+    timeout: '任務逾時'
+    reset-data-on-accepted: '接受時重置資料'
+    optional: '可選條目'
+    control: '任務控制'
+  hook:
+    accepted: '任務被接受後執行'
+    accept: '接受任務前執行（回傳 false 取消）'
+    accept_cancelled: '任務接受被取消後執行'
+    complete: '任務完成前執行（回傳 false 取消）'
+    completed: '任務完成後執行'
+    fail: '任務失敗前執行'
+    failed: '任務失敗後執行'
+    restart: '任務重置前執行'
+    restarted: '任務重置後執行'
+    continued: '任務條目繼續後執行'
+  scope:
+    '@ all': '所有範圍類型'
+    '@ party': '隊伍範圍'
+    '@ custom': '自訂範圍'
+
+tips:
+  - "烹飪馬鈴薯燒牛肉的好菜..."
+  - "正在飛八分錢..."
+  - "準備《逃離塊科夫》..."
+  - "撰寫任務..."
+  - "✶ Thinking..."
+  - "準備百萬粉絲直播..."
+  - "和糖糖去看海..."
+  - "疼痛休克..."
+  - "對zero說再見..."
+  - "撥亂反正，團結一致向前看..."
+  - "痛飲日本生可樂..."
+  - "解決布里亞特兵變..."
+  - "萬眾一心..."
+  - "發動大東亞戰爭..."
+  - "使用碳酸鋰緩釋片..."
+  - "宛如天使般微笑..."
+  - "建立自由伺服器組織..."
+  - "手中拿著鍟嗛摼，口中疾呼婕暩婕暩..."
+
+checks:
+  title: "設定檢查"
+  subtitle: "Debug · 整個專案的全部設定問題"
+  scan: "重新掃描"
+  scanning: "正在掃描…"
+  search: "搜尋訊息 / 檔案 / 條目 / 鍵…"
+  noProject: "請先在編輯器中開啟一個專案資料夾（或一個設定檔），然後再開啟此視窗。"
+  empty: "沒有發現任何問題。"
+  emptyFiltered: "目前篩選條件下沒有符合的問題。"
+  stats: "已掃描 {files} 個設定檔 · 共 {total} 個問題"
+  statsProgress: "掃描中 {done}/{files}…"
+  groupBy: "按檔案分組"
+  expandAll: "全部展開"
+  collapseAll: "全部摺疊"
+  openInEditor: "在編輯器中開啟"
+  copyAll: "複製全部"
+  copied: "已複製到剪貼簿"
+  close: "關閉"
+  colMessage: "問題"
+  colLocation: "位置"
+  severity: "等級"
+  line: "第 {n} 行"
+  notCE: "非 CraftEngine 檔案（僅做 YAML 語法檢查）"
+  assetsIndex: "資源索引：{state}"
+  assetsReady: "就緒 · 命名空間 {ns}"
+  assetsOff: "未啟用"
+
+diagnostics:
+  title: "設定檢查"
+  openPanel: "開啟設定檢查面板"
+  summary: "ERROR {e} · WARN {w} · WEAK {k} · INFO {i}"
+  noIssues: "未發現問題 ✓"
+  allFiltered: "目前篩選下沒有問題"
+  yamlSyntax: "YAML 語法錯誤: {msg}"
+  yamlTab: "YAML 不允許使用 Tab 縮排，請改用空格"
+  strippedTags: "檔案中有 {n} 處未知的 !! 類型標籤，已被忽略（CraftEngine 不支援該標籤）"
+  unknownSection: "未收錄的頂層段 「{key}」，CraftEngine 可能不會讀取它"
+  aliasSection: "頂層段 「{key}」 是別名寫法，CraftEngine 能識別，但編輯器與規範寫法為 「{canon}」"
+  badEntryId: "條目 ID 「{id}」 含非法字元（只允許字母/數字/底線/連字號/點）"
+  badEntryIdNs: "條目 ID 「{id}」 不是合法的 namespace:path 形式"
+  unknownNamespace: "命名空間 「{ns}」 不在目前掃描到的資源包中"
+  entryNotMap: "條目內容不是鍵值映射，CraftEngine 需要一個設定物件"
+  emptySection: "段 「{key}」 為空"
+  unknownKey: "未識別的鍵 「{key}」：CraftEngine 的鍵名註冊表中沒有它，編輯器 schema 也沒有；若為自訂/擴充欄位可忽略"
+  unknownType: "未識別的類型 「{type}」：CraftEngine 的類型註冊表中沒有它"
+  notNumber: "「{label}」需要數字，目前為 {value}"
+  notBool: "「{label}」應為 true/false，目前為 {value}"
+  notInOptions: "「{label}」的值 {value} 不在編輯器列出的建議取值內（CraftEngine 也接受其它取值）"
+  expectList: "「{label}」通常是字串列表，目前是鍵值映射"
+  expectMap: "「{label}」通常是鍵值映射，目前為 {actual}"
+  expectScalar: "「{label}」在編輯器 schema 中是文字，目前為 {actual}"
+  premium: "「{key}」為付費版專屬功能"
+  legacyKey: "「{key}」是舊鍵，新寫法為 「{new}」，兩者同時存在可能產生衝突"
+  emptyValue: "「{key}」是空字串，等同於未設定"
+  cmdDuplicate: "custom_model_data {n} 與條目 「{other}」 重複，兩者會渲染成同一模型"
+  unknownRef: "未知的{label} ID: {id}（原版註冊表中未找到）"
+  unknownGlobal: "未定義的全域變數 <global:{id}>"
+  unknownImage: "未定義的圖片 <image:{id}>（images 段中不存在）"
+  imageCellOutOfRange: "圖片儲存格越界: {id} 的網格為 {rows} 行 × {cols} 列，但引用了第 {row} 行第 {col} 列"
+  materialDefault: "未設定 material，將使用 config.yml 中的預設材質"
+  imageFileRequired: "images 條目缺少 file（或改用 ref 引用已有圖片）"
+  imageHeightAscent: "height({h}) 必須 ≥ ascent({a})，Minecraft 會拒絕該字型定義"
+  badGridSize: "grid_size 格式應為 「行,列」（如 2,3）"
+  charsRowMismatch: "chars 每行長度必須一致（第 1 行為 {n} 個字元，第 {row} 行為 {m} 個）"
+  imageFileExt: "file 未帶 .png 副檔名，外掛會自動補全"
+  emojiKeywords: "emoji 條目沒有 keywords，玩家無法用關鍵字觸發它"
+  emojiContent: "emoji 條目既沒有 image 也沒有 content/template，將不會有任何顯示內容"
+  emojiScene: "編輯器未收錄的場景名 「{scene}」（常見: chat/book/anvil/sign/command）"
+  badAutoState: "auto_state 組名 「{name}」 不存在（CraftEngine 會忽略該狀態組）"
+  autoStateId: "展開形式的 auto_state 建議同時提供 id，否則每個方塊會各佔一組狀態"
+  propTypeMissing: "方塊狀態屬性缺少 type（CraftEngine 會拋出 unknown_type）"
+  propTypeUnknown: "未知的方塊狀態屬性類型 「{type}」（可用: {list}）"
+  propStringValues: "string 類型的屬性需要提供 values 列表"
+  propIntRange: "int 類型的屬性建議提供 range（如 0~15）"
+  rotationStep: "rotation {v} 不是 90 的整數倍（CraftEngine 只接受 90/180/270）"
+  patternRowMismatch: "pattern 每行長度必須一致（第 1 行 {n} 列，第 {row} 行 {m} 列）"
+  ingredientUnused: "ingredients 中的鍵 「{key}」 未出現在 pattern 中，該原料不會被使用"
+  recipeTypeMissing: "配方缺少 type"
+  recipeResultMissing: "配方沒有 result"
+  categoryIcon: "分類未設定 icon，選單中將沒有圖示"
+  equipmentType: "裝備缺少 type（component / trim）"
+  brightnessIncomplete: "brightness 必須同時提供 block_light 與 sky_light，否則該項無效"
+  typeMissing: "缺少 「type」 欄位（CraftEngine 通常需要一個類型識別碼）"
+  vanillaRefNotFound: "原版資源索引中沒有 {id}（若它來自其它資源包，可忽略）"
+  someField: "該欄位"
+  shapeList: "列表"
+  shapeMap: "鍵值映射"
+  shapeText: "文字"
+  shapeNumber: "數字"
+  shapeBool: "布林值"
+
+preview:
+  title: "預覽"
+  windowTitle: "MC 場景預覽"
+  windowMax: "最大化 / 還原"
+  windowResize: "拖曳調整大小"
+  open: "在模擬遊戲場景中預覽"
+  unavailable: "預覽模組未載入"
+  sceneAuto: "自動"
+  sceneChat: "聊天"
+  sceneLore: "物品 Lore"
+  sceneGui: "GUI"
+  sceneImage: "字型圖像"
+  sceneFurniture: "家具"
+  furnitureVariant: "變體"
+  furnitureElements: "元素"
+  furnitureHitboxes: "碰撞箱"
+  furnitureBoxConfig: "設定 {n}"
+  furnitureSeats: "座位"
+  furnitureBlueprint: "外部模型"
+  furnitureNoVariants: "<red>該家具沒有 variants (至少需要一個變體)</red>"
+  furnYaw: "視角"
+  furnYawLeft: "視角左轉 45° (Q)"
+  furnYawRight: "視角右轉 45° (E)"
+  furnYawDrag: "在畫布上左右拖曳可直接旋轉視角 (按住 Shift 吸附 15°)"
+  furnReset: "重設"
+  furnZoom: "縮放"
+  furnZoomIn: "放大 (+)"
+  furnZoomOut: "縮小 (-)"
+  furnFill: "填滿"
+  furnLabels: "標籤"
+  furnGrid: "網格"
+  furnSelected: "已選碰撞箱"
+  hbTypeInteraction: "互動"
+  hbTypeShulker: "潛影貝"
+  hbTypeHappyGhast: "快樂惡魂"
+  hbTypeCustom: "自訂"
+  rows: "行數"
+  scale: "縮放"
+  guiScale: "介面尺寸"
+  scaleAuto: "自動"
+  customText: "自訂文字"
+  customTextHint: "支援 MiniMessage 與 <image:ns:id>, 如 <image:internal:item_browser>"
+  shift: "偏移"
+  shiftInsert: "插入 <shift:N>"
+  shiftInsertHint: "在游標處插入 <shift:N>; 之後用 -10/-1/+1/+10 微調 (Alt+←/→ = ∓1, Alt+Shift+←/→ = ∓10)"
+  resolveTags: "解析 CE 文字標籤"
+  resolveMiniMessage: "解析 MiniMessage 標籤"
+  resolveCeTags: "解析 CE 標籤"
+  resolveGlobals: "解析全域變數"
+  resolveImages: "渲染字型圖像"
+  shadow: "文字陰影"
+  darkBg: "深色底"
+  copyImage: "複製圖片"
+  showSource: "檢視文字"
+  copied: "已複製到剪貼簿"
+  copyFailed: "複製失敗: {msg}"
+  reloading: "正在重新掃描資源…"
+  renderFailed: "渲染失敗: {msg}"
+  sceneLabel: "場景"
+  assetsOk: "資源已索引 ({n} 項)"
+  assetsLoading: "資源索引中…"
+  assetsMissing: "未設定 Minecraft 資源目錄，使用內建回退字形"
+  imageGallery: "字型圖像總覽"
+  noImages: "目前專案未找到 images 條目"
+  sourceHint: "以下為預覽使用的原始文字（未經解析）"
+  globalsHint: "專案全域變數"
+  sceneItem: "物品欄"
+  sceneGlyphGui: "箱子 GUI"
+  glyphChatIntro: "字型圖像在聊天中的效果"
+  glyphInline: "和文字排在一行"
+  glyphRepeat: "連續多次"
+  glyphColored: "換顏色"
+  sceneItemModel: "模型"
+  sceneInventory: "背包 GUI"
+  modelContext: "display 上下文"
+  furnEdit: "編輯"
+  furnEditHint: "在預覽裡直接拖曳碰撞箱 / 座位 / 元素錨點 (變更寫回編輯器)"
+  furnPitchUp: "抬高視角 (俯仰 +15°)"
+  furnPitchDown: "壓低視角 (俯仰 -15°)"
+  furnPitchHint: "30° = 等軸測, 90° = 正俯視"
+  invSlotLabel: "槽位"
+  invSlotHotbar: "快捷欄"
+  invSlotMain: "背包"
+  invSlotCraft: "合成"
+  invSlotArmor: "裝備"
+  invSlotResult: "產物"

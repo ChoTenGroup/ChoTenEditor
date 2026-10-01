@@ -1215,15 +1215,14 @@
   function _labelOf(field) {
     if (field === null || field === undefined) return '';
     if (typeof field === 'string') return field;
-    var lang = (typeof I18N !== 'undefined' && I18N.lang) ? I18N.lang : 'zh_cn';
     var lb = field.label;
     if (typeof lb === 'string') return lb;
     if (lb && typeof lb === 'object') {
-      return lang === 'en_us' ? (lb.en || lb.zh || '') : (lb.zh || lb.en || '');
+      return (typeof I18N !== 'undefined' && I18N.pick) ? I18N.pick(lb) : (lb.zh || lb.en || '');
     }
     // 直接传 {zh, en} 对象 (如 placeholder)
     if (field.zh !== undefined || field.en !== undefined) {
-      return lang === 'en_us' ? (field.en || field.zh || '') : (field.zh || field.en || '');
+      return (typeof I18N !== 'undefined' && I18N.pick) ? I18N.pick(field) : (field.zh || field.en || '');
     }
     return field.key || '';
   }
@@ -1765,8 +1764,7 @@
   function _sfTipOf(h) {
     if (h === null || h === undefined) return '';
     if (typeof h === 'string') return h;
-    var lang = (typeof I18N !== 'undefined' && I18N.lang) ? I18N.lang : 'zh_cn';
-    return lang === 'en_us' ? (h.en || h.zh || '') : (h.zh || h.en || '');
+    return (typeof I18N !== 'undefined' && I18N.pick) ? I18N.pick(h) : (h.zh || h.en || '');
   }
   // 原生 title 用: 剥离富文本标记 (**粗体** / `代码` / §颜色码 / 换行)
   function _sfPlain(t) {

@@ -105,7 +105,7 @@
       margin-top: 10px;
     }
 
-    /* ---- 语言选择弹窗 ---- */
+    /* ---- 首次启动语言选择 ---- */
     .lang-picker-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.75);
@@ -117,9 +117,9 @@
       background: var(--color-bg-secondary);
       border: 1px solid var(--color-border);
       border-radius: 12px;
-      max-width: 460px;
+      max-width: 480px;
       width: 90%;
-      padding: 32px 36px;
+      padding: 32px 36px 24px;
       text-align: center;
       box-shadow: 0 8px 32px rgba(0,0,0,0.5);
       animation: ke-slide-up 0.25s ease;
@@ -135,28 +135,70 @@
       font-size: 13px; color: var(--color-text-secondary);
       margin: 0 0 24px;
     }
-    .lang-picker-btns {
-      display: flex; flex-direction: column; gap: 12px;
+    /* 默认两张大语言卡片 */
+    .lang-picker-primary {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
     }
-    .lang-picker-btn {
-      display: flex; flex-direction: column; align-items: center; gap: 4px;
-      padding: 14px 20px;
-      border-radius: 10px;
+    .lang-picker-card {
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      padding: 20px 12px 16px;
+      border-radius: 12px;
       border: 1px solid var(--color-border);
       background: var(--color-bg-tertiary);
       color: var(--color-text-primary);
       cursor: pointer;
-      transition: border-color 0.15s, transform 0.1s;
+      transition: border-color 0.15s, transform 0.1s, box-shadow 0.15s;
     }
-    .lang-picker-btn:hover {
+    .lang-picker-card:hover {
       border-color: var(--color-primary);
-      transform: translateY(-1px);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.35);
     }
-    .lang-picker-btn .lp-name {
-      font-size: 17px; font-weight: 700;
+    .lang-picker-card .lp-flags {
+      display: inline-flex; gap: 6px;
     }
-    .lang-picker-btn .lp-desc {
-      font-size: 12px; color: var(--color-text-tertiary);
+    .lang-picker-card .lp-flags img {
+      width: 42px; height: 28px;
+      object-fit: cover;
+      border-radius: 4px;
+      box-shadow: 0 0 0 1px rgba(128,128,128,0.35);
+    }
+    .lang-picker-card .lp-name {
+      font-size: 16px; font-weight: 700;
+    }
+    .lang-picker-card .lp-desc {
+      font-size: 11px; color: var(--color-text-tertiary);
+    }
+    /* 更多语言入口 + 展开列表 */
+    .lang-picker-more {
+      margin-top: 18px;
+      background: none;
+      border: none;
+      color: var(--color-primary);
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      padding: 6px 14px;
+      border-radius: 8px;
+      transition: background 0.15s;
+    }
+    .lang-picker-more:hover { background: var(--color-bg-tertiary); }
+    .lang-picker-more[aria-expanded="true"] { display: none; }
+    .lang-picker-extra {
+      display: none;
+      margin-top: 16px;
+      text-align: left;
+    }
+    .lang-picker-extra.expanded { display: block; }
+    /* 复用 settings-styles.css 的 .lang-modal-list / .lang-option 旗帜行样式 */
+    .lang-picker-extra .lang-modal-list { max-height: 236px; overflow-y: auto; }
+    .lang-picker-hint {
+      margin: 16px 0 0;
+      font-size: 12px;
+      color: var(--color-text-tertiary);
+      line-height: 1.5;
     }
 
     /* ---- 加载页面 ---- */
@@ -247,9 +289,9 @@
         <span class="title-bar-text">Choten Editor</span>
       </div>
       <div class="title-bar-controls">
-        <button class="tb-btn tb-btn-minimize" id="tb-minimize" data-tip="最小化" data-i18n-title="titlebar.minimize">─</button>
-        <button class="tb-btn tb-btn-maximize" id="tb-maximize" data-tip="最大化" data-i18n-title="titlebar.maximize">□</button>
-        <button class="tb-btn tb-btn-close" id="tb-close" data-tip="关闭" data-i18n-title="titlebar.close">✕</button>
+        <button class="tb-btn tb-btn-minimize" id="tb-minimize" data-tip="最小化" data-i18n-tip="titlebar.minimize" data-i18n-title="titlebar.minimize">─</button>
+        <button class="tb-btn tb-btn-maximize" id="tb-maximize" data-tip="最大化" data-i18n-tip="titlebar.maximize" data-i18n-title="titlebar.maximize">□</button>
+        <button class="tb-btn tb-btn-close" id="tb-close" data-tip="关闭" data-i18n-tip="titlebar.close" data-i18n-title="titlebar.close">✕</button>
       </div>
     </div>
     <nav class="menu-bar" id="menu-bar">
@@ -328,24 +370,24 @@
       <div class="sidebar">
         <div class="sidebar-header">
           <div class="fm-actions" id="fm-actions">
-            <button class="fm-btn" id="nav-back" data-tip="后退" data-i18n-title="sidebar.navBack" disabled>
+            <button class="fm-btn" id="nav-back" data-tip="后退" data-i18n-tip="sidebar.navBack" data-i18n-title="sidebar.navBack" disabled>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
             </button>
-            <button class="fm-btn" id="nav-forward" data-tip="前进" data-i18n-title="sidebar.navForward" disabled>
+            <button class="fm-btn" id="nav-forward" data-tip="前进" data-i18n-tip="sidebar.navForward" data-i18n-title="sidebar.navForward" disabled>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
             </button>
             <span class="fm-sep"></span>
-            <button class="fm-btn" id="nav-prev" data-tip="上一个文件" data-i18n-title="sidebar.navPrev">
+            <button class="fm-btn" id="nav-prev" data-tip="上一个文件" data-i18n-tip="sidebar.navPrev" data-i18n-title="sidebar.navPrev">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
             </button>
-            <button class="fm-btn" id="nav-next" data-tip="下一个文件" data-i18n-title="sidebar.navNext">
+            <button class="fm-btn" id="nav-next" data-tip="下一个文件" data-i18n-tip="sidebar.navNext" data-i18n-title="sidebar.navNext">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
             </button>
             <span class="fm-sep"></span>
-            <button class="fm-btn" id="fm-reload" data-tip="重新加载" data-i18n-title="common.reload">
+            <button class="fm-btn" id="fm-reload" data-tip="重新加载" data-i18n-tip="common.reload" data-i18n-title="common.reload">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
             </button>
-            <button class="fm-btn fm-btn-danger" id="fm-delete" data-tip="删除" style="display:none;" data-i18n-title="common.delete">
+            <button class="fm-btn fm-btn-danger" id="fm-delete" data-tip="删除" data-i18n-tip="common.delete" style="display:none;" data-i18n-title="common.delete">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
             </button>
           </div>
@@ -394,7 +436,7 @@
             <span class="ce-problems-title" data-i18n="diagnostics.title">配置检查</span>
             <div class="ce-problems-filters"></div>
             <span class="ce-problems-file"></span>
-            <button type="button" class="ce-problems-close" id="ce-problems-close" data-tip="关闭" data-i18n-title="common.close">✕</button>
+            <button type="button" class="ce-problems-close" id="ce-problems-close" data-tip="关闭" data-i18n-tip="common.close" data-i18n-title="common.close">✕</button>
           </div>
           <div class="ce-problems-list"></div>
         </div>
@@ -403,26 +445,94 @@
 
     <div class="status-bar">
       <span id="status-info" data-i18n="status.ready">Ready</span>
-      <span id="ce-diag-status" class="ce-diag-status" data-tip="配置检查" title="配置检查" style="cursor:pointer;">✓</span>
+      <span id="ce-diag-status" class="ce-diag-status" data-tip="配置检查" data-i18n-tip="diagnostics.title" title="配置检查" style="cursor:pointer;">✓</span>
       <span id="file-path"></span>
     </div>
   </div>
 
-  <!-- 首次启动语言选择 -->
+  <!-- 首次启动语言选择: 默认 English/简体中文 两张大卡片, "更多语言"展开完整旗帜列表 -->
   <div class="lang-picker-overlay" id="lang-picker-overlay" style="display:none;">
     <div class="lang-picker-modal">
       <h2 class="lang-picker-title">Choten Editor</h2>
       <p class="lang-picker-sub">Select your language / 选择语言</p>
-      <div class="lang-picker-btns">
-        <button class="lang-picker-btn" data-lang="zh_cn">
-          <span class="lp-name">简体中文</span>
-          <span class="lp-desc">中文界面</span>
-        </button>
-        <button class="lang-picker-btn" data-lang="en_us">
+      <div class="lang-picker-primary">
+        <button class="lang-picker-card" data-lang="en_us">
+          <span class="lp-flags"><img src="images/flag/ENG.png" alt="UK"><img src="images/flag/USA.png" alt="US"></span>
           <span class="lp-name">English</span>
-          <span class="lp-desc">English UI</span>
+          <span class="lp-desc">United States / United Kingdom</span>
+        </button>
+        <button class="lang-picker-card" data-lang="zh_cn">
+          <span class="lp-flags"><img src="images/flag/PRC.png" alt="CN"></span>
+          <span class="lp-name">简体中文</span>
+          <span class="lp-desc">Chinese Mainland / 中国大陆</span>
         </button>
       </div>
+      <button type="button" class="lang-picker-more" id="lang-picker-more" aria-expanded="false" aria-controls="lang-picker-extra">
+        🌐 更多语言 / More languages
+      </button>
+      <div class="lang-picker-extra" id="lang-picker-extra">
+        <div class="lang-modal-list">
+          <button type="button" class="lang-option" data-lang="en_us">
+            <span class="lang-option-flags">
+              <img src="images/flag/ENG.png" alt="UK"><img src="images/flag/USA.png" alt="US">
+            </span>
+            <span class="lang-option-text">
+              <span class="lang-option-name">English</span>
+              <span class="lang-option-region">United States / United Kingdom</span>
+            </span>
+            <span class="lang-option-check">✓</span>
+          </button>
+          <button type="button" class="lang-option" data-lang="zh_cn">
+            <span class="lang-option-flags"><img src="images/flag/PRC.png" alt="CN"></span>
+            <span class="lang-option-text">
+              <span class="lang-option-name">简体中文 <span class="lang-option-alt">Chinese Simp.</span></span>
+              <span class="lang-option-region">Chinese Mainland / 中国大陆</span>
+            </span>
+            <span class="lang-option-check">✓</span>
+          </button>
+          <button type="button" class="lang-option" data-lang="zh_tw">
+            <span class="lang-option-flags"><img src="images/flag/HKN.png" alt="HK"></span>
+            <span class="lang-option-text">
+              <span class="lang-option-name">繁體中文 <span class="lang-option-alt">Chinese Trad.</span></span>
+              <span class="lang-option-region">Hong Kong / Taiwan / 香港特別行政區・台灣</span>
+            </span>
+            <span class="lang-option-check">✓</span>
+          </button>
+          <button type="button" class="lang-option" data-lang="de_de">
+            <span class="lang-option-flags"><img src="images/flag/GER.png" alt="DE"></span>
+            <span class="lang-option-text">
+              <span class="lang-option-name">Deutsch <span class="lang-option-alt">German</span></span>
+              <span class="lang-option-region">Germany / Deutschland</span>
+            </span>
+            <span class="lang-option-check">✓</span>
+          </button>
+          <button type="button" class="lang-option" data-lang="es_es">
+            <span class="lang-option-flags"><img src="images/flag/SPR.png" alt="ES"></span>
+            <span class="lang-option-text">
+              <span class="lang-option-name">Español <span class="lang-option-alt">Spanish</span></span>
+              <span class="lang-option-region">Spain / España</span>
+            </span>
+            <span class="lang-option-check">✓</span>
+          </button>
+          <button type="button" class="lang-option" data-lang="ko_kr">
+            <span class="lang-option-flags"><img src="images/flag/KOR.png" alt="KR"></span>
+            <span class="lang-option-text">
+              <span class="lang-option-name">한국어</span>
+              <span class="lang-option-region">Korea / 대한민국</span>
+            </span>
+            <span class="lang-option-check">✓</span>
+          </button>
+          <button type="button" class="lang-option" data-lang="ru_ru">
+            <span class="lang-option-flags"><img src="images/flag/SOV.png" alt="RU"></span>
+            <span class="lang-option-text">
+              <span class="lang-option-name">русский язык <span class="lang-option-alt">Russian</span></span>
+              <span class="lang-option-region">Russia / Россия</span>
+            </span>
+            <span class="lang-option-check">✓</span>
+          </button>
+        </div>
+      </div>
+      <p class="lang-picker-hint">提示：语言选择将在重启软件后生效。 / Language changes take effect after restart.</p>
     </div>
   </div>
 
@@ -724,7 +834,7 @@
     }
   })();
 
-  // 欢迎弹窗
+  // 欢迎弹窗（首次启动时等语言选择完成后再显示, 避免两个 999999 遮罩叠加）
   (function showWelcome() {
     var version = (window.electronAPI && window.electronAPI.appVersion) || '1.0.0';
     var overlay = document.getElementById('welcome-overlay');
@@ -738,6 +848,17 @@
     // 检查是否已在此版本勾选"不再提示"
     var dismissed = localStorage.getItem('welcomeDismissed');
     if (dismissed === version) return;
+
+    var langPicker = document.getElementById('lang-picker-overlay');
+    var langPickerVisible = langPicker && langPicker.style.display !== 'none' && !langPicker.hidden;
+    if (langPickerVisible) {
+      // 语言选择还在前面挡着：先挂起, 等它关掉再弹
+      document.addEventListener('choten:lang-chosen', function once() {
+        document.removeEventListener('choten:lang-chosen', once);
+        setTimeout(showWelcome, 50);
+      });
+      return;
+    }
 
     overlay.style.display = '';
     sessionStorage.setItem('welcomeShown', version);

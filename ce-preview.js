@@ -7,6 +7,9 @@
  *      (image / shift / global / i18n / l10n / expr / random / arg / var / papi / bubble 等)
  *   2) 物品/方块图标: 平面物品贴图 + 由原版模型 JSON 生成的等轴测 3D 方块
  *   3) 场景合成: 聊天栏 / 物品悬浮提示(lore) / 原版容器 GUI (9x1~9x6) / 字体图像总览
+ *   4) 模型场景 (item-model): 物品/方块模型按 display.<context> (ItemTransform)
+ *      完整展开渲染, 支持视角旋转与俯仰 —— 「物品模型的完全预览」
+ *   5) 家具场景编辑: 碰撞箱/座位/元素的可拖拽手柄 + 反投影 API (预览内编辑)
  *
  * 对外 API: window.CEPreview
  */
@@ -78,6 +81,10 @@
     resolveImages: true
   };
   var _projectData = { images: {}, globals: {}, emojis: {}, langs: {}, furniture: {}, items: {} };
+  // 当前场景视图俯仰 (度): 30 = 等轴测 (缺省), 90 = 正俯视, -90 = 正仰视。
+  // scenePitch 与 sceneViewYaw 一起构成视图旋转, 家具场景/模型场景共用;
+  // 每个场景渲染入口都会按 scene.pitch 重新赋值 (缺省 30)。
+  var scenePitch = 30;
   var _fonts = null;             // 已加载的 glyph ?(codepoint -> glyph)
   var _fontPromise = null;
   var _fontSettled = false;      // 是否已基于资源就绪完成一次真实加?
@@ -280,6 +287,30 @@
     }).catch(function () { return null; });
     return cacheSet(_jsonCache, p, pr);
   }
+  // .mcmeta (动画/纹理元数据): 与贴图同目录同名, 后缀 .mcmeta
+  async function loadTextureMeta(texturePath) {
+    var p = String(texturePath || '');
+    if (!p) return null;
+    return await loadJsonPath(p.replace(/\.png$/i, '') + '.mcmeta');
+  }
+  // 带动画 (.mcmeta animation) 的贴图是纵向帧条: 整张直接画会把所有帧叠在一起。
+  // 这里按 animation 声明 (或宽高推断) 裁出单帧, 供静态图标/模型 UV 使用。
+  // 返回 { img, sw, sh, sx, sy }; 非动画贴图返回 null (调用方按整图绘制)。
+  async function spriteFrameOf(img, texturePath) {
+    try {
+      if (!img || !img.width || !img.height) return null;
+      var meta = await loadTextureMeta(texturePath);
+      var anim = meta && meta.animation;
+      if (!anim) return null;
+      var fw = anim.width != null ? anim.width : img.width;      // mc 帧宽默认 = 贴图宽
+      var fh = anim.height != null ? anim.height : img.width;    // 帧高默认 = 帧宽 (纵向条)
+      if (!(fw > 0) || !(fh > 0) || fw > img.width || fh > img.height) return null;
+      // 帧数 = 总高 / 帧高; interpolate 等参数只影响播放, 静态预览取第一帧即可
+      var frames = Math.floor(img.height / fh + 1e-6);
+      if (frames <= 1) return null;
+      return { img: img, sw: fw, sh: fh, sx: 0, sy: 0 };
+    } catch (e) { return null; }
+  }
   function assets() { return root.CEMCAssets || null; }
   function resolvePath(kind, id) {
     var A = assets();
@@ -312,6 +343,25 @@
       if (img) return img;
     }
     return null;
+  }
+  // 带路径的加载: 命中哪个候选就返回它 (供 .mcmeta 按「贴图路径 + .mcmeta」查找)
+  async function loadImageAnyWithPath(kind, id) {
+    var cands = resolveCandidates(kind, id);
+    for (var i = 0; i < cands.length; i++) {
+      var img = await loadImagePath(cands[i]);
+      if (img) return { img: img, path: cands[i] };
+    }
+    return null;
+  }
+  // 贴图加载 (动画感知): 命中图 + 若是 .mcmeta 动画帧条则裁出第一帧。
+  // 返回 { img, sw, sh, sx, sy } 或 null; sw/sh/sx/sy 缺省 = 整图。
+  async function loadTextureFrame(kind, id) {
+    var hit = await loadImageAnyWithPath(kind, id);
+    if (!hit) return null;
+    var fr = await spriteFrameOf(hit.img, hit.path);
+    if (fr) return fr;
+    var img = hit.img;
+    return { img: img, sw: img.width, sh: img.height, sx: 0, sy: 0 };
   }
   async function loadJsonAny(kind, id) {
     var cands = resolveCandidates(kind, id);
@@ -1266,6 +1316,20 @@
       return { img: null, missing: true, sw: 1, sh: 1, sx: 0, sy: 0, width: ph, height: ph, ascent: cfgA == null ? ph - 1 : cfgA };
     }
     var img = entry._img;
+    // 动画帧条 (无 grid 配置时): 用预加载算好的帧窗口 (sw/sh/sx/sy) 当作这一格;
+    // 配了 grid_size/chars 的精灵图仍按 grid 切 (那是精灵表, 不是动画)
+    if (entry._frame && !grid) {
+      var fw0 = entry._frame.sw, fh0 = entry._frame.sh;
+      var outH0 = cfgH != null ? cfgH : fh0;
+      var scale0 = fh0 > 0 ? outH0 / fh0 : 1;
+      return {
+        img: img, sw: fw0, sh: fh0,
+        sx: entry._frame.sx, sy: entry._frame.sy,
+        width: Math.max(1, Math.round(fw0 * scale0)),
+        height: Math.max(1, Math.round(outH0)),
+        ascent: cfgA != null ? cfgA : outH0 - 1
+      };
+    }
     var cw = img.width / cols;
     var chh = img.height / rows;
     var outH = cfgH != null ? cfgH : chh;
@@ -1466,7 +1530,13 @@
     var cands = imageFileCandidates(entry.file);
     for (var i = 0; i < cands.length; i++) {
       var img = await loadImagePath(cands[i]);
-      if (img) { entry._img = img; entry._path = cands[i]; return; }
+      if (img) {
+        entry._img = img; entry._path = cands[i];
+        // CE 图像也可能指向动画帧条: 预加载时一并算出静态帧窗口
+        var fr = await spriteFrameOf(img, cands[i]);
+        if (fr) { entry._frame = fr; }
+        return;
+      }
     }
     warn('missing-image: ' + id + ' (' + entry.file + ')');
   }
@@ -1700,6 +1770,9 @@
   };
   // 视图方向 (yaw 45°, pitch 30°): ?+x +y +z 方向看向方块 ?可见?up / south / east
   var VIEW = { x: COS30, y: SIN30 * 2, z: COS30 };
+  // 物品栏 GUI 的视图向量: 原版把 display.gui 的 ItemTransform 烘进模型后再「正交直视」,
+  // 观察方向就是变换后空间的 +Z (镜头在 +Z 无穷远处看向原点)
+  var GUI_SLOT_VIEW = { x: 0, y: 0, z: 1 };
   function faceVisible(face) {
     var n = FACE_NORMALS[face];
     if (!n) return false;
@@ -1897,11 +1970,15 @@
       pt: function (p) {
         var x = (p[0] - 8) * sc[0], y = (p[1] - 8) * sc[1], z = (p[2] - 8) * sc[2];
         if (rot) { var r = mat3Apply(rot, [x, y, z]); x = r[0]; y = r[1]; z = r[2]; }
-        return rotYmc([ax + x, ay + y, az + z], viewYaw);
+        var out = rotYmc([ax + x, ay + y, az + z], viewYaw);
+        var t = tiltMat(scenePitch);
+        return t ? mat3Apply(t, out) : out;
       },
       nrm: function (n) {
         var r = rot ? mat3Apply(rot, [n[0], n[1], n[2]]) : [n[0], n[1], n[2]];
-        return rotYmc(r, viewYaw);
+        var out = rotYmc(r, viewYaw);
+        var t = tiltMat(scenePitch);
+        return t ? mat3Apply(t, out) : out;
       }
     };
   }
@@ -1910,7 +1987,116 @@
     nrm: function (n) { return [n[0], n[1], n[2]]; }
   };
 
+  // ---------------- display 上下文 (ItemTransform) ----------------
+  // 物品/方块模型在原版里的展示变换 (models/*/block.json 等), 键为展示上下文:
+  //   gui / ground / fixed / head / thirdperson_righthand / thirdperson_lefthand /
+  //   firstperson_righthand / firstperson_lefthand / on_shelf (26.4+ 新增)
+  // 变换语义 (Minecraft Wiki / BlockBakery): 顶点 p (0..16 模型空间) →
+  //   1. scale      p → s∘p
+  //   2. rotation   XYZ 欧拉 → R_x·R_y·R_z (先 Z 后 Y 后 X, 角度任意, 非原版 ±45 限制)
+  //   3. translation(1/16 单位) 旋转之后平移
+  // 左手上下文 = 对应右手上下文整体镜像 (R_pt 里 x → -x), 与 GUI 左手持物的镜像一致。
+  var DISPLAY_CONTEXTS = ['gui', 'ground', 'fixed', 'head', 'thirdperson_righthand',
+    'thirdperson_lefthand', 'firstperson_righthand', 'firstperson_lefthand', 'on_shelf'];
+  function displayContextList() { return DISPLAY_CONTEXTS.slice(); }
+  // 沿 parent 链逐层合并 display (子级按上下文覆盖父级, 上下文内字段也逐个覆盖)。
+  // loadModelChain 只保留最近一层有 display 的模型, 这里需要完整链上的 JSON。
+  async function collectDisplayChain(modelId, depth) {
+    depth = depth || 0;
+    if (depth > 8) return {};
+    var id = String(modelId);
+    if (id.indexOf(':') === -1) id = 'minecraft:' + id;
+    var json = null;
+    try { json = await loadJsonAny('model', id); } catch (e) { json = null; }
+    var merged = {};
+    if (json && json.parent) merged = await collectDisplayChain(json.parent, depth + 1);
+    if (json && json.display) {
+      var dk = Object.keys(json.display);
+      for (var i = 0; i < dk.length; i++) {
+        var ctxName = dk[i];
+        var base = isObj(merged[ctxName]) ? Object.assign({}, merged[ctxName]) : {};
+        var own = json.display[ctxName];
+        if (isObj(own)) {
+          var fk = Object.keys(own);
+          for (var j = 0; j < fk.length; j++) base[fk[j]] = own[fk[j]];
+        }
+        merged[ctxName] = base;
+      }
+    }
+    return merged;
+  }
+  // 上下文名归一: 接受缩写 (3rd/1st, 简写 righthand 等), 找不到就返回 null
+  function normalizeDisplayContext(name) {
+    var s = String(name || '').trim().toLowerCase().replace(/^minecraft:/, '');
+    if (!s) return null;
+    var all = DISPLAY_CONTEXTS;
+    for (var i = 0; i < all.length; i++) if (all[i] === s) return all[i];
+    var alias = s
+      .replace(/^thirdperson/, 'thirdperson').replace(/^firstperson/, 'firstperson')
+      .replace(/^3rd_?person/, 'thirdperson').replace(/^1st_?person/, 'firstperson')
+      .replace(/^third/, 'thirdperson').replace(/^first$/, 'firstperson')
+      .replace(/_?right_?hand$/, 'righthand').replace(/_?left_?hand$/, 'lefthand');
+    var cand = [];
+    if (alias.indexOf('thirdperson') === 0) {
+      cand.push(alias.indexOf('left') >= 0 ? 'thirdperson_lefthand' : 'thirdperson_righthand');
+    } else if (alias.indexOf('firstperson') === 0) {
+      cand.push(alias.indexOf('left') >= 0 ? 'firstperson_lefthand' : 'firstperson_righthand');
+    }
+    for (var c = 0; c < cand.length; c++) {
+      for (var k = 0; k < all.length; k++) if (all[k] === cand[c]) return all[k];
+    }
+    // 最后按包含关系猜 (比如 "head" / "fixed" / "ground" / "gui" 的变体拼写)
+    for (var m = 0; m < all.length; m++) {
+      if (all[m].indexOf(s) === 0 || s.indexOf(all[m]) === 0) return all[m];
+    }
+    return null;
+  }
+  // 把一条 ItemTransform 变成与 furnitureElementXf 同构的 xf (供 collectFacesFromModel 用)。
+  // centred: 旋转/缩放围绕模型中心 (8,8,8) —— MC 的 ItemTransform 就是这样做的
+  // (BlockBakery 先把模型平移到 -8..8, 应用变换, 再放回 0..16)。
+  // yaw (度, MC 语义): 场景视角旋转; pitch: 场景俯仰 —— 都作用在变换结果上 (与家具场景一致)。
+  // mirrorLeft: 左手上下文的 x 镜像 (在旋转之后)。
+  function displayXf(tr, yaw, mirrorLeft, pitch) {
+    tr = tr || {};
+    var sc = fscale(tr.scale != null ? tr.scale : 1);
+    var rot = tr.rotation;
+    var m = null;
+    if (rot != null) {
+      var parts = Array.isArray(rot)
+        ? rot.map(function (x) { return parseFloat(x); })
+        : String(rot).trim().split(/[\s,]+/).filter(Boolean).map(parseFloat);
+      if (parts.length === 3 && parts.every(function (x) { return isFinite(x); })) {
+        // R = R_x·R_y·R_z (右乘次序: 顶点先被 Z 旋转)
+        m = mat3Mul(rotMatX(parts[0]), mat3Mul(rotMatY(parts[1]), rotMatZ(parts[2])));
+      }
+    }
+    var tv = fvec(tr.translation, [0, 0, 0]);
+    var scx = sc[0], scy = sc[1], scz = sc[2];
+    var hasRot = !!m, hasMirror = !!mirrorLeft;
+    return {
+      tr: tr, sc: sc, rot: m, translation: tv,
+      pt: function (p) {
+        var x = (p[0] - 8) * scx, y = (p[1] - 8) * scy, z = (p[2] - 8) * scz;
+        if (hasRot) { var r = mat3Apply(m, [x, y, z]); x = r[0]; y = r[1]; z = r[2]; }
+        if (hasMirror) x = -x;
+        var out = [x + tv[0], y + tv[1], z + tv[2]];
+        if (yaw) out = rotYmc(out, yaw);
+        var t = tiltMat(pitch);
+        return t ? mat3Apply(t, out) : out;
+      },
+      nrm: function (n) {
+        var r = hasRot ? mat3Apply(m, [n[0], n[1], n[2]]) : [n[0], n[1], n[2]];
+        if (hasMirror) r = [-r[0], r[1], r[2]];
+        var out = yaw ? rotYmc(r, yaw) : r;
+        var t = tiltMat(pitch);
+        return t ? mat3Apply(t, out) : out;
+      }
+    };
+  }
+
   // 收集一个模型在给定变换下的全部可见面 (不含贴图加载)。
+  // view: 「变换后空间」里的视图向量 (默认 VIEW = 等轴测); 物品栏 GUI 场景传 GUI_SLOT_VIEW
+  // (烘焙后的正视角: +Z 朝观察者)。面按深度升序返回 (先远后近, 画的时候就是正确的遮挡)。
   // 返回 [{face, corners(世界坐标), uvs, texId, depth, shade, shadeAlpha}] 或 null。
   async function collectModelFaces(modelId, xf) {
     var model = await loadModelChain(modelId);
@@ -1933,9 +2119,24 @@
       }]
     };
   }
-  function collectFacesFromModel(model, xf) {
+  // 模型没有几何体 (只有 parent 链 + 贴图, 如 item/generated 一族) → 该按平面卡片画。
+  // 带 elements 的模型 (方块/家具) 返回 false, 必须按 3D 几何体渲染。
+  // 异步版: 缓存里没有时先加载再判 (scene.modelId 直指的模型此前从未加载过), 加载失败同样拍平。
+  async function flatKindModelAsync(modelId) {
+    // 缓存里存的是 Promise (loadModelChain 的返回值), 必须先 await 拿到真正的模型 ——
+    // 直接读 .elements 永远是 undefined, 任何加载过的模型都会被误判成「平面」。
+    var hit = (_modelCache && _modelCache.has && _modelCache.has(modelId))
+      ? _modelCache.get(modelId) : loadModelChain(modelId);
+    var m = null;
+    try { m = await hit; } catch (e) { m = null; }
+    if (!m) return false;                        // json 都读不到 → 交给后续 model-json-missing 分支报错
+    return !(Array.isArray(m.elements) && m.elements.length);
+  }
+  function collectFacesFromModel(model, xf, view) {
     if (!model || !Array.isArray(model.elements)) return null;
     var T = xf || FURN_IDENTITY_XF;
+    // 视图向量 (变换后空间): 默认等轴测 VIEW; 物品栏 GUI 场景传 GUI_SLOT_VIEW (正交直视 +Z)
+    var V = view || VIEW;
     var faces = [];
     for (var e = 0; e < model.elements.length; e++) {
       var el = model.elements[e];
@@ -1951,7 +2152,7 @@
         var nrm = FACE_NORMALS[face];
         if (!nrm) continue;
         var visN = T.nrm(rotAxis ? rotateDir(nrm, rotAxis, rotAngle) : nrm);
-        if ((visN[0] * VIEW.x + visN[1] * VIEW.y + visN[2] * VIEW.z) <= 0.0001) continue;
+        if ((visN[0] * V.x + visN[1] * V.y + visN[2] * V.z) <= 0.0001) continue;
         var fd = el.faces[face];
         if (!fd) continue;
         var texId = resolveTextureRef(model, fd.texture);
@@ -1969,23 +2170,32 @@
         var cxm = 0, cym = 0, czm = 0;
         corners.forEach(function (p) { cxm += p[0] / 4; cym += p[1] / 4; czm += p[2] / 4; });
         faces.push({ face: face, corners: corners, uvs: uvs, texId: texId,
-          depth: cxm * VIEW.x + cym * VIEW.y + czm * VIEW.z,
+          depth: cxm * V.x + cym * V.y + czm * V.z,
           shade: fd.shade !== false && el.shade !== false, tint: fd.tintindex,
           shadeAlpha: (rotAxis || xf) ? normalShadeAlpha(visN) : null });
       }
     }
+    // 先远后近 (depth 小 = 离观察者远), 画的时候就是正确的画家算法遮挡
+    faces.sort(function (a, b) { return a.depth - b.depth; });
     return faces.length ? faces : null;
   }
 
   async function drawBlockModel(ctx, modelId, cx, cy, size, xf) {
     var faces = await collectModelFaces(modelId, xf);
     if (!faces) return false;
-    // 加载贴图
+    // 加载贴图 (动画贴图取第一帧)
     var texCache = {};
     for (var i = 0; i < faces.length; i++) {
       var id = faces[i].texId;
-      if (!texCache[id]) texCache[id] = await loadImageAny('texture', id);
-      faces[i].img = texCache[id];
+      if (!texCache[id]) texCache[id] = await loadTextureFrame('texture', id);
+      var fr = texCache[id];
+      if (fr) {
+        faces[i].img = fr.img;
+        faces[i].sx = fr.sx; faces[i].sy = fr.sy;
+        faces[i].sw = fr.sw; faces[i].sh = fr.sh;
+      } else {
+        faces[i].img = null;
+      }
     }
     // 缩放: 16 单位方块在等轴测下宽 (x+z)*cos30 ≈27.7, 高 (x+z)*sin30 + y = 32
     var unit = size / 32;
@@ -1994,23 +2204,29 @@
     ctx.restore();
     return true;
   }
-  // 把已收集 (已变换/已排序) 的面画到 (ox, oy) 屏幕锚点上
-  function paintFaces(ctx, faces, unit, ox, oy) {
+  // 把已收集 (已变换/已排序) 的面画到 (ox, oy) 屏幕锚点上。
+  // projFn: 世界坐标 → 屏幕坐标 (单位仍要乘 unit), 默认等轴测 project();
+  // 物品栏 GUI 场景传 projectGui (正交直视, 1 单位 = 1 像素, y 翻转朝上)。
+  function paintFaces(ctx, faces, unit, ox, oy, projFn) {
+    var proj = projFn || project;
     for (var k = 0; k < faces.length; k++) {
       var fc = faces[k];
       if (!fc.img) continue;
-      drawTexturedQuad(ctx, fc, unit, ox, oy);
+      drawTexturedQuad(ctx, fc, unit, ox, oy, proj);
     }
   }
-  function drawTexturedQuad(ctx, fc, unit, ox, oy) {
+  function drawTexturedQuad(ctx, fc, unit, ox, oy, projFn) {
+    var proj = projFn || project;
     var pts = fc.corners.map(function (p) {
-      var s = project(p[0], p[1], p[2]);
+      var s = proj(p[0], p[1], p[2]);
       return { x: ox + s.x * unit, y: oy + s.y * unit };
     });
-    // UV (0..16) ?贴图坐标
-    var tw = fc.img.width, th = fc.img.height;
+    // UV (0..16) ?贴图坐标 (动画帧: fc.sw/sh/sx/sy 指向帧条中的那一帧)
+    var tw = fc.sw != null ? fc.sw : fc.img.width;
+    var th = fc.sh != null ? fc.sh : fc.img.height;
+    var u0 = fc.sx || 0, v0 = fc.sy || 0;
     var uv = fc.uvs.map(function (q) {
-      return { u: (q[0] / 16) * tw, v: (q[1] / 16) * th };
+      return { u: u0 + (q[0] / 16) * tw, v: v0 + (q[1] / 16) * th };
     });
     // 仿射: ?3 个角点解?(平行四边形精?
     var p0 = pts[0], p1 = pts[1], p3 = pts[3];
@@ -2030,7 +2246,7 @@
     ctx.closePath();
     ctx.clip();
     ctx.transform(a, c, b, d, e0, f0);
-    try { ctx.drawImage(fc.img, 0, 0); } catch (err) { /* ignore */ }
+    try { ctx.drawImage(fc.img, fc.sx || 0, fc.sy || 0, tw, th, 0, 0, tw, th); } catch (err) { /* ignore */ }
     ctx.restore();
     if (fc.shade) {
       var alpha = fc.shadeAlpha != null ? fc.shadeAlpha : faceShadeAlpha(fc.face);
@@ -2068,11 +2284,11 @@
         if (t3) info.texture = t3;
       }
       if (info.texture) {
-        var img = await loadImageAny('texture', info.texture);
-        if (img) {
+        var fr2 = await loadTextureFrame('texture', info.texture);
+        if (fr2) {
           ctx.save();
           ctx.imageSmoothingEnabled = false;
-          ctx.drawImage(img, x, y, size, size);
+          ctx.drawImage(fr2.img, fr2.sx, fr2.sy, fr2.sw, fr2.sh, x, y, size, size);
           ctx.restore();
           return res;
         }
@@ -2435,6 +2651,188 @@
     ctx.fillRect(x - 1, y + h - 2, w, 1); ctx.fillRect(x + w - 2, y - 1, 1, h);
   }
 
+  // ---------------- 原版生存物品栏 GUI (物品模型按 gui 上下文渲染) ----------------
+  // 与 sceneGui (generic_54 容器) 不同: 这里画的是玩家自带的生存物品栏
+  // (textures/gui/container/inventory), 物品不再走 drawItem 的「平面/等轴测」两条路,
+  // 而是原版槽位渲染管线 —— display.gui 的 ItemTransform 烘进模型后正交直视。
+  var GUI_INVENTORY = 'minecraft:gui/container/inventory';
+  var INV_W = 176, INV_H = 166;   // 原版该贴图 256x256, 有效区 176x166
+  // 原版模型没有 display 时, block/block.json 的 [30,225,0]/0.625 也拿不到 (gui 上下文为空),
+  // 渲染结果会是一坨 16x16 的正投影 —— 这在原版是真的, 但观感不对。
+  // 这里对 3D 模型回退到标准方块 gui 变换 (和原版 block/block.json 一致), 并发 warning。
+  var GUI_FALLBACK_TR = { rotation: [30, 225, 0], translation: [0, 0, 0], scale: 0.625 };
+
+  // 生存物品栏槽位坐标 (InventoryMenu: armor 8, 8+i*18; 合成 98+j*18, 18+i*18;
+  // 成品 154, 28; 主背包 8+j*18, 84+i*18; 快捷栏 8+j*18, 142)。返回 [{key, x, y}]。
+  function inventorySlots() {
+    var s = [], i, j;
+    for (i = 0; i < 4; i++) s.push({ key: 'armor' + i, x: 8, y: 8 + i * 18 });
+    for (i = 0; i < 2; i++) for (j = 0; j < 2; j++) s.push({ key: 'craft' + i + j, x: 98 + j * 18, y: 18 + i * 18 });
+    s.push({ key: 'result', x: 154, y: 28 });
+    for (i = 0; i < 3; i++) for (j = 0; j < 9; j++) s.push({ key: 'main' + i + j, x: 8 + j * 18, y: 84 + i * 18 });
+    for (j = 0; j < 9; j++) s.push({ key: 'hotbar' + j, x: 8 + j * 18, y: 142 });
+    return s;
+  }
+
+  // 单个槽位的物品渲染: 平面物品 = 16x16 贴图 (与原版一致);
+  // 3D 模型 = display.gui ItemTransform + 正交投影 (projectGui), 单位 1:1, 居中在槽位。
+  // 解析不出 / 贴图缺失: 画 drawItem 同款占位框并警告 (原版此时什么都不画, 预览里明示更好排查)
+  function drawInvPlaceholder(ctx, sx, sy) {
+    ctx.fillStyle = 'rgba(255,255,255,0.10)';
+    ctx.fillRect(sx + 1, sy + 1, 16, 16);
+    ctx.fillStyle = 'rgba(255,80,80,0.85)';
+    ctx.fillRect(sx + 1, sy + 1, 16, 1); ctx.fillRect(sx + 1, sy + 16, 16, 1);
+    ctx.fillRect(sx + 1, sy + 1, 1, 16); ctx.fillRect(sx + 16, sy + 1, 1, 16);
+  }
+  async function renderInvSlotItem(ctx, itemRef, sx, sy) {
+    var info = await resolveItemModel(itemRef);
+    if (!info || info.kind === 'none') {
+      drawInvPlaceholder(ctx, sx, sy);
+      warn('item-not-renderable: ' + itemRef);
+      return info || { kind: 'none' };
+    }
+    if (info.kind !== 'block' || !info.model) {
+      // 平面物品: 原版就是一张 16x16 贴图原样画进槽位
+      var tex = info.texture || (info.model ? await flatTextureOf(info.model) : null);
+      if (tex) {
+        var fr = await loadTextureFrame('texture', tex);
+        if (fr) {
+          ctx.save();
+          ctx.imageSmoothingEnabled = false;
+          ctx.drawImage(fr.img, fr.sx, fr.sy, fr.sw, fr.sh, sx + 1, sy + 1, 16, 16);
+          ctx.restore();
+          return { kind: 'flat', texture: tex };
+        }
+      }
+      drawInvPlaceholder(ctx, sx, sy);
+      warn('missing texture ' + (tex || itemRef));
+      return { kind: 'none' };
+    }
+    // 3D 模型: collectDisplayChain 沿 parent 链合并 display (子优先), 再叠模型自身的
+    var modelId = info.model;
+    var model = await loadModelChain(modelId);
+    if (!model) {
+      drawInvPlaceholder(ctx, sx, sy);
+      warn('model-json-missing: ' + modelId);
+      return { kind: 'none' };
+    }
+    if (await flatKindModelAsync(modelId)) {
+      // 带 parent 到 item/generated 的「伪 3D」: 实为平面贴图, 拍平处理
+      var ft = await flatTextureOf(modelId);
+      if (ft) {
+        var fr2 = await loadTextureFrame('texture', ft);
+        if (fr2) {
+          ctx.save();
+          ctx.imageSmoothingEnabled = false;
+          ctx.drawImage(fr2.img, fr2.sx, fr2.sy, fr2.sw, fr2.sh, sx + 1, sy + 1, 16, 16);
+          ctx.restore();
+          return { kind: 'flat', texture: ft };
+        }
+      }
+      drawInvPlaceholder(ctx, sx, sy);
+      warn('missing texture ' + (ft || modelId));
+      return { kind: 'none' };
+    }
+    var chainDisp = await collectDisplayChain(modelId);
+    if (model.display) {
+      var dk = Object.keys(model.display);
+      for (var d = 0; d < dk.length; d++) {
+        var base = isObj(chainDisp[dk[d]]) ? Object.assign({}, chainDisp[dk[d]]) : {};
+        var own = model.display[dk[d]];
+        if (isObj(own)) {
+          var fk = Object.keys(own);
+          for (var k = 0; k < fk.length; k++) base[fk[k]] = own[fk[k]];
+        }
+        chainDisp[dk[d]] = base;
+      }
+    }
+    // gui 上下文缺失时回退到标准方块 gui 变换 (原版里这意味着模型没有任何 display,
+    // 但那样的直投影完全没有立体感 —— 预览选择向 block/block.json 的经典外观看齐)
+    var tr = chainDisp.gui || GUI_FALLBACK_TR;
+    var fallbackUsed = !chainDisp.gui;
+    if (fallbackUsed) warn('gui-display-fallback: ' + modelId);
+    // 关键: yaw 恒为 0, pitch 恒为 30 (tiltMat(30) = null) ⇒ displayXf 就是纯 ItemTransform
+    var xf = displayXf(tr, 0, false, 30);
+    var faces = collectFacesFromModel(model, xf, GUI_SLOT_VIEW) || [];
+    var texCache = {};
+    for (var ti = 0; ti < faces.length; ti++) {
+      var tid = faces[ti].texId;
+      if (!texCache[tid]) texCache[tid] = await loadTextureFrame('texture', tid);
+      var tfr = texCache[tid];
+      if (tfr) {
+        faces[ti].img = tfr.img;
+        faces[ti].sx = tfr.sx; faces[ti].sy = tfr.sy;
+        faces[ti].sw = tfr.sw; faces[ti].sh = tfr.sh;
+      } else {
+        faces[ti].img = null;
+      }
+    }
+    // 正交直视: 屏幕 x = 模型 x, 屏幕 y = -模型 y (画布 y 朝下), 1 模型单位 = 1 像素,
+    // 模型中心 (变换后原点) 对准槽位中心。面片已按深度升序 (先远后近)。
+    paintFaces(ctx, faces, 1, sx + 1 + 8, sy + 1 + 8, projectGui);
+    return { kind: 'model', model: modelId, faces: faces.length, fallback: fallbackUsed };
+  }
+
+  async function sceneInventory(canvas, scene) {
+    await fontReady();
+    var scale = normScale(scene.scale);
+    var img = await loadImageAny('texture', GUI_INVENTORY);
+    var surf = makeSurface(INV_W, INV_H, scale);
+    var ctx = surf.ctx;
+    if (img) {
+      // 原版贴图是 256x256 画布, 有效区只有左上 176x166, 直接裁剪绘制
+      ctx.drawImage(img, 0, 0, INV_W, INV_H, 0, 0, INV_W, INV_H);
+    } else {
+      // 无贴图时手绘近似生存物品栏: 底板 + 槽位格
+      ctx.fillStyle = '#C6C6C6';
+      ctx.fillRect(0, 0, INV_W, INV_H);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, INV_W, 1); ctx.fillRect(0, 0, 1, INV_H);
+      ctx.fillStyle = '#555555';
+      ctx.fillRect(0, INV_H - 1, INV_W, 1); ctx.fillRect(INV_W - 1, 0, 1, INV_H);
+      var slotsFb = inventorySlots();
+      for (var fbi = 0; fbi < slotsFb.length; fbi++) {
+        drawSlotRect(ctx, slotsFb[fbi].x, slotsFb[fbi].y, 18, 18);
+      }
+      warn('gui-texture-missing');
+    }
+    var slots = inventorySlots();
+    // 选中的槽位 (面板点击可换; 越界回落到 0 = 快捷栏第一格)
+    var slotIdx = clamp(parseInt(scene.slot, 10) || 0, 0, slots.length - 1);
+    var sel = slots[slotIdx];
+    // 物品渲染
+    var r = { kind: 'none' };
+    if (scene.item) r = await renderInvSlotItem(ctx, scene.item, sel.x, sel.y);
+    var count = scene.count != null ? parseInt(scene.count, 10) || 0 : 1;
+    if (scene.item && count > 1) {
+      // MC: drawString(count, x + 17 - width, y + 9, white, shadow) —— y 是文字顶,
+      // drawItems 的 y 是基线, 默认 ascent=7 → 基线 = 槽内顶 + 9 + 7
+      var pCount = parseText(String(count), { style: { color: hexToRgb('#FFFFFF'), shadow: true } });
+      drawItems(ctx, pCount.items, sel.x + 1 + 17 - pCount.width, sel.y + 1 + 9 + 7, { shadow: true });
+    }
+    // 鼠标悬浮高亮 (半透明白 16x16, 和原版渲染一致)
+    if (scene.hoverSlot != null && parseInt(scene.hoverSlot, 10) === slotIdx) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.fillRect(sel.x, sel.y, 16, 16);
+      ctx.restore();
+    }
+    // 拾取数据: 面板点击换槽位用 (逻辑坐标)
+    _invPick = { slots: slots, w: INV_W, h: INV_H, slot: slotIdx, rendered: r };
+    blit(canvas, surf);
+    return { width: canvas.width, height: canvas.height, warnings: _warnings.slice() };
+  }
+  // 最近一次物品栏渲染的拾取数据 (面板点击时查它)
+  var _invPick = null;
+  function inventoryPickAt(px, py) {
+    if (!_invPick || !_invPick.slots) return -1;
+    var slots = _invPick.slots;
+    for (var i = 0; i < slots.length; i++) {
+      if (px >= slots[i].x && px < slots[i].x + 18 && py >= slots[i].y && py < slots[i].y + 18) return i;
+    }
+    return -1;
+  }
+
   // ---------------- 家具 (furniture) ----------------
   // CE 家具是基于展示实体的装饰系统: 一个家具下有多个 variants,
   // 每个变体 = elements (外观部件) + hitboxes (碰撞箱, 可带 seats 座位)。
@@ -2653,27 +3051,82 @@
     return out;
   }
   // ---- 家具场景投影 ----
-  // 等轴测投影 (yaw 45° pitch 30°), 可叠加:
-  //   - viewYaw: 绕竖直轴的视图旋转 (±90/180 → 看家具的四个朝向)
-  //   - zoom:    视图缩放 (>1 放大)
-  // project() 返回「1/16 方块单位」下的屏幕偏移, 调用方乘 FURN_UNIT 或 zoom 后再加锚点。
+  // 基础等轴测投影 (dimetric 2:1, 无视图变换)
   function project(x, y, z) {
     var sx = (x - z) * COS30;
     var sy = (x + z) * SIN30 - y;
     return { x: sx, y: sy };
   }
+  // 物品栏 GUI 的投影: display.gui 的 ItemTransform 烘进模型后, 原版把结果「正交直视」——
+  // 屏幕 x = 模型 x, 屏幕 y = 模型 y (画布 y 轴朝下, 所以显示时翻转)。1 单位 = 1 像素。
+  function projectGui(x, y, z) {
+    return { x: x, y: -y };
+  }
+  // 等轴测投影 (yaw 45° pitch 30°), 可叠加:
+  //   - viewYaw:   绕竖直轴的视图旋转 (±90/180 → 看家具的四个朝向)
+  //   - viewPitch: 视图俯仰 (度: 30 = 默认等轴测, 90 = 正俯视, -90 = 正仰视)
+  //   - zoom:      视图缩放 (>1 放大)
+  // project() 返回「1/16 方块单位」下的屏幕偏移, 调用方乘 FURN_UNIT 或 zoom 后再加锚点。
+  // 俯仰的实现: 先把点绕「屏幕水平轴」r = (1,0,-1)/√2 旋转 β, 再做等轴测投影。
+  // 旋转轴垂直于视线且水平, 所以旋转只改俯仰不改方位角 (转台式俯仰)。
+  // 标定: β=+54.74° 时世界 +Y 恰好转到视线 (1,1,1) 方向 = 正俯视; 等轴测俯仰为 30°、
+  // 俯视区间 [30,90) 对应 β∈[0,54.74), 换算 β = (pitch-30) × 54.74/60 —— pitch=30 时
+  // β=0, 投影与原等轴测完全一致。
+  var TILT_AXIS = [1 / Math.SQRT2, 0, -1 / Math.SQRT2];
+  var TILT_TOP = 54.7356;   // 世界 +Y → 视线 (1,1,1) 方向的旋转角
+  function tiltBeta(pitch) {
+    return ((pitch == null ? 30 : pitch) - 30) * (TILT_TOP / 60);
+  }
+  // 绕任意单位轴旋转 3x3 矩阵 (Rodrigues): R = cosβ·I + sinβ·[k]× + (1-cosβ)·k⊗k
+  function rodriguesMat(k, deg) {
+    var a = deg * Math.PI / 180, c = Math.cos(a), s = Math.sin(a), t = 1 - c;
+    var x = k[0], y = k[1], z = k[2];
+    return [
+      c + t * x * x,      t * x * y - s * z,  t * x * z + s * y,
+      t * x * y + s * z,  c + t * y * y,      t * y * z - s * x,
+      t * x * z - s * y,  t * y * z + s * x,  c + t * z * z
+    ];
+  }
+  var _tiltCache = { pitch: NaN, m: null };
+  function tiltMat(pitch) {
+    var p = pitch == null ? 30 : pitch;
+    if (_tiltCache.pitch === p && _tiltCache.m !== null) return _tiltCache.m;
+    var b = tiltBeta(p);
+    _tiltCache.m = Math.abs(b) < 0.001 ? null : rodriguesMat(TILT_AXIS, b);
+    _tiltCache.pitch = p;
+    return _tiltCache.m;
+  }
+  // 带俯仰的等轴测投影 (俯仰只影响投影; 剔除/光照用「最终坐标系」的固定 VIEW 向量,
+  // 与 project 的视线自洽, 不受俯仰影响)
+  function projectPitched(x, y, z, pitch) {
+    var p = pitch == null ? 30 : pitch;
+    if (Math.abs(p - 30) < 0.01) return project(x, y, z);
+    var m = tiltMat(p);
+    var q = m ? mat3Apply(m, [x, y, z]) : [x, y, z];
+    return project(q[0], q[1], q[2]);
+  }
   function projectView(x, y, z, viewYaw) {
     var p = rotYmc([x, y, z], viewYaw || 0);
     return project(p[0], p[1], p[2]);
+  }
+  // 带俯仰的视图投影 (家具/模型场景共用; pitch 缺省 30 = 原等轴测)
+  function projectViewP(x, y, z, viewYaw, viewPitch) {
+    var p = rotYmc([x, y, z], viewYaw || 0);
+    return projectPitched(p[0], p[1], p[2], viewPitch);
   }
   function viewDepth(x, y, z, viewYaw) {
     var p = rotYmc([x, y, z], viewYaw || 0);
     return p[0] * VIEW.x + p[1] * VIEW.y + p[2] * VIEW.z;
   }
   function fpt(cx, cy, x, y, z) {
-    var s = projectView(x, y, z, sceneViewYaw);
+    var s = projectViewP(x, y, z, sceneViewYaw, scenePitch);
     var u = FURN_UNIT * sceneZoom;
     return { x: cx + s.x * u, y: cy + s.y * u };
+  }
+  function clampPitchDeg(v) {
+    var n = parseFloat(v);
+    if (!isFinite(n)) return 30;
+    return clamp(n, -90, 90);
   }
   // 画一个 3D 线框盒 (8 顶点 12 边)。半透明填充 + 背面虚线用于「填充」模式。
   function drawWireBox(ctx, cx, cy, min, max, color, width, o) {
@@ -2694,12 +3147,12 @@
     var EDGES = [[0, 1], [0, 2], [0, 4], [1, 3], [1, 5], [2, 3], [2, 6], [3, 7], [4, 5], [4, 6], [5, 7], [6, 7]];
     var fillA = o.fillAlpha != null ? o.fillAlpha : 0;
     var front = [], back = [];
+    var tilt = tiltMat(scenePitch);
     for (var fi = 0; fi < FACES.length; fi++) {
       var fc = FACES[fi];
       var nrm = rotYmc(fc.n, sceneViewYaw);
+      if (tilt) nrm = mat3Apply(tilt, nrm);
       var dv = nrm[0] * VIEW.x + nrm[1] * VIEW.y + nrm[2] * VIEW.z;
-      // 顶/底面的法线绕竖直轴旋转不变, 直接用原值判定
-      if (fc.n[1] !== 0) dv = fc.n[1] * VIEW.y;
       (dv > 0.0001 ? front : back).push(fc);
     }
     ctx.save();
@@ -2777,20 +3230,45 @@
     }
     ctx.restore();
     return q;
-  }
-  // 座位: "x,y,z [yaw] [force]" 或 {position,yaw,...}
+  }  // 座位: "x,y,z [yaw] [force]" 或 {position,yaw,...}
+  // 字符串座位解析出 tail (yaw 之后的未知 token, 编辑回写时原样保留)
   function furnitureSeat(seat) {
     var o = fobj(seat);
     if (o) {
       var p = fvec(o.position, null) || [0, 0, 0];
-      return { pos: p, yaw: fnum(o.yaw) };
+      return { pos: p, yaw: fnum(o.yaw), tail: [], obj: true };
     }
     var s = String(fval(seat) == null ? '' : fval(seat)).trim();
     if (!s) return null;
     var parts = s.split(/[\s,]+/).filter(Boolean);
     var n = parts.slice(0, 3).map(parseFloat);
     if (n.length < 3 || !isFinite(n[0])) return null;
-    return { pos: n, yaw: isFinite(parseFloat(parts[3])) ? parseFloat(parts[3]) : null };
+    var yaw = isFinite(parseFloat(parts[3])) ? parseFloat(parts[3]) : null;
+    // yaw 后面的 token (force 等) 原样保留; yaw 缺省时从第 4 个起全是 tail
+    var tail = parts.slice(yaw != null ? 4 : 3);
+    return { pos: n, yaw: yaw, tail: tail, obj: false };
+  }
+
+  // ---- 编辑手柄绘制 (预览内编辑) ----
+  // shape: 'square' 碰撞箱角/中心 | 'diamond' 高度 | 'ring' 座位 | 'dot' 元素锚点
+  function drawEditHandle(ctx, x, y, color, shape, active) {
+    ctx.save();
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = 'rgba(0,0,0,0.65)';
+    ctx.fillStyle = active ? '#FFFFFF' : color;
+    ctx.beginPath();
+    if (shape === 'square') { ctx.rect(x - 3.5, y - 3.5, 7, 7); }
+    else if (shape === 'diamond') {
+      ctx.moveTo(x, y - 5.5); ctx.lineTo(x + 5.5, y);
+      ctx.lineTo(x, y + 5.5); ctx.lineTo(x - 5.5, y); ctx.closePath();
+    } else if (shape === 'ring') {
+      ctx.arc(x, y, 5, 0, Math.PI * 2);
+    } else {
+      ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+    }
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
   }
   // 元素要画的东西: {kind:'item'|'block'|'text'|'external', ...}
   function furnitureElementVisual(el) {
@@ -2857,6 +3335,92 @@
     }
     return best;
   }
+
+  // ---------------- 预览内编辑 (家具画布手柄) ----------------
+  // 编辑模式下场景会画出手柄并把「屏幕坐标 + 反投影函数」暴露给面板:
+  //   面板负责指针事件 → 反投影出世界坐标 → 直接改 ctx.data (解析树里的活对象)
+  //   → 拖动结束派发 'ce-preview-data-changed', 由 renderer 桥接同步可视化表单。
+  function furnitureEditHandles() {
+    return (_furnPick && _furnPick.handles) || [];
+  }
+  function furnitureEditHitAt(px, py) {
+    var hs = furnitureEditHandles();
+    if (!hs.length) return null;
+    // 命中半径按「手柄半径 + 容差」, 同距时 prio 大者优先 (seat=2 > el-pos=3 > hb-height=1 > hb-pos=0;
+    // 数值越大越后画/越小越精, score = d − prio → 高 prio 赢)
+    var best = null, bestScore = Infinity;
+    for (var i = 0; i < hs.length; i++) {
+      var h = hs[i];
+      var dx = px - h.x, dy = py - h.y;
+      var d = Math.sqrt(dx * dx + dy * dy);
+      var R = (h.r || 7) + 4;
+      if (d > R) continue;
+      var score = d - (h.prio || 0);
+      if (score < bestScore) { bestScore = score; best = h; }
+    }
+    return best;
+  }
+  // 视图信息 (面板拖拽时把像素增量换算成世界增量用)
+  function furnitureViewInfo() {
+    if (!_furnPick) return null;
+    return {
+      ox: _furnPick.ox || 0, oy: _furnPick.oy || 0,
+      unit: FURN_UNIT * sceneZoom,
+      yaw: sceneViewYaw, pitch: scenePitch,
+      boxes: _furnPick.boxes || []
+    };
+  }
+  // 世界坐标(1/16) → 画布逻辑坐标 的仿射映射 (视图旋转 + 俯仰都是线性变换, 精确求逆用)。
+  // 返回 {ox, oy, mx, my, mz}: screen = origin + world.x·mx + world.y·my + world.z·mz
+  function furnitureAffine() {
+    var u = FURN_UNIT * sceneZoom;
+    function F(x, y, z) {
+      var s = projectViewP(x, y, z, sceneViewYaw, scenePitch);
+      return [s.x * u, s.y * u];
+    }
+    var o = F(0, 0, 0);
+    var ex = F(1, 0, 0), ey = F(0, 1, 0), ez = F(0, 0, 1);
+    return {
+      ox: o[0], oy: o[1],
+      mx: [ex[0] - o[0], ex[1] - o[1]],   // d(screen) / d(world.x)
+      my: [ey[0] - o[0], ey[1] - o[1]],
+      mz: [ez[0] - o[0], ez[1] - o[1]]
+    };
+  }
+  // 已知世界高度 y (1/16 单位) 时, 画布逻辑坐标 → 世界 (x, z): 解 2x2 线性方程组
+  function furnitureUnproject(lx, ly, y) {
+    if (!_furnPick) return null;
+    var A = furnitureAffine();
+    var rx = lx - (_furnPick.ox || 0) - A.ox - A.my[0] * y;
+    var ry = ly - (_furnPick.oy || 0) - A.oy - A.my[1] * y;
+    var det = A.mx[0] * A.mz[1] - A.mz[0] * A.mx[1];
+    if (Math.abs(det) < 1e-9) return null;
+    var wx = (rx * A.mz[1] - A.mz[0] * ry) / det;
+    var wz = (A.mx[0] * ry - rx * A.mx[1]) / det;
+    return [wx, y, wz];
+  }
+  // 已知世界 (x, z) 时, 画布逻辑坐标 → 世界 y (Shift 垂直拖动)
+  function furnitureUnprojectY(lx, ly, x, z) {
+    if (!_furnPick) return null;
+    var A = furnitureAffine();
+    var bx = (_furnPick.ox || 0) + A.ox + A.mx[0] * x + A.mz[0] * z;
+    var rx = lx - bx;
+    if (Math.abs(A.my[0]) > 1e-6) return rx / A.my[0];
+    var by = (_furnPick.oy || 0) + A.oy + A.mx[1] * x + A.mz[1] * z;
+    var ry = ly - by;
+    if (Math.abs(A.my[1]) < 1e-6) return null;
+    return ry / A.my[1];
+  }
+  // 世界坐标 (1/16 单位) → 画布逻辑坐标 (与 furniturePickAt / 手柄命中同一坐标系)
+  function furnitureProjectPoint(x, y, z) {
+    if (!_furnPick) return null;
+    var A = furnitureAffine();
+    return {
+      x: (_furnPick.ox || 0) + A.ox + A.mx[0] * x + A.my[0] * y + A.mz[0] * z,
+      y: (_furnPick.oy || 0) + A.oy + A.mx[1] * x + A.my[1] * y + A.mz[1] * z
+    };
+  }
+
   // 碰撞箱尺寸文案: 1/16 单位 → 方块 (去尾零)
   function furnDim(n) {
     var v = Math.round(n * 100) / 100;
@@ -2886,9 +3450,11 @@
     var vi = clamp(parseInt(scene.variant, 10) || 0, 0, variants.length - 1);
     var v = variants[vi];
 
-    // ---- 视图状态: 旋转 (yaw, 45°步进) / 缩放 ----
+    // ---- 视图状态: 旋转 (yaw, 45°步进) / 缩放 / 俯仰 ----
     sceneViewYaw = ((parseFloat(scene.yaw) || 0) % 360 + 360) % 360;
     sceneZoom = clamp(parseFloat(scene.zoom) || 1, 0.25, 4);
+    scenePitch = clampPitchDeg(scene.pitch != null ? scene.pitch : scene.viewPitch);
+    var editMode = scene.edit === true;
     var opt = {
       hitboxes: scene.showHitboxes !== false,
       seats: scene.showSeats !== false,
@@ -2897,7 +3463,9 @@
       // 需要更直观的体积感时由面板打开
       fill: scene.hbFill === true,
       labels: scene.hbLabels !== false,
-      highlight: isFinite(parseInt(scene.hlHitbox, 10)) ? parseInt(scene.hlHitbox, 10) : -1
+      highlight: isFinite(parseInt(scene.hlHitbox, 10)) ? parseInt(scene.hlHitbox, 10) : -1,
+      // 编辑模式: 当前选中的手柄 id (白亮显示)
+      editSel: scene.editSel || null
     };
     var unit = FURN_UNIT * sceneZoom;
 
@@ -2913,13 +3481,20 @@
       if (x > bMaxX) bMaxX = x; if (y > bMaxY) bMaxY = y;
     }
     var scrOf = function (x, y, z) {
-      var s = projectView(x, y, z, sceneViewYaw);
+      var s = projectViewP(x, y, z, sceneViewYaw, scenePitch);
       return { x: s.x * unit, y: s.y * unit };
     };
-    // 面片角点在 collectModelFaces 里已随 xf 旋转过 (含 viewYaw), 投影时不能再转一次
+    // 面片角点在 collectModelFaces 里已随 xf 旋转过 (含 viewYaw + 俯仰), 投影时不能再转一次
     var scrOfRaw = function (x, y, z) {
       var s = project(x, y, z);
       return { x: s.x * unit, y: s.y * unit };
+    };
+    // 元素深度: 与面片同一「倾斜后」坐标系里比较
+    var depthOf = function (x, y, z) {
+      var p = rotYmc([x, y, z], sceneViewYaw);
+      var t = tiltMat(scenePitch);
+      var q = t ? mat3Apply(t, p) : p;
+      return q[0] * VIEW.x + q[1] * VIEW.y + q[2] * VIEW.z;
     };
     var growBox = function (min, max) {
       for (var i = 0; i < 8; i++) {
@@ -2947,7 +3522,7 @@
       var vis = furnitureElementVisual(el);
       var sp = scrOf(xf.anchor[0], xf.anchor[1], xf.anchor[2]);
       var avg = (xf.sc[0] + xf.sc[1] + xf.sc[2]) / 3;
-      var depth = viewDepth(xf.anchor[0], xf.anchor[1], xf.anchor[2], sceneViewYaw);
+      var depth = depthOf(xf.anchor[0], xf.anchor[1], xf.anchor[2]);
 
       if (vis.kind === 'external') {
         externalModels.push(vis.model || '(未指定模型)');
@@ -3036,7 +3611,8 @@
         seatCount++;
         var sw = furnWorld(st.pos[0], st.pos[1], st.pos[2]);
         var sq = scrOf(sw[0], sw[1], sw[2]);
-        seatPts.push({ st: st, q: sq, world: sw });
+        // si = hb.seats 里的真实下标 (seatPts 会跳过解析失败的座位, 拖拽写回必须用 si)
+        seatPts.push({ st: st, q: sq, world: sw, si: si });
         if (opt.seats) { grow(sq.x - 5, sq.y - 5); grow(sq.x + 8, sq.y + 8); }
       }
       for (var bi = 0; bi < hbBoxes.length; bi++) {
@@ -3091,8 +3667,15 @@
     for (var tdi = 0; tdi < draws.length; tdi++) {
       if (draws[tdi].kind !== 'face') continue;
       var tid = draws[tdi].face.texId;
-      if (!texCache[tid]) texCache[tid] = await loadImageAny('texture', tid);
-      draws[tdi].face.img = texCache[tid];
+      if (!texCache[tid]) texCache[tid] = await loadTextureFrame('texture', tid);
+      var tfr = texCache[tid];
+      if (tfr) {
+        draws[tdi].face.img = tfr.img;
+        draws[tdi].face.sx = tfr.sx; draws[tdi].face.sy = tfr.sy;
+        draws[tdi].face.sw = tfr.sw; draws[tdi].face.sh = tfr.sh;
+      } else {
+        draws[tdi].face.img = null;
+      }
     }
     for (var ddi = 0; ddi < draws.length; ddi++) {
       var d = draws[ddi];
@@ -3138,7 +3721,7 @@
     }
 
     // ---- 碰撞箱 + 座位 (最后画, 始终在最上层, 与 /ce debug furniture 一致) ----
-    _furnPick = { boxes: [] };
+    _furnPick = { boxes: [], handles: [], ox: 0, oy: 0 };
     for (var pi = 0; pi < pickBoxes.length; pi++) {
       var pk = pickBoxes[pi];
       var isHl = opt.highlight === pk.index;
@@ -3165,6 +3748,19 @@
           pos: fvec(pk.hb.position, [0, 0, 0]),
           seats: pk.seatPts.length
         });
+        // 编辑手柄 (仅非壳体箱体 + 编辑模式): 底面中心 (挪位置) / 顶面中心 (改高度)
+        if (editMode && !pk.box.lid) {
+          var bmin = pk.box.min, bmax = pk.box.max;
+          var pCen = fpt(ox, oy, (bmin[0] + bmax[0]) / 2, bmin[1], (bmin[2] + bmax[2]) / 2);
+          var pTop = fpt(ox, oy, (bmin[0] + bmax[0]) / 2, bmax[1], (bmin[2] + bmax[2]) / 2);
+          var hidP = 'hb-pos:' + pk.index, hidH = 'hb-height:' + pk.index;
+          var midX = (bmin[0] + bmax[0]) / 2, midZ = (bmin[2] + bmax[2]) / 2;
+          _furnPick.handles.push({ id: hidP, kind: 'hb-pos', boxIndex: pk.index, x: pCen.x, y: pCen.y, r: 8, color: pk.color, shape: 'square', prio: 0, hb: pk.hb, boxType: pk.box.type, baseY: bmin[1], topY: bmax[1] });
+          // wx/wz = 手柄的世界中心: 高度手柄拖动时沿这条竖直线改 y
+          _furnPick.handles.push({ id: hidH, kind: 'hb-height', boxIndex: pk.index, x: pTop.x, y: pTop.y, r: 8, color: pk.color, shape: 'diamond', prio: 1, hb: pk.hb, boxType: pk.box.type, baseY: bmin[1], topY: bmax[1], wx: midX, wz: midZ });
+          drawEditHandle(ctx, pCen.x, pCen.y, pk.color, 'square', opt.editSel === hidP);
+          drawEditHandle(ctx, pTop.x, pTop.y, pk.color, 'diamond', opt.editSel === hidH);
+        }
         drawWireBox(ctx, ox, oy, pk.box.min, pk.box.max, pk.color, isHl ? 2 : 1.25,
           { fillAlpha: isHl ? 0.28 : (opt.fill ? 0.10 : 0) });
         if (isHl || opt.labels) {
@@ -3188,10 +3784,31 @@
       if (opt.seats) {
         for (var spi = 0; spi < pk.seatPts.length; spi++) {
           var sm = pk.seatPts[spi];
-          drawSeatMarker(ctx, ox, oy, sm.world[0], sm.world[1], sm.world[2], sm.st.yaw, isHl);
+          var smq = drawSeatMarker(ctx, ox, oy, sm.world[0], sm.world[1], sm.world[2], sm.st.yaw, isHl);
+          if (editMode) {
+            var sid = 'seat:' + pk.index + ':' + (sm.si != null ? sm.si : spi);
+            drawEditHandle(ctx, smq.x, smq.y, '#FFD54F', 'ring', opt.editSel === sid);
+            // hb 必须带上: 面板写回座位时要用它定位 hb.seats 列表;
+            // seatIndex 用 sm.si (hb.seats 的真实下标), 不能用渲染序号 —— 后者跳过了解析失败的座位
+            _furnPick.handles.push({ id: sid, kind: 'seat', boxIndex: pk.index, seatIndex: (sm.si != null ? sm.si : spi), x: smq.x, y: smq.y, r: 7, color: '#FFD54F', shape: 'ring', prio: 2, world: sm.world, seat: sm.st, hb: pk.hb });
+          }
         }
       }
     }
+    // ---- 元素锚点手柄 (item/block_display 的 translation 拖拽) ----
+    if (editMode) {
+      for (var em = 0; em < v.elements.length; em++) {
+        var eEl = fobj(v.elements[em]) || {};
+        var eType = furnitureElementType(eEl);
+        if (eType !== 'item_display' && eType !== 'block_display' && eType !== 'item') continue;
+        var eXf = furnitureElementXf(eEl, sceneViewYaw);
+        var eQ = fpt(ox, oy, eXf.anchor[0], eXf.anchor[1], eXf.anchor[2]);
+        var eid = 'el-pos:' + em;
+        drawEditHandle(ctx, eQ.x, eQ.y, '#EF5350', 'dot', opt.editSel === eid);
+        _furnPick.handles.push({ id: eid, kind: 'el-pos', elementIndex: em, x: eQ.x, y: eQ.y, r: 6, color: '#EF5350', shape: 'dot', prio: 3, anchor: eXf.anchor, el: eEl });
+      }
+    }
+    _furnPick.ox = ox; _furnPick.oy = oy; _furnPick.pitch = scenePitch; _furnPick.edit = !!editMode;
 
     // ---- 说明 ----
     // 画布里的文字只能用 ASCII: 原版字体数据包里 unifont 的 providers 是空的,
@@ -3220,6 +3837,180 @@
   // 用碰撞箱自身的颜色给标注上色 (MiniMessage 支持 <#rrggbb>)
   function furnColorTag(hex, text) {
     return '<' + hex + '>' + text;
+  }
+
+  // ---------------- 模型场景 (display 上下文完整预览) ----------------
+  // 「物品模型的完全预览」: 把物品/方块按指定 display 上下文的 ItemTransform 展开渲染。
+  // 视图: yaw (±45 步进, 拖拽自由旋转) + pitch (俯仰) + zoom, 画布内容自适应。
+  async function sceneItemModel(canvas, scene) {
+    await fontReady();
+    var scale = normScale(scene.scale);
+    sceneViewYaw = ((parseFloat(scene.yaw) || 0) % 360 + 360) % 360;
+    sceneZoom = clamp(parseFloat(scene.zoom) || 1, 0.25, 4);
+    scenePitch = clampPitchDeg(scene.pitch != null ? scene.pitch : scene.viewPitch);
+    var ctxName = normalizeDisplayContext(scene.displayContext) || 'gui';
+
+    // ---- 解析模型: 1.21.4+ 定义 / 蓝图路径 / 直接模型 / 项目内引用 ----
+    var ref = scene.modelRef || scene.icon || scene.item || scene.entryKey || null;
+    var modelId = null, flatTex = null;
+    var info = ref ? await resolveItemModel(ref) : { kind: 'none' };
+    if (info && info.kind === 'block' && info.model) modelId = info.model;
+    else if (info && info.model) modelId = info.model;
+    else if (info && info.texture) flatTex = info.texture;
+    if (scene.modelId) modelId = String(scene.modelId);
+    if (scene.textureId && !modelId) flatTex = String(scene.textureId);
+    var flatCardSource = null;
+    // 平面物品优先按贴图画卡片 (flatCardModel): 1.21.4 的 item/stick 之类只有
+    // parent + layer0 贴图、没有 elements, 拿它当几何体会得到零面片的空模型。
+    if (modelId && flatTex && (await flatKindModelAsync(modelId))) {
+      flatCardSource = modelId; modelId = null;
+    }
+    // 只有 modelId (scene.modelId 直指 / 3D 判定路径) 也判一次: 无 elements 的模型
+    // 此前从未进过缓存, 同步版会误报 false → 渲染出空模型
+    else if (modelId && !flatTex && (await flatKindModelAsync(modelId))) {
+      var ftex = await flatTextureOf(modelId);
+      if (ftex) { flatCardSource = modelId; flatTex = ftex; modelId = null; }
+    }
+    // 贴图也读不到 (模型/纹理都不存在) → 老老实实报 model not found,
+    // 不然 resolveItemModel 的「最后按路径猜贴图」回退会把错误吞成一张空卡片。
+    if (!modelId && flatTex && !(await loadTextureFrame('texture', flatTex))) {
+      modelId = null; flatTex = null;
+    }
+    if (!modelId && !flatTex) {
+      var surfE = makeSurface(FURN_W, FURN_H, scale);
+      surfE.ctx.fillStyle = 'rgba(0,0,0,0.72)';
+      surfE.ctx.fillRect(0, 0, FURN_W, FURN_H);
+      var pe = parseText('<red>model not found' + (ref ? ': ' + ref : ''), {});
+      drawItems(surfE.ctx, pe.items, 8, 20, { shadow: false });
+      warn('model-not-found' + (ref ? ': ' + ref : ''));
+      blit(canvas, surfE);
+      return { width: canvas.width, height: canvas.height, warnings: _warnings.slice() };
+    }
+
+    // 平面物品: 竖直卡片 (和游戏内展示实体一致), 同样吃 display 变换
+    var model = modelId ? await loadModelChain(modelId) : flatCardModel(flatTex);
+    if (!model) {
+      var surfM = makeSurface(FURN_W, FURN_H, scale);
+      surfM.ctx.fillStyle = 'rgba(0,0,0,0.72)';
+      surfM.ctx.fillRect(0, 0, FURN_W, FURN_H);
+      var pmE = parseText('<red>model json missing: ' + modelId, {});
+      drawItems(surfM.ctx, pmE.items, 8, 20, { shadow: false });
+      warn('model-json-missing: ' + modelId);
+      blit(canvas, surfM);
+      return { width: canvas.width, height: canvas.height, warnings: _warnings.slice() };
+    }
+    // display 链按「显示时的模型 id」取; 卡片化时链从原模型 id 取 (贴图上下文仍生效),
+    // ref 兜底时把 ref 规范成裸路径再拼 item/ 前缀, 避免拼出 minecraft:item/minecraft:stick 这种非法 id
+    var dispId = modelId || flatCardSource;
+    if (!dispId && ref) {
+      var rs = String(ref).replace(/^minecraft:/, '');
+      dispId = 'minecraft:item/' + rs;
+    }
+    var chainDisp = dispId ? await collectDisplayChain(dispId) : {};
+    // 项目内模型可能自带 display (CE 的物品模型类型), 与模型自身的合并 (自身优先)
+    if (model && model.display) {
+      var dk2 = Object.keys(model.display);
+      for (var d2 = 0; d2 < dk2.length; d2++) {
+        var base2 = isObj(chainDisp[dk2[d2]]) ? Object.assign({}, chainDisp[dk2[d2]]) : {};
+        var own2 = model.display[dk2[d2]];
+        if (isObj(own2)) {
+          var fk2 = Object.keys(own2);
+          for (var j2 = 0; j2 < fk2.length; j2++) base2[fk2[j2]] = own2[fk2[j2]];
+        }
+        chainDisp[dk2[d2]] = base2;
+      }
+    }
+    var hasCtx = !!chainDisp[ctxName];
+    // ground 是「掉在地上」的基准 (无 display 的旧模型也按 0.25 缩放渲染), 其余上下文缺省时回退
+    var tr = chainDisp[ctxName] || (ctxName === 'ground' ? { scale: 0.25, translation: [0, 3, 0] } : chainDisp.gui) || {};
+    var xf = displayXf(tr, sceneViewYaw, ctxName.indexOf('lefthand') >= 0, scenePitch);
+    var unit = FURN_UNIT * sceneZoom;
+    var faces = collectFacesFromModel(model, xf) || [];
+
+    // ---- 包围盒 (投影后), 画布自适应 ----
+    var PAD = 14, HEAD_H = 26;
+    var bMinX = 0, bMinY = 0, bMaxX = 0, bMaxY = 0, hasBound = false;
+    function grow(x, y) {
+      if (!hasBound) { bMinX = bMaxX = x; bMinY = bMaxY = y; hasBound = true; return; }
+      if (x < bMinX) bMinX = x; if (y < bMinY) bMinY = y;
+      if (x > bMaxX) bMaxX = x; if (y > bMaxY) bMaxY = y;
+    }
+    // 面片角点已含 display 变换 + 视图 yaw + 俯仰 (displayXf 内倾斜), 直接等轴测投影
+    var scrOf = function (x, y, z) {
+      var s = project(x, y, z);
+      return { x: s.x * unit, y: s.y * unit };
+    };
+    for (var fi = 0; fi < faces.length; fi++) {
+      var c = faces[fi].corners;
+      for (var ci = 0; ci < c.length; ci++) {
+        var sp = scrOf(c[ci][0], c[ci][1], c[ci][2]);
+        grow(sp.x, sp.y);
+      }
+    }
+    if (!hasBound) { grow(-8, -16); grow(8, 0); }   // 空模型: 至少给个 1 格大的画布
+    // 地面足迹 (y=0 平面上的方块轮廓), 帮助判断 translation 的高度
+    if (scene.showGround !== false) {
+      for (var gxi = 0; gxi < 2; gxi++) {
+        for (var gzi = 0; gzi < 2; gzi++) {
+          var gp = scrOf(gxi * 16, 0, gzi * 16);
+          grow(gp.x, gp.y);
+        }
+      }
+    }
+    var w = clamp(Math.ceil(bMaxX - bMinX) + PAD * 2, FURN_W, FURN_MAX_W);
+    var h = clamp(Math.ceil(bMaxY - bMinY) + PAD + HEAD_H, FURN_H, FURN_MAX_H);
+    var surf = makeSurface(w, h, scale);
+    var ctx = surf.ctx;
+    ctx.fillStyle = 'rgba(0,0,0,0.72)';
+    ctx.fillRect(0, 0, w, h);
+    var ox = PAD + (w - PAD * 2 - (bMaxX - bMinX)) / 2 - bMinX;
+    var oy = HEAD_H + (h - PAD - HEAD_H - (bMaxY - bMinY)) / 2 - bMinY;
+
+    // ---- 地面足迹 (显示 translation 是否把模型抬离地面) ----
+    if (scene.showGround !== false) {
+      var gg = [];
+      for (var gi = 0; gi < 4; gi++) {
+        gg.push(scrOf((gi & 1) ? 16 : 0, 0, (gi & 2) ? 16 : 0));
+      }
+      ctx.beginPath();
+      ctx.moveTo(ox + gg[0].x, oy + gg[0].y);
+      ctx.lineTo(ox + gg[1].x, oy + gg[1].y);
+      ctx.lineTo(ox + gg[3].x, oy + gg[3].y);
+      ctx.lineTo(ox + gg[2].x, oy + gg[2].y);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(255,255,255,0.045)';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.22)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    // ---- 面片: 贴图加载 + 深度已由 collectFacesFromModel 排序 ----
+    var texCache = {};
+    for (var ti = 0; ti < faces.length; ti++) {
+      var tid = faces[ti].texId;
+      if (!texCache[tid]) texCache[tid] = await loadTextureFrame('texture', tid);
+      var tfr = texCache[tid];
+      if (tfr) {
+        faces[ti].img = tfr.img;
+        faces[ti].sx = tfr.sx; faces[ti].sy = tfr.sy;
+        faces[ti].sw = tfr.sw; faces[ti].sh = tfr.sh;
+      } else {
+        faces[ti].img = null;
+      }
+    }
+    paintFaces(ctx, faces, unit, ox, oy);
+
+    // ---- 页眉 (ASCII) ----
+    var head = String(ref || modelId || flatTex || '') + '   ctx: ' + ctxName +
+      (hasCtx ? '' : ' (fallback)') + '   faces ' + faces.length;
+    if (sceneViewYaw) head += '  yaw ' + Math.round(sceneViewYaw);
+    if (Math.abs(scenePitch - 30) > 0.5) head += '  pitch ' + Math.round(scenePitch);
+    if (sceneZoom !== 1) head += '  zoom ' + Math.round(sceneZoom * 100) + '%';
+    var ph = parseText('<gray>' + head, {});
+    drawItems(ctx, ph.items, 6, 14, { shadow: false });
+    blit(canvas, surf);
+    return { width: canvas.width, height: canvas.height, warnings: _warnings.slice() };
   }
   // 命名空间是否形如合法 id (block_display 的解析用)
   function dnsOk(ns) { return !!ns && /^[a-z0-9_.-]+$/.test(ns); }
@@ -3278,12 +4069,17 @@
     try {
       if (scene.options) setOptions(scene.options);
       var type = scene.type || 'lore';
-      if (type !== 'furniture') { sceneViewYaw = 0; sceneZoom = 1; _furnPick = null; }
+      if (type !== 'furniture' && type !== 'item-model') {
+        sceneViewYaw = 0; sceneZoom = 1; scenePitch = 30; _furnPick = null;
+      }
+      if (type !== 'inventory') _invPick = null;
       if (type === 'chat') return await sceneChat(canvas, scene);
       if (type === 'gui') return await sceneGui(canvas, scene);
-      if (type === 'item' || type === 'inventory' || type === 'hotbar') return await sceneItem(canvas, scene);
+      if (type === 'item' || type === 'hotbar') return await sceneItem(canvas, scene);
+      if (type === 'inventory') return await sceneInventory(canvas, scene);
       if (type === 'image' || type === 'gallery') return await sceneImageGallery(canvas, scene);
       if (type === 'furniture') return await sceneFurniture(canvas, scene);
+      if (type === 'item-model') return await sceneItemModel(canvas, scene);
       return await sceneLore(canvas, scene);
     } catch (e) {
       warn('render-error: ' + (e && e.message));
@@ -3507,7 +4303,14 @@
     sceneLore: sceneLore,
     sceneItem: sceneItem,
     sceneGui: sceneGui,
+    sceneInventory: sceneInventory,
+    inventorySlots: function () { return inventorySlots(); },
+    inventoryPickAt: function (px, py) { return inventoryPickAt(px, py); },
+    inventoryPickData: function () { return _invPick; },
     sceneFurniture: sceneFurniture,
+    sceneItemModel: sceneItemModel,
+    displayContextList: displayContextList,
+    normalizeDisplayContext: normalizeDisplayContext,
     furnitureVariants: furnitureVariants,
     furnitureInlineOf: furnitureInlineOf,
     furnitureById: furnitureById,
@@ -3516,6 +4319,13 @@
     furnitureHitboxBoxes: furnitureHitboxBoxes,
     furniturePickAt: function (px, py) { return furniturePickAt(px, py); },
     furniturePickData: function () { return _furnPick; },
+    // 预览内编辑: 手柄列表 / 命中测试 / 视图与投影换算 (面板拖拽用)
+    furnitureEditHandles: function () { return furnitureEditHandles(); },
+    furnitureEditHitAt: function (px, py) { return furnitureEditHitAt(px, py); },
+    furnitureViewInfo: function () { return furnitureViewInfo(); },
+    furnitureUnproject: function (lx, ly, y) { return furnitureUnproject(lx, ly, y); },
+    furnitureUnprojectY: function (lx, ly, x, z) { return furnitureUnprojectY(lx, ly, x, z); },
+    furnitureProjectPoint: function (x, y, z) { return furnitureProjectPoint(x, y, z); },
     hasVariants: function (d) {
       var o = fobj(d);
       if (!o) return false;
@@ -3529,6 +4339,10 @@
       LINE_HEIGHT: LINE_HEIGHT,
       parseColor: parseColor,
       drawItems: drawItems,
+      // 动画贴图帧窗口 (供测试/诊断直接验证)
+      loadImageAnyWithPath: loadImageAnyWithPath,
+      spriteFrameOf: spriteFrameOf,
+      loadTextureFrame: loadTextureFrame,
       // 家具几何 (供测试/诊断直接验证, 不参与渲染流程)
       mat3Apply: mat3Apply,
       furnitureRotationMatrix: furnitureRotationMatrix,
@@ -3536,6 +4350,21 @@
       furnitureSeat: furnitureSeat,
       furnWorld: furnWorld,
       FURN_ORIGIN: FURN_ORIGIN,
+      // display 上下文 (模型场景) 与视图俯仰
+      collectDisplayChain: collectDisplayChain,
+      displayXf: displayXf,
+      projectViewP: projectViewP,
+      projectPitched: projectPitched,
+      tiltMat: tiltMat,
+      // 物品栏 GUI 场景: 正交投影与视图向量 (供测试直接验证)
+      projectGui: projectGui,
+      GUI_SLOT_VIEW: GUI_SLOT_VIEW,
+      collectFacesFromModel: collectFacesFromModel,
+      GUI_FALLBACK_TR: GUI_FALLBACK_TR,
+      renderInvSlotItem: renderInvSlotItem,
+      furnitureAffine: furnitureAffine,
+      get scenePitch() { return scenePitch; },
+      get sceneViewYaw() { return sceneViewYaw; },
     },
   };
 })();

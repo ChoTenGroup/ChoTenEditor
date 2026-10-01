@@ -56,9 +56,9 @@ var AIPanel = (function() {
       <span id="ai-status" style="font-size:11px;color:var(--color-text-tertiary);"></span>\
     </div>\
     <div style="display:flex;align-items:center;gap:6px;">\
-      <button id="ai-btn-settings" title="设置" style="background:none;border:none;color:var(--color-text-secondary);cursor:pointer;font-size:15px;padding:4px 8px;border-radius:4px;">⚙️</button>\
-      <button id="ai-btn-clear" title="清除对话" style="background:none;border:none;color:var(--color-text-secondary);cursor:pointer;font-size:15px;padding:4px 8px;border-radius:4px;">🗑️</button>\
-      <button id="ai-btn-close" title="关闭" style="background:none;border:none;color:var(--color-text-secondary);cursor:pointer;font-size:18px;padding:4px 8px;border-radius:4px;">✕</button>\
+      <button id="ai-btn-settings" data-tip="设置" title="设置" style="background:none;border:none;color:var(--color-text-secondary);cursor:pointer;font-size:15px;padding:4px 8px;border-radius:4px;">⚙️</button>\
+      <button id="ai-btn-clear" data-tip="清除对话" title="清除对话" style="background:none;border:none;color:var(--color-text-secondary);cursor:pointer;font-size:15px;padding:4px 8px;border-radius:4px;">🗑️</button>\
+      <button id="ai-btn-close" data-tip="关闭" title="关闭" style="background:none;border:none;color:var(--color-text-secondary);cursor:pointer;font-size:18px;padding:4px 8px;border-radius:4px;">✕</button>\
     </div>\
   </div>\
   <div id="ai-context-bar" style="display:flex;align-items:center;padding:6px 16px;border-bottom:1px solid var(--color-border);background:var(--color-bg-tertiary);flex-shrink:0;font-size:11px;color:var(--color-text-tertiary);gap:12px;">\
@@ -77,6 +77,10 @@ var AIPanel = (function() {
 </div>';
 
     document.body.appendChild(_overlay);
+    // 控件提示跟随语言设置: ai.* 键覆盖 HTML 里的中文兜底 (tooltip.js 自动绑定 data-tip)
+    if (window.I18N && window.I18N.applyDOM) {
+      try { I18N.applyDOM(_overlay); } catch (e) { /* ignore */ }
+    }
     bindEvents();
 
     // 更新上下文文件信息
