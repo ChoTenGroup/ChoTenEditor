@@ -468,7 +468,7 @@
         </button>
       </div>
       <button type="button" class="lang-picker-more" id="lang-picker-more" aria-expanded="false" aria-controls="lang-picker-extra">
-        🌐 更多语言 / More languages
+        🌐 More languages / 更多语言
       </button>
       <div class="lang-picker-extra" id="lang-picker-extra">
         <div class="lang-modal-list">
@@ -532,7 +532,7 @@
           </button>
         </div>
       </div>
-      <p class="lang-picker-hint">提示：语言选择将在重启软件后生效。 / Language changes take effect after restart.</p>
+      <p class="lang-picker-hint">Language changes take effect after restart. / 提示：语言选择将在重启软件后生效。</p>
     </div>
   </div>
 
@@ -823,15 +823,62 @@
     var overlay = document.getElementById('lang-picker-overlay');
     if (!overlay) return;
     overlay.style.display = '';
-    var btns = overlay.querySelectorAll('[data-lang]');
-    for (var i = 0; i < btns.length; i++) {
-      btns[i].addEventListener('click', function() {
-        var lang = this.getAttribute('data-lang');
-        I18N.setLang(lang).then(function() {
-          overlay.style.display = 'none';
-        });
+
+    var extra = document.getElementById('lang-picker-extra');
+    var moreBtn = document.getElementById('lang-picker-more');
+
+    // "更多语言" 展开完整列表 (此前该按钮没有任何事件绑定, 点了没反应)
+    if (moreBtn && extra) {
+      moreBtn.addEventListener('click', function() {
+        if (typeof playSound === 'function') playSound('click');
+        var open = extra.classList.toggle('expanded');
+        moreBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) {
+          // 展开后把列表滚进可视区, 避免按钮下方内容超出弹窗高度
+          var first = extra.querySelector('.lang-option');
+          if (first && first.scrollIntoView) first.scrollIntoView({ block: 'nearest' });
+        }
       });
     }
+
+    // 选择语言: 只保存 + 提示重启后生效 (与设置页一致)。
+    // 首启时界面语言已经按默认值渲染完成, 热切换会造成中英混排与缓存失效,
+    // 所以这里不调用 I18N.setLang, 只落盘并告知需要重启。
+    function finishChoice(lang, displayName) {
+      if (!lang || !I18N.isSupported(lang)) return;
+      I18N.saveLang(lang);
+      overlay.style.display = 'none';
+      // 唤醒正在等待语言选择的欢迎弹窗
+      document.dispatchEvent(new CustomEvent('choten:lang-chosen', { detail: { lang: lang } }));
+      if (lang !== I18N.lang && typeof UI !== 'undefined' && UI.alert) {
+        UI.alert({
+          title: I18N.t('settings.languageRestartTitle'),
+          message: I18N.t('settings.languageRestartMessage', { lang: displayName || lang }),
+        });
+      }
+    }
+
+    overlay.addEventListener('click', function(e) {
+      var t = e.target;
+      if (!t || typeof t.closest !== 'function') return;
+      var btn = t.closest('[data-lang]');
+      if (!btn) return;
+      if (typeof playSound === 'function') playSound('click');
+      // 母语名直接取自行内文本, 避免在首启页面重复维护一份语言名表。
+      // .lang-option-name 内还嵌了一个 .lang-option-alt (英文名), 只取首个子文本节点。
+      var nameEl = btn.querySelector('.lang-option-name, .lp-name');
+      var name = null;
+      if (nameEl) {
+        for (var n = 0; n < nameEl.childNodes.length; n++) {
+          if (nameEl.childNodes[n].nodeType === 3) { // TEXT_NODE
+            var s = nameEl.childNodes[n].textContent.trim();
+            if (s) { name = s; break; }
+          }
+        }
+        if (!name) name = nameEl.textContent.trim();
+      }
+      finishChoice(btn.getAttribute('data-lang'), name);
+    });
   })();
 
   // 欢迎弹窗（首次启动时等语言选择完成后再显示, 避免两个 999999 遮罩叠加）

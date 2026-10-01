@@ -2,7 +2,8 @@
  * 依赖: js-yaml (全局 jsyaml)。在 index.html / settings.html 中紧随 js-yaml 加载。
  * 字典: locales/<lang>.yml (zh_cn 为源语言)。语言持久化: localStorage.editorConfig.language
  * 支持语言: zh_cn / zh_tw / en_us / de_de / es_es / ko_kr / ru_ru
- * 回退链: 新语言缺失词条 → en_us → zh_cn; zh_tw 缺失词条 → en_us → zh_cn
+ * 默认语言: en_us (未选择过语言时)
+ * 回退链: 新语言缺失词条 → en_us → zh_cn (源语言); zh_tw 同样 → en_us → zh_cn
  */
 (function () {
   var SUPPORTED = ['zh_cn', 'zh_tw', 'en_us', 'de_de', 'es_es', 'ko_kr', 'ru_ru'];
@@ -22,7 +23,10 @@
     en_us: 'en', de_de: 'de', es_es: 'es', ko_kr: 'ko', ru_ru: 'ru',
   };
 
-  var current = 'zh_cn';
+  var DEFAULT_LANG = 'en_us'; // 默认语言 (未选择过语言时)
+  var SOURCE_LANG = 'zh_cn';  // 源语言, 所有字典的最后兜底
+
+  var current = DEFAULT_LANG;
   var dicts = {}; // lang -> dict object
   var initPromise = null;
 
@@ -42,14 +46,14 @@
 
   function getLang() {
     var cfg = getConfig();
-    return isSupported(cfg.language) ? cfg.language : 'zh_cn';
+    return isSupported(cfg.language) ? cfg.language : DEFAULT_LANG;
   }
 
   // 当前语言的完整回退链 (自身优先, 最终总是落到 zh_cn 源语言)
   function fallbackChain(lang) {
     var chain = (FALLBACK[lang] || []).slice();
     chain.unshift(lang);
-    chain.push('zh_cn');
+    if (chain.indexOf(SOURCE_LANG) === -1) chain.push(SOURCE_LANG);
     return chain;
   }
 
@@ -154,7 +158,7 @@
   }
 
   function init(lang) {
-    if (!isSupported(lang)) lang = 'zh_cn';
+    if (!isSupported(lang)) lang = DEFAULT_LANG;
     current = lang;
     // 回退链上的所有字典 + 源语言 zh_cn 都要加载
     var langs = fallbackChain(lang);
@@ -183,7 +187,7 @@
   // 语言热切换会让已生成的界面文本、提示/补全缓存与其它窗口状态不一致
   // (混合语言、旧缓存失效)，因此设置页统一改为"保存 + 重启后生效"。
   function persistLang(lang) {
-    saveLang(isSupported(lang) ? lang : 'zh_cn');
+    saveLang(isSupported(lang) ? lang : DEFAULT_LANG);
   }
 
   // 启动加载提示列表（替代 loadingtips.txt）
