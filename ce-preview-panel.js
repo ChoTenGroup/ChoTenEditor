@@ -1335,6 +1335,11 @@
           name: useCustom ? cLines[0] : (p.name || ('<white>' + esc(ctx.entryKey || ''))),
           lore: useCustom ? cLines.slice(1) : p.lore, item: sceneItemRef(p),
           count: countOf(p), rarity: rarityOf(ctx),
+          // 原版提示行由 CE 组件/设置推导 (ce-tooltip.js); useCustom 时用户文本优先
+          data: useCustom ? null : p.data,
+          itemId: p.icon || null,
+          tooltipStyle: useCustom ? null : tooltipStyleOf(ctx),
+          advanced: false,
         };
       } else if (scene === 'inventory') {
         // 原版生存物品栏: 物品按 gui 上下文的 ItemTransform 渲染 (3D 模型 = 正交直视)
@@ -1349,6 +1354,10 @@
           name: useCustom ? cLines[0] : (p.name || ('<white>' + esc(ctx.entryKey || ''))),
           lore: useCustom ? cLines.slice(1) : p.lore, showItem: true, item: sceneItemRef(p),
           rarity: rarityOf(ctx),
+          data: useCustom ? null : p.data,
+          itemId: p.icon || null,
+          tooltipStyle: useCustom ? null : tooltipStyleOf(ctx),
+          advanced: false,
         };
       }
       try { root.CEPreview.setStageWidth(els.stage ? els.stage.clientWidth : 0); } catch (e) {}
@@ -1484,6 +1493,18 @@
     var d = c.data || {};
     var r = findKey(d, 'rarity');
     return ['common', 'uncommon', 'rare', 'epic'].indexOf(r) === -1 ? 'common' : r;
+  }
+  // CE data.tooltip_style → 原版 minecraft:tooltip_style 组件 (1.21.2+),
+  // 决定提示框用 tooltip/<style>_background / _frame 这套贴图。
+  function tooltipStyleOf(c) {
+    var d = c.data || {};
+    var v = unwrap(findKey(d, 'tooltip_style'));
+    if (typeof v === 'string' && v) return v;
+    if (isObj(v)) {
+      var x = unwrap(v.path || v.id || v.style);
+      if (typeof x === 'string' && x) return x;
+    }
+    return null;
   }
 
   function buildSourceText() {

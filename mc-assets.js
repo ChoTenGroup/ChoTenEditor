@@ -219,7 +219,37 @@ async function scanAssets(root) {
   }
 
   if (!roots.length) return { ok: false, error: 'no asset namespace found' };
+  await loadNamespaceLangs(namespaces);
   return { ok: true, root: root.replace(/\\/g, '/'), namespaces: namespaces, order: roots };
+}
+
+/** 语言文件内容上限：原版 zh_cn.json 约 400KB，留足余量 */
+const MAX_LANG_BYTES = 4 * 1024 * 1024;
+
+/**
+ * 把每个命名空间下 lang/*.json 的内容读出来，供渲染进程离线查表。
+ * 原版物品/方块/附魔/属性名都靠这些键解析，之前只读了文件名列表，
+ * 预览只能拿到 en_us/zh_cn 两份（还是渲染进程另行 fetch 的），
+ * 其它语言、以及被 scanNamespace 漏掉的情况就查不到名字了。
+ * @param {object} namespaces scanNamespace 的结果表
+ */
+async function loadNamespaceLangs(namespaces) {
+  for (const ns of Object.keys(namespaces || {})) {
+    const rec = namespaces[ns];
+    const files = rec.langFiles || [];
+    if (!files.length) continue;
+    const dir = path.join(rec.dir, 'lang');
+    const langs = {};
+    for (const name of files) {
+      const file = path.join(dir, name + '.json');
+      try {
+        const st = await fs.promises.stat(file);
+        if (!st.isFile() || st.size > MAX_LANG_BYTES) continue;
+        langs[name] = JSON.parse(await fs.promises.readFile(file, 'utf-8'));
+      } catch (e) { /* 单个语言文件坏掉不影响整体扫描 */ }
+    }
+    if (Object.keys(langs).length) rec.langs = langs;
+  }
 }
 
 /**

@@ -369,16 +369,24 @@
       // en_us 恒加载 (Minecraft 回退语言); zh_cn 恒加载 (源语言兜底);
       // 再加载当前界面语言对应的原版语言文件, 让预览名跟随语言设置。
       if (mcRoot) {
-        var en = await fetchLang(norm(mcRoot) + '/minecraft', 'en_us');
+        // 扫描阶段已顺带读出的语言内容优先（覆盖资源包内所有语言、所有命名空间）；
+        // 只有本地没扫到、或要的是扫描范围外的语言时才回落到按需读取。
+        var langNs = REG['minecraft'] && REG['minecraft'].langs;
+        if (langNs) {
+          Object.keys(langNs).forEach(function (lg) {
+            if (!LANG[lg]) LANG[lg] = langNs[lg];
+          });
+        }
+        var en = LANG.en_us || await fetchLang(norm(mcRoot) + '/minecraft', 'en_us');
         if (en) {
           LANG.en_us = en;
           harvestFromLang('minecraft', en);
-          var zh = await fetchLang(norm(mcRoot) + '/minecraft', 'zh_cn');
+          var zh = LANG.zh_cn || await fetchLang(norm(mcRoot) + '/minecraft', 'zh_cn');
           if (zh) LANG.zh_cn = zh;
           computeLists();
         }
         var uiLang = (typeof I18N !== 'undefined' && I18N.lang) ? I18N.lang : 'zh_cn';
-        if (uiLang !== 'en_us' && uiLang !== 'zh_cn') {
+        if (uiLang !== 'en_us' && uiLang !== 'zh_cn' && !LANG[uiLang]) {
           var ui = await fetchLang(norm(mcRoot) + '/minecraft', uiLang);
           if (ui) LANG[uiLang] = ui;
         }

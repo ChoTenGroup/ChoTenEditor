@@ -307,11 +307,22 @@
     }).catch(function () { return null; });
     return cacheSet(_jsonCache, p, pr);
   }
-  // .mcmeta (动画/纹理元数据): 与贴图同目录同名, 后缀 .mcmeta
+  // .mcmeta (动画/纹理元数据)。
+  // 注意两种命名都存在, 必须都试:
+  //   · 资源包惯例: <name>.mcmeta          (去掉 .png)
+  //   · 原版 gui sprite: <name>.png.mcmeta (保留 .png —— Mojang 自己的命名)
+  // 先试保留 .png 的写法 (原版贴图), 再退回去 .png 的写法。
   async function loadTextureMeta(texturePath) {
     var p = String(texturePath || '');
     if (!p) return null;
-    return await loadJsonPath(p.replace(/\.png$/i, '') + '.mcmeta');
+    var withPng = /\.png$/i.test(p) ? p + '.mcmeta' : p + '.mcmeta';
+    var m1 = await loadJsonPath(withPng);
+    if (m1) return m1;
+    if (/\.png$/i.test(p)) {
+      var m2 = await loadJsonPath(p.replace(/\.png$/i, '') + '.mcmeta');
+      if (m2) return m2;
+    }
+    return null;
   }
   // 带动画 (.mcmeta animation) 的贴图是纵向帧条: 整张直接画会把所有帧叠在一起。
   // 这里按 animation 声明 (或宽高推断) 裁出单帧, 供静态图标/模型 UV 使用。
@@ -1465,7 +1476,7 @@
       var it = items[i];
       if (it.kind === 'break') {
         maxW = Math.max(maxW, cx - startX);
-        cx = startX; cy += LINE_HEIGHT; continue;
+        cx = startX; cy += opts.lineHeight || LINE_HEIGHT; continue;
       }
       if (it.kind === 'shift') { cx += it.dx || 0; continue; }
       var color = it.gradColor || (it.style && it.style.color) || { r: 255, g: 255, b: 255, a: 1 };
@@ -1634,7 +1645,17 @@
         if (td.width < pw || td.height < ph) { td.width = Math.max(td.width, pw); td.height = Math.max(td.height, ph); }
         var tc = td.getContext('2d');
         tc.putImageData(new ImageData(cells, pw, ph), 0, 0);
-        ctx.drawImage(td, 0, 0, pw, ph, gx0, gy0, pw, ph);
+        // gx0/gy0/pw/ph 都是设备像素 (putImageData 的语义), 而 drawImage 的目标矩形
+        // 按当前变换解释 —— 必须临时置回单位变换, 否则 GUI scale≥2 会被二次放大错位。
+        if (ctx.save && ctx.setTransform && ctx.restore) {
+          ctx.save();
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.imageSmoothingEnabled = false;
+          ctx.drawImage(td, 0, 0, pw, ph, gx0, gy0, pw, ph);
+          ctx.restore();
+        } else {
+          try { ctx.putImageData(new ImageData(cells, pw, ph), gx0, gy0); } catch (e) { /* ignore */ }
+        }
         return;
       }
       if (it.style && it.style.italic) {
@@ -3087,39 +3108,227 @@
 
   // ---- 物品 Lore / 悬浮提示 ----
   // 抽出「工具提示面板」的画法, 供物品提示(lore)与物品栏(item)两个场景共用
+  //
+  // 原版几何 (TooltipRenderUtil.java:16-58, GuiGraphics.java:749-792):
+  //   · 每行文字高 10 (ClientTextTooltip.getHeight = 10), 但第 0 行额外 +2 (:779/:787)
+  //     → 名称行步进 12, 之后每行步进 10
+  //   · 提示框在文字内容外各留 PADDING=3, 再各留 MARGIN=9, 合计每边扩 12
+  //   · 背景/边框是 9 宫格贴图 tooltip/background 与 tooltip/frame,
+  //     命名随 tooltip_style 变化: tooltip/<style>_background / _frame
+  //   · 贴图缺失时回退到旧版实心底色 + 稀有度描边 (本机 mcRoot 无 gui/sprites 时必须走这条路)
+  var TOOLTIP_PAD = 3;    // TooltipRenderUtil.PADDING
+  var TOOLTIP_MARGIN = 9; // TooltipRenderUtil.MARGIN
+  var TOOLTIP_LINE = 10;  // ClientTextTooltip.getHeight
+
+  // 9 宫格切图 —— 按 .mcmeta 里 gui.scaling (type=nine_slice) 声明的 border 切角。
+  // 原版 tooltip/background 与 tooltip/frame 都是 100x100, border 分别为 9 / 10。
+  // 缺 mcmeta 时退回 16 分辨率下的常见值 (贴图宽度的 1/9, 上限 16)。
+  function drawNineSlice(ctx, img, sw, sh, dx, dy, dw, dh, border, stretchInner) {
+    var b = border;
+    if (!(b > 0)) b = Math.min(16, Math.max(1, Math.round(Math.min(sw, sh) / 9)));
+    b = Math.min(b, Math.floor(sw / 2), Math.floor(sh / 2));
+    if (b <= 0) { ctx.drawImage(img, dx, dy, dw, dh); return; }
+    var sInnerW = sw - b * 2, sInnerH = sh - b * 2;
+    var dInnerW = dw - b * 2, dInnerH = dh - b * 2;
+    // 四角 (原样)
+    ctx.drawImage(img, 0, 0, b, b, dx, dy, b, b);
+    ctx.drawImage(img, sw - b, 0, b, b, dx + dw - b, dy, b, b);
+    ctx.drawImage(img, 0, sh - b, b, b, dx, dy + dh - b, b, b);
+    ctx.drawImage(img, sw - b, sh - b, b, b, dx + dw - b, dy + dh - b, b, b);
+    // 四边: 原版 nine_slice 把非 stretch_inner 的边块「平铺」, stretch_inner 时拉伸。
+    // 提示框背景二者视觉等价 (边块是竖向/横向的纯色渐变), 这里统一按拉伸处理。
+    if (sInnerW > 0 && dInnerW > 0) {
+      ctx.drawImage(img, b, 0, sInnerW, b, dx + b, dy, dInnerW, b);
+      ctx.drawImage(img, b, sh - b, sInnerW, b, dx + b, dy + dh - b, dInnerW, b);
+    }
+    if (sInnerH > 0 && dInnerH > 0) {
+      ctx.drawImage(img, 0, b, b, sInnerH, dx, dy + b, b, dInnerH);
+      ctx.drawImage(img, sw - b, b, b, sInnerH, dx + dw - b, dy + b, b, dInnerH);
+    }
+    // 中心
+    if (sInnerW > 0 && sInnerH > 0 && dInnerW > 0 && dInnerH > 0) {
+      ctx.drawImage(img, b, b, sInnerW, sInnerH, dx + b, dy + b, dInnerW, dInnerH);
+    }
+  }
+
+  // 读取 tooltip 背景/边框贴图 + 它们在 .mcmeta 里声明的 nine_slice border
+  // 返回 { bg, frame } —— 每项是 { img, sw, sh, border } 或 null
+  var _tipSpriteCache = {};
+  async function loadOneTooltipSprite(id) {
+    try {
+      var hit = await loadImageAnyWithPath('texture', id);
+      if (!hit) return null;
+      var fr = await spriteFrameOf(hit.img, hit.path);
+      var img = hit.img;
+      var sw = img.width, sh = img.height;
+      if (fr) { img = fr.img; sw = fr.sw; sh = fr.sh; }
+      // gui.scaling.type = nine_slice → border 才是真正的切角尺寸
+      var border = 0, stretchInner = false, metaErr = null, metaRaw = null;
+      try {
+        var meta = await loadTextureMeta(hit.path);
+        metaRaw = meta ? JSON.stringify(meta).slice(0, 200) : null;
+        var sc = meta && meta.gui && meta.gui.scaling;
+        if (sc && (!sc.type || sc.type === 'nine_slice')) {
+          if (sc.border != null) border = sc.border | 0;
+          stretchInner = !!sc.stretch_inner;
+        }
+      } catch (e) { metaErr = String(e && e.message || e); }
+      return { img: img, sw: sw, sh: sh, border: border, stretchInner: stretchInner,
+               metaPath: hit.path, metaRaw: metaRaw, metaErr: metaErr };
+    } catch (e) { return null; }
+  }
+  async function loadTooltipSprites(style) {
+    var key = style ? String(style) : '';
+    if (key in _tipSpriteCache) return _tipSpriteCache[key];
+    var pr = style ? String(style) : '';
+    var ci = pr.indexOf(':');
+    var ns = ci === -1 ? 'minecraft' : pr.slice(0, ci);
+    var path = (ci === -1 ? pr : pr.slice(ci + 1)).replace(/^tooltip\//, '');
+    var bgId, frId;
+    if (path) {
+      bgId = ns + ':gui/sprites/tooltip/' + path + '_background';
+      frId = ns + ':gui/sprites/tooltip/' + path + '_frame';
+    } else {
+      bgId = 'minecraft:gui/sprites/tooltip/background';
+      frId = 'minecraft:gui/sprites/tooltip/frame';
+    }
+    // 1.21.2+ 的 sprite 路径; 老版本/资源包里可能直接放在 textures/gui/ 下, 一并尝试
+    var bg = await loadOneTooltipSprite(bgId);
+    if (!bg) bg = await loadOneTooltipSprite(ns + ':gui/tooltip_background');
+    var frame = await loadOneTooltipSprite(frId);
+    if (!frame) frame = await loadOneTooltipSprite(ns + ':gui/tooltip_frame');
+    var res = { bg: bg, frame: frame };
+    _tipSpriteCache[key] = res;
+    return res;
+  }
+
+  // 把 CETooltip 的行序列解析成字形项; 每行独立 parseText 并带初始样式
+  // 这样行内自带的 MiniMessage/§ 依旧生效, 而我们只负责给「没写颜色」的行套上原版色。
+  // CETooltip 产出的颜色是 6 位十六进制且不带 '#' (如 "AAAAAA"), 而 hexToRgb 期望以 '#' 开头。
+  // 直接把 "FFFFFF" 喂给 hexToRgb 会 slice(1) 掉首个 F -> 0x0FFFFF -> 青色。这里统一补齐。
+  function tipColorToRgb(c) {
+    if (c == null) return null;
+    if (typeof c === 'object') {
+      if (c.r != null) return { r: c.r, g: c.g, b: c.b, a: c.a == null ? 1 : c.a };
+      return null;
+    }
+    var s = String(c).trim();
+    if (s.charAt(0) === '#') s = s.slice(1);
+    if (s.length === 8) s = s.slice(2);           // AARRGGBB -> RRGGBB
+    if (s.length === 3) s = s[0]+s[0]+s[1]+s[1]+s[2]+s[2];
+    if (!/^[0-9a-fA-F]{6}$/.test(s)) return null;
+    return hexToRgb('#' + s);
+  }
+  function tooltipLineItems(lines, c) {
+    var out = [];
+    for (var i = 0; i < lines.length; i++) {
+      var l = lines[i];
+      var text = l.text == null ? '' : String(l.text);
+      var st = null;
+      if (l.color || l.italic || l.bold || l.underlined || l.strikethrough) {
+        st = {};
+        var rgb = tipColorToRgb(l.color);
+        if (rgb) st.color = rgb;
+        if (l.italic) st.italic = true;
+        if (l.bold) st.bold = true;
+        if (l.underlined) st.underlined = true;
+        if (l.strikethrough) st.strikethrough = true;
+      }
+      var o = { shadow: true };
+      if (st) o.style = st;
+      var p = parseText(text, o);
+      out.push(p);
+    }
+    return out;
+  }
+
   async function buildTooltipSurface(scene, forceNoItem, scaleOverride) {
-    var name = scene.name != null ? String(scene.name) : '';
-    var lore = (scene.lore || []).map(function (x) { return typeof x === 'string' ? x : String(x && x.text || ''); });
-    var pName = parseText(name, {});
-    var pLore = lore.map(function (l) { return parseText(l, {}); });
     var itemSize = 16;
     var showItem = !forceNoItem && scene.showItem !== false;
     var hasIcon = !!(scene.item || scene.itemId);
     if (showItem && !hasIcon) showItem = false;
     var iconW = showItem ? itemSize + 4 : 0;
-    var contentW = Math.max(pName.width, Math.max.apply(null, [0].concat(pLore.map(function (p) { return p.width; }))));
-    var padX = 6, padY = 5;
-    var w = contentW + padX * 2 + iconW;
-    // 行高固定 9px: 与游戏一致 —— 字体图像比文字高时会溢出, 不去撑开 (按用户要求照抄游戏行为)
-    var h = padY * 2 + LINE_HEIGHT + (pLore.length ? 2 + pLore.length * LINE_HEIGHT : 0);
-    var surf = makeSurface(Math.max(40, w), Math.max(20, h),
-      scaleOverride != null ? scaleOverride : normScale(scene.scale));
-    // 背景 (MC 工具提示: #100010 底 + 边框)
-    var border = rarityBorder(scene.rarity);
-    surf.ctx.fillStyle = 'rgba(16,0,16,0.94)';
-    surf.ctx.fillRect(0, 0, surf.w, surf.h);
-    surf.ctx.strokeStyle = border;
-    surf.ctx.lineWidth = 1;
-    surf.ctx.strokeRect(0.5, 0.5, surf.w - 1, surf.h - 1);
-    if (showItem) {
-      await drawItem(surf.ctx, scene.item || scene.itemId, padX, padY, itemSize);
+
+    // 由 CE 组件/设置推导原版提示行; 失败时退回「name + lore」的老路径,
+    // 保证任何配置都不会让预览空白。
+    var parsed = null;
+    if (typeof CETooltip !== 'undefined' && CETooltip && CETooltip.buildLines) {
+      try {
+        parsed = CETooltip.buildLines({
+          name: scene.name,
+          lore: scene.lore,
+          itemId: scene.itemId || (scene.item && (scene.item.id || scene.item)) || null,
+          data: scene.data || scene.components || null,
+          advanced: !!scene.advanced,
+          count: scene.count
+        });
+      } catch (e) { parsed = null; }
     }
-    var tx = padX + iconW;
-    drawItems(surf.ctx, pName.items, tx, padY + 7, { shadow: true });
-    var ly = padY + LINE_HEIGHT + 2 + 7;
-    for (var i = 0; i < pLore.length; i++) {
-      drawItems(surf.ctx, pLore[i].items, tx, ly, { shadow: true });
-      ly += LINE_HEIGHT;
+    var rows;
+    if (parsed && parsed.lines && parsed.lines.length) {
+      rows = tooltipLineItems(parsed.lines, scene);
+    } else {
+      var nm = scene.name != null ? String(scene.name) : '';
+      var lo = (scene.lore || []).map(function (x) { return typeof x === 'string' ? x : String(x && x.text || ''); });
+      rows = [parseText(nm, { shadow: true })].concat(lo.map(function (l) { return parseText(l, { shadow: true }); }));
+    }
+    if (!rows.length) rows = [parseText('', { shadow: true })];
+
+    // 内容宽度: 原版取所有行宽的最大值; 有图标时名称行还要给图标留位
+    var contentW = 0;
+    for (var i = 0; i < rows.length; i++) {
+      var wNeed = rows[i].width + (i === 0 ? iconW : 0);
+      if (wNeed > contentW) contentW = wNeed;
+    }
+    var innerW = contentW + TOOLTIP_PAD * 2;
+    // 原版高度: 第 0 行 10+2, 其余每行 10; 行内 \n/<br> 的每个视觉行也各占 10
+    // (parseText 的 lines = 视觉行数); 只有 1 个组件 (且单视觉行) 时整体 -2
+    var visLines = 0;
+    for (var vl = 0; vl < rows.length; vl++) visLines += Math.max(1, rows[vl].lines || 1);
+    var innerH = visLines * TOOLTIP_LINE + (rows.length > 1 ? 2 : -2) + TOOLTIP_PAD * 2;
+    var boxW = innerW + TOOLTIP_MARGIN * 2;
+    var boxH = innerH + TOOLTIP_MARGIN * 2;
+
+    var scale = scaleOverride != null ? scaleOverride : normScale(scene.scale);
+    var surf = makeSurface(Math.max(40, boxW), Math.max(20, boxH), scale);
+
+    // ---- 背景 ----
+    var sprites = await loadTooltipSprites(scene.tooltipStyle || scene.tooltip_style);
+    var drawn = false;
+    if (sprites && sprites.bg) {
+      var s = sprites.bg;
+      drawNineSlice(surf.ctx, s.img, s.sw, s.sh,
+        TOOLTIP_MARGIN - TOOLTIP_PAD, TOOLTIP_MARGIN - TOOLTIP_PAD,
+        surf.w - (TOOLTIP_MARGIN - TOOLTIP_PAD) * 2, surf.h - (TOOLTIP_MARGIN - TOOLTIP_PAD) * 2,
+        s.border, s.stretchInner);
+      drawn = true;
+    }
+    if (!drawn) {
+      // 回退: 旧版实心底色 (#100010) + 1px 边框
+      // 注意原版 1.21.4 的边框来自贴图而非稀有度色, 这里仅作为无贴图时的近似
+      surf.ctx.fillStyle = 'rgba(16,0,16,0.94)';
+      surf.ctx.fillRect(0, 0, surf.w, surf.h);
+      surf.ctx.strokeStyle = rarityBorder(scene.rarity);
+      surf.ctx.lineWidth = 1;
+      surf.ctx.strokeRect(0.5, 0.5, surf.w - 1, surf.h - 1);
+    }
+    if (sprites && sprites.frame) {
+      var f = sprites.frame;
+      drawNineSlice(surf.ctx, f.img, f.sw, f.sh, 0, 0, surf.w, surf.h, f.border, f.stretchInner);
+    }
+
+    if (showItem) {
+      await drawItem(surf.ctx, scene.item || scene.itemId, TOOLTIP_MARGIN + TOOLTIP_PAD, TOOLTIP_MARGIN + TOOLTIP_PAD, itemSize);
+    }
+    // ---- 文本: 名称行基线 y = MARGIN + PADDING + 7(=字体基线), 名称行占 12 ----
+    // 行内折行 (break) 的视觉行用 lineHeight=10 步进, 整行占 视觉行数×10
+    var tx = TOOLTIP_MARGIN + TOOLTIP_PAD + iconW;
+    var baseY = TOOLTIP_MARGIN + TOOLTIP_PAD + 7;
+    drawItems(surf.ctx, rows[0].items, tx, baseY, { shadow: true, lineHeight: TOOLTIP_LINE });
+    var ly = baseY + Math.max(1, rows[0].lines || 1) * TOOLTIP_LINE + 2;
+    for (var k = 1; k < rows.length; k++) {
+      drawItems(surf.ctx, rows[k].items, tx, ly, { shadow: true, lineHeight: TOOLTIP_LINE });
+      ly += Math.max(1, rows[k].lines || 1) * TOOLTIP_LINE;
     }
     return surf;
   }
@@ -5151,160 +5360,362 @@
   //   block_display → (0, 0, 0)
   // better_model / model_engine 是插件侧渲染, 浏览器里没有几何体, 只出提示。
   function blkEntityType(er) {
-    var t = fval(er && (er.type || er.entity_type));
-    return t ? String(t).toLowerCase() : 'item_display';
+    var el = fobj(er);
+    if (!el) return 'item_display';
+    return blkEntityElementType(el) || 'item_display';
   }
   function blkEntityDefaultPos(type) {
     return type === 'block_display' ? [0, 0, 0] : [0.5, 0.5, 0.5];
   }
-  // entity_renderer 在画布上占的范围 (用于包围盒/居中)。
-  // 返回 {x, y, half} (方块/物品层) 或 {x, y, textWidth} (文本层); 无实体层返回 null。
-  // scr: (x,y,z) → 画布内相对坐标 (未含 ox/oy); unit: 当前场景的每单位像素
+  // entity_renderer = 元素列表 (对象形式 = 单元素列表, 源码 BlockEntityElementConfigs.fromConfig)。
+  // 旧实现只认对象形式 → 列表形 (官方围栏 block_states 模板就是列表) 整层被静默丢弃。
+  // CE block entity type 注册表 (源码 BlockEntityElementConfigs 注册 + 插件可扩展, 预览认这几种)
+  var KNOWN_ENTITY_TYPES = ['text_display', 'block_display', 'item_display', 'item', 'armor_stand',
+    'interaction', 'better_model', 'model_engine'];
+  function blkEntityElements(visual) {
+    var raw = fval(visual && visual.entityRenderer);
+    if (raw == null) return [];
+    var arr = Array.isArray(raw) ? raw.map(fval) : [raw];
+    var out = [];
+    for (var i = 0; i < arr.length; i++) {
+      var el = fobj(arr[i]);
+      if (el) out.push(el);
+      else warn('block-entity-element-invalid: #' + i);
+    }
+    return out;
+  }
+  // 元素类型: 显式 type/entity_type, 否则按字段推断 (源码 getOrGuessType:
+  // containsKey("text")→text_display / "item"→item_display / "block"→block_display, 否则 unknown_type)
+  function blkEntityElementType(el) {
+    if (!el) return null;
+    var t = fval(el.type || el.entity_type);
+    if (t) {
+      t = String(t).toLowerCase();
+      // CE 按注册表查 type, 未注册的 type 在加载时就会报错; 预览对应发 unknown 警告
+      if (KNOWN_ENTITY_TYPES.indexOf(t) === -1) return null;
+      return t;
+    }
+    if (fkey(el, 'text') !== undefined) return 'text_display';
+    if (fkey(el, 'item') !== undefined || fkey(el, 'item_model') !== undefined) return 'item_display';
+    if (fkey(el, 'block') !== undefined) return 'block_display';
+    return null;
+  }
+  // CE rotation 四元数 (QuaternionUtils.toQuaternionf 逐式移植, 弧度, 不做数学"纠正"):
+  // w=cr·cp·cy+sr·sp·sy; x=sr·cp·cy−cr·sp·sy; y=cr·sp·cy+sr·cp·sy; z=cr·cp·sy−sr·sp·cy
+  function ceQuatFromYPR(yaw, pitch, roll) {
+    var cy = Math.cos(yaw * 0.5), sy = Math.sin(yaw * 0.5);
+    var cp = Math.cos(pitch * 0.5), sp = Math.sin(pitch * 0.5);
+    var cr = Math.cos(roll * 0.5), sr = Math.sin(roll * 0.5);
+    return [
+      sr * cp * cy - cr * sp * sy,
+      cr * sp * cy + sr * cp * sy,
+      cr * cp * sy - sr * sp * cy,
+      cr * cp * cy + sr * sp * sy
+    ];
+  }
+  // rotation 字段解析 (ConfigValue.getAsQuaternion 逐分支移植): 数与单元素列表/单段字符串
+  // → pitch=−弧度(n); [x,y,z,w] 原样; 字符串去下划线按 "," 分段: 4=xyzw / 3=yaw第3,pitch第2,
+  // roll第1 / 2=yaw第2,pitch第1 (全按度)。解析失败 → null (Java 抛 unknown, 预览跳过)
+  function ceRotationQuat(v) {
+    var raw = fval(v);
+    if (raw == null) return null;
+    function rad(d) { return parseFloat(d) * Math.PI / 180; }
+    var n, q;
+    if (typeof raw === 'number') return ceQuatFromYPR(0, -rad(raw), 0);
+    if (Array.isArray(raw)) {
+      if (raw.length === 4) {
+        q = raw.map(function (x) { return parseFloat(fval(x)); });
+        return q.every(isFinite) ? q : null;
+      }
+      if (raw.length === 1) {
+        n = parseFloat(fval(raw[0]));
+        return isFinite(n) ? ceQuatFromYPR(0, -rad(n), 0) : null;
+      }
+      return null;
+    }
+    if (typeof raw === 'string') {
+      var parts = String(raw).replace(/_/g, '').split(',').filter(Boolean);
+      if (parts.length === 4) {
+        q = parts.map(parseFloat);
+        return q.every(isFinite) ? q : null;
+      }
+      if (parts.length === 3) return ceQuatFromYPR(rad(parts[2]), rad(parts[1]), rad(parts[0]));
+      if (parts.length === 2) return ceQuatFromYPR(rad(parts[1]), rad(parts[0]), 0);
+      if (parts.length === 1) {
+        n = parseFloat(parts[0]);
+        return isFinite(n) ? ceQuatFromYPR(0, -rad(n), 0) : null;
+      }
+    }
+    return null;
+  }
+  // 元素显示变换 → 烘焙变换。CE 语义: 世界偏移 = 朝向(yaw→pitch)·(T16 + R·(S·(p−C))) + anchor,
+  // T16 = translation×16, R = rotation 四元数矩阵 (left_rotation), S = scale,
+  // C = 模型中心 (block_display 从 position 向 +x/+y/+z 伸展 → C=[0,0,0]; 其余类型模型以实体
+  // 位置为中心 → C=[8,8,8]); 朝向: rotYmc(yaw) (MC yaw, 0=南, 顺时针) 后 rotMatX(pitch) (正=低头)。
+  // pt/nrm 已含 position 与视图旋转 (env.yaw/pitch), 可直接喂 collectModelFaces; 烘焙坐标为
+  // 世界坐标, 用恒等投影 + 世界原点锚绘制。
+  function blkEntityElementXf(el, type, env) {
+    var pos = fvec(fkey(el, 'position'), blkEntityDefaultPos(type));
+    var tr = fvec(fkey(el, 'translation'), [0, 0, 0]);
+    var sc = fscale(fkey(el, 'scale'));
+    var q = ceRotationQuat(fkey(el, 'rotation'));
+    var R = q ? quatToMat(q) : null;
+    var eyaw = fnum(fkey(el, 'yaw')) || 0;
+    var epitch = fnum(fkey(el, 'pitch')) || 0;
+    var C = type === 'block_display' ? [0, 0, 0] : [8, 8, 8];
+    var A = [pos[0] * 16, pos[1] * 16, pos[2] * 16];
+    var T16 = [tr[0] * 16, tr[1] * 16, tr[2] * 16];
+    function orient(off) {
+      if (eyaw) off = rotYmc(off, eyaw);
+      if (epitch) off = mat3Apply(rotMatX(epitch), off);
+      return off;
+    }
+    function toWorld(p, ctr) {
+      var c0 = ctr ? ctr[0] : 0, c1 = ctr ? ctr[1] : 0, c2 = ctr ? ctr[2] : 0;
+      var x = (p[0] - c0) * sc[0], y = (p[1] - c1) * sc[1], z = (p[2] - c2) * sc[2];
+      if (R) { var r = mat3Apply(R, [x, y, z]); x = r[0]; y = r[1]; z = r[2]; }
+      var off = orient([x + T16[0], y + T16[1], z + T16[2]]);
+      return [A[0] + off[0], A[1] + off[1], A[2] + off[2]];
+    }
+    var vy = env ? env.yaw : 0, vp = env ? env.pitch : 30;
+    return {
+      type: type, pos: pos, tr: tr, sc: sc, rot: R, eyaw: eyaw, epitch: epitch,
+      anchor: A, center: C, toWorld: toWorld,
+      // 文本像素 → 世界: 文本面在实体局部 XY 平面, 1 text px = 0.4 模型单位 (原版 0.025 格)
+      textPx: function (px, py) { return toWorld([px * 0.4, py * 0.4, 0], null); },
+      pt: function (p) { return blockRot(toWorld(p, C), null, vy, vp); },
+      nrm: function (n) {
+        var r = R ? mat3Apply(R, [n[0], n[1], n[2]]) : [n[0], n[1], n[2]];
+        return blockRotN(orient(r), null, vy, vp);
+      }
+    };
+  }
+  // 按 maxPx 折行 parseText 结果 (text_display line_width, 原版默认 200): 超宽 glyph 前插
+  // break, 折行后跳过行首空格; CJK 逐字可断。返回 {items, width(最宽视觉行), lines, lineWs[]}
+  function wrapParsedItems(parsed, maxPx) {
+    if (!(maxPx > 0) || !parsed.items) {
+      return { items: parsed.items || [], width: parsed.width || 0, lines: 1, lineWs: [parsed.width || 0] };
+    }
+    var src = parsed.items;
+    var out = [], lineWs = [];
+    var lineW = 0, maxW = 0, lines = 1, atStart = true;
+    function flush() {
+      lineWs.push(lineW);
+      if (lineW > maxW) maxW = lineW;
+      lineW = 0; lines++; atStart = true;
+    }
+    for (var i = 0; i < src.length; i++) {
+      var it = src[i];
+      if (it.kind === 'break') { out.push(it); flush(); continue; }
+      var adv = itemAdvance(it);
+      var isSpace = false;
+      if (it.cp != null) {
+        var g = glyphFor(it.cp, it.style && it.style.font);
+        isSpace = !!(g && g.type === 'space');
+      }
+      if (isSpace && atStart) continue;
+      if (lineW + adv > maxPx && lineW > 0) {
+        out.push({ kind: 'break' });
+        flush();
+        if (isSpace) continue;
+      }
+      out.push(it);
+      lineW += adv;
+      atStart = false;
+    }
+    lineWs.push(lineW);
+    if (lineW > maxW) maxW = lineW;
+    return { items: out, width: maxW, lines: lines, lineWs: lineWs };
+  }
+  // text_display 文本排版: parseText + line_width 折行 (默认 200)。空文本 → null
+  function blkEntityTextLayout(el) {
+    var txt = fval(fkey(el, 'text'));
+    if (txt == null || String(txt) === '') return null;
+    var parsed = parseText(String(txt), { style: { color: { r: 255, g: 255, b: 255, a: 1 } } });
+    var lw = fnum(fkey(el, 'line_width'));
+    if (lw == null) lw = 200;
+    return wrapParsedItems(parsed, lw);
+  }
+  // entity_renderer 在画布上占的范围 (用于包围盒/居中): 所有元素屏幕矩形的外接盒。
+  // 返回 {x0, y0, x1, y1} 或 null; scr: 世界 (1/16 格) → 画布相对坐标 (未含 ox/oy)。
+  // 元素坐标已含 rotation/translation/scale/朝向, 视图旋转由 scr (=wscr) 承担。
   function blockEntityExtent(visual, scr, unit) {
-    var er = fobj(visual && visual.entityRenderer);
-    if (!er) return null;
-    var type = blkEntityType(er);
-    if (type === 'better_model' || type === 'model_engine') return null;
-    var pos = fvec(fkey(er, 'position'), blkEntityDefaultPos(type));
-    var a = scr(pos[0] * 16, pos[1] * 16, pos[2] * 16);
-    if (type === 'text_display') {
-      var txt = String(fval(fkey(er, 'text')) || '');
-      if (!txt) return null;
-      var parsed = parseText(txt, {});
-      return { x: a.x, y: a.y, textWidth: parsed.width };
+    var els = blkEntityElements(visual);
+    var has = false, x0 = 0, y0 = 0, x1 = 0, y1 = 0;
+    function grow(x, y) {
+      if (!has) { x0 = x1 = x; y0 = y1 = y; has = true; return; }
+      if (x < x0) x0 = x; if (y < y0) y0 = y;
+      if (x > x1) x1 = x; if (y > y1) y1 = y;
     }
-    // 展示实体占位: 按 8 个角点在屏幕上精确 grow。
-    // block_display: 方块从 position 向 +x/+y/+z 伸展整格 (原版语义);
-    // 其余类型: 以 entity 位置为中心的一格立方体。
-    // scr 为 wscr (与烘焙同一旋转), 故任意 yaw/pitch 下范围稳定不跳。
-    var corners = [];
-    if (type === 'block_display') {
-      for (var bx = 0; bx <= 1; bx++) for (var by = 0; by <= 1; by++) for (var bz = 0; bz <= 1; bz++)
-        corners.push([pos[0] * 16 + bx * 16, pos[1] * 16 + by * 16, pos[2] * 16 + bz * 16]);
-    } else {
-      for (var cx = -1; cx <= 1; cx += 2) for (var cy = -1; cy <= 1; cy += 2) for (var cz = -1; cz <= 1; cz += 2)
-        corners.push([pos[0] * 16 + cx * 8, pos[1] * 16 + cy * 8, pos[2] * 16 + cz * 8]);
+    for (var i = 0; i < els.length; i++) {
+      var el = els[i];
+      var type = blkEntityElementType(el);
+      if (!type || type === 'better_model' || type === 'model_engine') continue;
+      var xf = blkEntityElementXf(el, type, null);
+      if (type === 'text_display') {
+        var lay = blkEntityTextLayout(el);
+        if (!lay) continue;
+        var align = String(fval(fkey(el, 'alignment')) || 'center').toLowerCase();
+        var W = lay.width, H = lay.lines * 10;
+        var px0 = align === 'left' ? 0 : (align === 'right' ? -W : -W / 2);
+        var tcs = [[px0, -H / 2], [px0 + W, -H / 2], [px0, H / 2], [px0 + W, H / 2]];
+        for (var ti = 0; ti < tcs.length; ti++) {
+          var tw = xf.textPx(tcs[ti][0], tcs[ti][1]);
+          var ts = scr(tw[0], tw[1], tw[2]);
+          grow(ts.x, ts.y);
+        }
+      } else {
+        var C = xf.center;
+        for (var bx = 0; bx <= 16; bx += 16) {
+          for (var by = 0; by <= 16; by += 16) {
+            for (var bz = 0; bz <= 16; bz += 16) {
+              var cw = xf.toWorld([bx, by, bz], C);
+              var cs2 = scr(cw[0], cw[1], cw[2]);
+              grow(cs2.x, cs2.y);
+            }
+          }
+        }
+      }
     }
-    var half = 8 * unit;
-    for (var ci = 0; ci < corners.length; ci++) {
-      var cs = scr(corners[ci][0], corners[ci][1], corners[ci][2]);
-      half = Math.max(half, Math.abs(cs.x - a.x), Math.abs(cs.y - a.y));
-    }
-    return { x: a.x, y: a.y, half: half };
+    return has ? { x0: x0, y0: y0, x1: x1, y1: y1 } : null;
   }
 
   // 返回值给 sceneBlock 追加到抬头文字里
+  // entity_renderer 渲染: 元素列表循环 (对象形式 = 单元素列表, 源码 fromConfig)。
+  // 每元素: position(格) 决定锚点, translation/scale/rotation(四元数)/yaw/pitch 构成
+  // 显示变换 (语义见 blkEntityElementXf)。面片烘焙后是绝对世界坐标, project 无平移
+  // ⇒ paintFaces 锚 = env.ox/oy, 裸投影 (project(blockRot(w)) ≡ projectViewP(w))。
   async function drawBlockEntityRenderer(ctx, visual, env) {
-    var er = fobj(visual.entityRenderer);
-    if (!er) return [];
     var lines = [];
-    var type = blkEntityType(er);
-    var unit = env.unit;
-
-    if (type === 'better_model' || type === 'model_engine') {
-      // 这两种由插件/客户端模型引擎渲染, 浏览器预览没有几何数据
-      warn('block-entity-external: ' + type);
-      lines.push('<yellow>' + t('preview.blockEntityExternal', 'entity_renderer 由插件渲染, 预览不可用') + ': ' + type);
-      return lines;
-    }
-
-    var pos = fvec(fkey(er, 'position'), blkEntityDefaultPos(type));
-    // 世界坐标 (格) → 方块局部坐标 (1 格 = 16 单位, 方块底部中心为原点)
-    var lx = pos[0] * 16, ly = pos[1] * 16, lz = pos[2] * 16;
-    var anchor = env.scr(lx, ly, lz);
-    var sx = env.ox + anchor.x, sy = env.oy + anchor.y;
-
-    // 该实体层自己的旋转 (yaw/pitch, 单位度)
-    var eyaw = parseFloat(fval(fkey(er, 'yaw'))) || 0;
-    var epitch = parseFloat(fval(fkey(er, 'pitch'))) || 0;
-
-    if (type === 'text_display') {
-      var txt = fval(fkey(er, 'text')) || '';
-      if (txt === '') { lines.push('<gray>' + t('preview.blockEntityText', '文本实体') + ': (空)'); return lines; }
-      var parsed = parseText(String(txt), { style: { color: { r: 255, g: 255, b: 255, a: 1 } } });
-      // 文本层按「实体中心」对齐, 再往上提半行, 让文字落在 position 处
-      var tx = sx, ty = sy + LINE_ASCENT / 2;
-      var align = String(fval(fkey(er, 'alignment')) || 'center').toLowerCase();
-      if (align === 'left') { /* 左对齐: 原点在左侧 */ }
-      else if (align === 'right') tx -= parsed.width;
-      else tx -= parsed.width / 2;
-      drawItems(ctx, parsed.items, tx, ty, { shadow: fkey(er, 'has_shadow') === true });
-      lines.push('<gray>' + t('preview.blockEntityText', '文本实体') + ': ' + String(txt).slice(0, 40));
-      return lines;
-    }
-
-    if (type === 'block_display') {
-      var blk = String(fval(fkey(er, 'block')) || '');
-      if (!blk) { lines.push('<gray>' + t('preview.blockEntityBlock', '方块实体') + ': (未指定)'); return lines; }
-      var bp = blk.indexOf(':') === -1 ? blk : blk.split(':')[1].replace(/\[.*\]$/, '');
-      var bns = blk.indexOf(':') === -1 ? 'minecraft' : blk.split(':')[0];
-      if (!dnsOk(bns)) return lines;
-      // 展示实体里的方块用同一套 3D 变换渲染
-      var bxf = { pt: function (p) { return blockRot(p, null, env.yaw + eyaw, env.pitch + epitch); },
-                  nrm: function (n) { return blockRotN(n, null, env.yaw + eyaw, env.pitch + epitch); } };
-      var bFaces = await collectModelFaces(bns + ':block/' + bp, bxf);
-      if (bFaces && bFaces.length) {
-        // 新 blockRot 不做中心平移: 烘焙后模型 [0..16]³ 原点落在
-        // anchor = wscr(pos*16), 即方块从 position 向 +x/+y/+z 伸展整格
-        // (原版 block_display 的放置语义), 与主方块/线框同一世界变换
-        var cache = {};
-        for (var i = 0; i < bFaces.length; i++) {
-          var fid = bFaces[i].texId;
-          if (!(fid in cache)) cache[fid] = await loadTextureFrame('texture', fid);
-          var fr = cache[fid];
-          if (fr) { bFaces[i].img = fr.img; bFaces[i].sx = fr.sx; bFaces[i].sy = fr.sy; bFaces[i].sw = fr.sw; bFaces[i].sh = fr.sh; }
-          else bFaces[i].img = null;
-        }
-        paintFaces(ctx, bFaces, unit, env.ox + anchor.x, env.oy + anchor.y, null);
-        lines.push('<gray>' + t('preview.blockEntityBlock', '方块实体') + ': ' + blk);
-      } else {
-        warn('block-entity-unknown-block: ' + blk);
-        lines.push('<yellow>' + t('preview.blockEntityUnknown', '实体引用的方块解析不到') + ': ' + blk);
+    var els = blkEntityElements(visual);
+    if (!els.length) return lines;
+    async function loadFaceImgs(faces) {
+      var cache = {};
+      for (var i = 0; i < faces.length; i++) {
+        var fid = faces[i].texId;
+        if (!(fid in cache)) cache[fid] = await loadTextureFrame('texture', fid);
+        var fr = cache[fid];
+        if (fr) { faces[i].img = fr.img; faces[i].sx = fr.sx; faces[i].sy = fr.sy; faces[i].sw = fr.sw; faces[i].sh = fr.sh; }
+        else faces[i].img = null;
       }
-      return lines;
     }
+    function splitLines(items) {
+      var out = [], cur = [];
+      for (var i = 0; i < items.length; i++) {
+        if (items[i].kind === 'break') { out.push(cur); cur = []; }
+        else cur.push(items[i]);
+      }
+      out.push(cur);
+      return out;
+    }
+    for (var ei = 0; ei < els.length; ei++) {
+      var el = els[ei];
+      var type = blkEntityElementType(el);
+      if (!type) {
+        warn('block-entity-unknown-type: #' + ei);
+        lines.push('<yellow>' + t('preview.blockEntityUnknown', '实体引用的方块解析不到') + ': #' + ei);
+        continue;
+      }
+      if (type === 'better_model' || type === 'model_engine') {
+        // 这两种由插件/客户端模型引擎渲染, 浏览器预览没有几何数据
+        warn('block-entity-external: ' + type);
+        lines.push('<yellow>' + t('preview.blockEntityExternal', 'entity_renderer 由插件渲染, 预览不可用') + ': ' + type);
+        continue;
+      }
+      var xf = blkEntityElementXf(el, type, env);
 
-    // item_display / item / armor_stand: 用物品模型
-    var item = fval(fkey(er, 'item')) || fval(fkey(er, 'item_model'));
-    if (!item) { lines.push('<gray>' + t('preview.blockEntityItem', '物品实体') + ': (未指定)'); return lines; }
-    var im = await resolveItemModel(String(item));
-    if (!im || im.kind === 'none') {
-      warn('block-entity-unknown-item: ' + item);
-      lines.push('<yellow>' + t('preview.blockEntityUnknown', '实体引用的方块解析不到') + ': ' + item);
-      return lines;
-    }
-    // 3D 方块物品: 直接按模型画
-    if (im.kind === 'block' && im.model) {
-      // 物品展示实体以 entity 位置为中心: 先局部把模型立方体中心化
-      // (-8), 再走与场景同一的世界烘焙变换 (blockRot 无平移)
-      var ixf = { pt: function (p) { return blockRot([p[0] - 8, p[1] - 8, p[2] - 8], null, env.yaw + eyaw, env.pitch + epitch); },
-                  nrm: function (n) { return blockRotN(n, null, env.yaw + eyaw, env.pitch + epitch); } };
-      var iFaces = await collectModelFaces(im.model, ixf);
-      if (iFaces && iFaces.length) {
-        var c2 = {};
-        for (var j = 0; j < iFaces.length; j++) {
-          var jid = iFaces[j].texId;
-          if (!(jid in c2)) c2[jid] = await loadTextureFrame('texture', jid);
-          var fr2 = c2[jid];
-          if (fr2) { iFaces[j].img = fr2.img; iFaces[j].sx = fr2.sx; iFaces[j].sy = fr2.sy; iFaces[j].sw = fr2.sw; iFaces[j].sh = fr2.sh; }
-          else iFaces[j].img = null;
+      if (type === 'text_display') {
+        var lay = blkEntityTextLayout(el);
+        if (!lay) { lines.push('<gray>' + t('preview.blockEntityText', '文本实体') + ': (空)'); continue; }
+        // 文本面: 局部文本像素 (u=前进, v=行进, 10px=1行) 经 0.4 单位/px 映射到世界,
+        // 差分投影得屏幕基向量 (project 线性, 锚点消去), 整块文字随元素变换/朝向。
+        var Ow = xf.textPx(0, 0);
+        var O = env.scr(Ow[0], Ow[1], Ow[2]);
+        function tBasis(dpx, dpy) {
+          var w1 = xf.textPx(dpx, dpy);
+          var d = blockRot([w1[0] - Ow[0], w1[1] - Ow[1], w1[2] - Ow[2]], null, env.yaw, env.pitch);
+          var s = project(d[0], d[1], d[2]);
+          return { x: s.x * env.unit, y: s.y * env.unit };
         }
-        // 中心化后的烘焙坐标以 anchor 为中心线性叠加
-        paintFaces(ctx, iFaces, unit, env.ox + anchor.x, env.oy + anchor.y, null);
+        var E1 = tBasis(10, 0), E2 = tBasis(0, 10);
+        var align = String(fval(fkey(el, 'alignment')) || 'center').toLowerCase();
+        var W = lay.width, H = lay.lines * 10;
+        var xL = align === 'left' ? 0 : (align === 'right' ? -W : -W / 2);
+        ctx.save();
+        ctx.transform(E1.x / 10, E1.y / 10, E2.x / 10, E2.y / 10, O.x, O.y);
+        ctx.beginPath();
+        ctx.rect(xL, 0, W, H);
+        ctx.clip();
+        var rows = splitLines(lay.items);
+        for (var ri = 0; ri < rows.length; ri++) {
+          var rowW = lay.lineWs[ri] || 0;
+          var startX = align === 'left' ? 0 : (align === 'right' ? -rowW : -rowW / 2);
+          drawItems(ctx, rows[ri], startX, ri * 10 + LINE_ASCENT,
+            { shadow: fkey(el, 'has_shadow') === true, lineHeight: 10 });
+        }
+        ctx.restore();
+        lines.push('<gray>' + t('preview.blockEntityText', '文本实体') + ': ' +
+          String(fval(fkey(el, 'text'))).slice(0, 40));
+        continue;
+      }
+
+      if (type === 'block_display') {
+        var blk = String(fval(fkey(el, 'block')) || '');
+        if (!blk) { lines.push('<gray>' + t('preview.blockEntityBlock', '方块实体') + ': (未指定)'); continue; }
+        var bp = blk.indexOf(':') === -1 ? blk : blk.split(':')[1].replace(/\[.*\]$/, '');
+        var bns = blk.indexOf(':') === -1 ? 'minecraft' : blk.split(':')[0];
+        if (!dnsOk(bns)) continue;
+        var bFaces = await collectModelFaces(bns + ':block/' + bp, xf);
+        if (bFaces && bFaces.length) {
+          await loadFaceImgs(bFaces);
+          // 展示实体里的方块用同一套 3D 变换; block_display 模型 [0..16]³ 从
+          // position 向 +x/+y/+z 伸展整格 (原版放置语义), xf.pt 已含 position
+          paintFaces(ctx, bFaces, env.unit, env.ox, env.oy, null);
+          lines.push('<gray>' + t('preview.blockEntityBlock', '方块实体') + ': ' + blk);
+        } else {
+          warn('block-entity-unknown-block: ' + blk);
+          lines.push('<yellow>' + t('preview.blockEntityUnknown', '实体引用的方块解析不到') + ': ' + blk);
+        }
+        continue;
+      }
+
+      // item_display / item / armor_stand: 用物品模型
+      var item = fval(fkey(el, 'item')) || fval(fkey(el, 'item_model'));
+      if (!item) { lines.push('<gray>' + t('preview.blockEntityItem', '物品实体') + ': (未指定)'); continue; }
+      var im = await resolveItemModel(String(item));
+      if (!im || im.kind === 'none') {
+        warn('block-entity-unknown-item: ' + item);
+        lines.push('<yellow>' + t('preview.blockEntityUnknown', '实体引用的方块解析不到') + ': ' + item);
+        continue;
+      }
+      // 3D 方块物品: 直接按模型画 (item_display 以 entity 位置为中心)
+      if (im.kind === 'block' && im.model) {
+        var iFaces = await collectModelFaces(im.model, xf);
+        if (iFaces && iFaces.length) {
+          await loadFaceImgs(iFaces);
+          paintFaces(ctx, iFaces, env.unit, env.ox, env.oy, null);
+          lines.push('<gray>' + t('preview.blockEntityItem', '物品实体') + ': ' + String(item));
+          continue;
+        }
+      }
+      // 平面物品: 画成竖直卡片, 四角取元素变换 (translation/rotation/scale 生效)
+      var tex = (im.texture && im.kind === 'flat') ? await loadImageAny('texture', im.texture) : null;
+      if (tex) {
+        var ctr = xf.center;
+        var fc = {
+          corners: [
+            xf.toWorld([0, 0, 8], ctr), xf.toWorld([16, 0, 8], ctr),
+            xf.toWorld([16, 16, 8], ctr), xf.toWorld([0, 16, 8], ctr)
+          ],
+          uvs: [[0, 0], [16, 0], [16, 16], [0, 16]],
+          img: tex, sw: tex.width, sh: tex.height
+        };
+        drawTexturedQuad(ctx, fc, env.unit, env.ox, env.oy, null);
         lines.push('<gray>' + t('preview.blockEntityItem', '物品实体') + ': ' + String(item));
-        return lines;
+      } else {
+        warn('block-entity-unknown-item: ' + item);
+        lines.push('<yellow>' + t('preview.blockEntityUnknown', '实体引用的方块解析不到') + ': ' + item);
       }
-    }
-    // 平面物品: 画成竖直卡片 (与原版展示实体一致)
-    var tex = (im.texture && im.kind === 'flat') ? await loadImageAny('texture', im.texture) : null;
-    if (tex) {
-      var size = 16 * unit;
-      var cardX = sx - size / 2, cardY = sy - size / 2;
-      try { ctx.drawImage(tex, cardX, cardY, size, size); } catch (e) { /* ignore */ }
-      lines.push('<gray>' + t('preview.blockEntityItem', '物品实体') + ': ' + String(item));
-    } else {
-      warn('block-entity-unknown-item: ' + item);
-      lines.push('<yellow>' + t('preview.blockEntityUnknown', '实体引用的方块解析不到') + ': ' + item);
     }
     return lines;
   }
@@ -5370,15 +5781,8 @@
     // 会被画到画布上边之外裁掉。text_display 还要按文字宽高额外留位。
     var entBox = blockEntityExtent(visual, wscr, unit);
     if (entBox) {
-      if (entBox.textWidth) {
-        // 文本按对齐方式向左右扩展
-        grow(entBox.x - entBox.textWidth / 2, entBox.y - LINE_ASCENT);
-        grow(entBox.x + entBox.textWidth / 2, entBox.y + (LINE_HEIGHT - LINE_ASCENT));
-      } else {
-        var eh = entBox.half;
-        grow(entBox.x - eh, entBox.y - eh);
-        grow(entBox.x + eh, entBox.y + eh);
-      }
+      grow(entBox.x0, entBox.y0);
+      grow(entBox.x1, entBox.y1);
     }
     // 抬头文字先排版: 行高固定, 从顶部往下排, 画布高度要把它算进去
     var lines = [];
@@ -5757,6 +6161,16 @@
     },
     resolveItemModel: resolveItemModel,
     inspectModel: inspectModel,
+    // 工具提示内部 (诊断/测试用): 背景贴图加载 + 9 宫格绘制 + 尺寸公式
+    _tooltipInternals: {
+      buildTooltipSurface: buildTooltipSurface,
+      loadTooltipSprites: loadTooltipSprites,
+      drawNineSlice: drawNineSlice,
+      tooltipLineItems: tooltipLineItems,
+      PAD: TOOLTIP_PAD,
+      MARGIN: TOOLTIP_MARGIN,
+      LINE: TOOLTIP_LINE,
+    },
     drawItem: drawItem,
     renderScene: renderScene,
     sceneChat: sceneChat,
@@ -5858,6 +6272,15 @@
       GUI_FALLBACK_TR: GUI_FALLBACK_TR,
       renderInvSlotItem: renderInvSlotItem,
       furnitureAffine: furnitureAffine,
+      // 方块实体 entity_renderer (供测试/诊断直接验证)
+      blkEntityElements: blkEntityElements,
+      blkEntityElementType: blkEntityElementType,
+      ceQuatFromYPR: ceQuatFromYPR,
+      ceRotationQuat: ceRotationQuat,
+      blkEntityElementXf: blkEntityElementXf,
+      blockEntityExtent: blockEntityExtent,
+      wrapParsedItems: wrapParsedItems,
+      blkEntityTextLayout: blkEntityTextLayout,
       get scenePitch() { return scenePitch; },
       get sceneViewYaw() { return sceneViewYaw; },
     },
