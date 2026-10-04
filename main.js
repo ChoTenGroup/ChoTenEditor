@@ -307,7 +307,73 @@ ipcMain.handle('fs:stat', async (event, filePath) => {
 ipcMain.handle('fs:deleteFile', async (event, filePath) => {
   if (!isValidFsPath(filePath)) return { success: false, error: '无效路径' };
   try {
-    await fs.promises.unlink(filePath);
+    // 移入系统回收站 (而非永久删除)
+    await shell.trashItem(filePath);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// 目录复制 (递归): 渲染层树右键"复制/粘贴"用
+async function copyDirRecursive(src, dest) {
+  const stat = await fs.promises.stat(src);
+  if (!stat.isDirectory()) {
+    await fs.promises.copyFile(src, dest);
+    return;
+  }
+  await fs.promises.mkdir(dest, { recursive: true });
+  const entries = await fs.promises.readdir(src, { withFileTypes: true });
+  for (const entry of entries) {
+    await copyDirRecursive(path.join(src, entry.name), path.join(dest, entry.name));
+  }
+}
+
+ipcMain.handle('fs:copyPath', async (event, src, dest) => {
+  if (!isValidFsPath(src) || !isValidFsPath(dest)) return { success: false, error: '无效路径' };
+  try {
+    const stat = await fs.promises.stat(src);
+    if (stat.isDirectory()) {
+      // 防止把目录复制进自身 (dest 在 src 内部)
+      const resolvedSrc = path.resolve(src);
+      const resolvedDest = path.resolve(dest);
+      if (resolvedDest === resolvedSrc || resolvedDest.startsWith(resolvedSrc + path.sep)) {
+        return { success: false, error: '不能将目录复制到其自身内部' };
+      }
+      await copyDirRecursive(resolvedSrc, resolvedDest);
+    } else {
+      await fs.promises.copyFile(src, dest);
+    }
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// 重命名/移动文件或目录 (同一系统调用天然支持目录; 树右键"重命名"用)
+ipcMain.handle('fs:rename', async (event, oldPath, newPath) => {
+  if (!isValidFsPath(oldPath) || !isValidFsPath(newPath)) return { success: false, error: '无效路径' };
+  try {
+    const resolvedOld = path.resolve(oldPath);
+    const resolvedNew = path.resolve(newPath);
+    if (resolvedOld === resolvedNew) return { success: true };
+    // 目标已存在时拒绝, 避免覆盖用户文件
+    try {
+      await fs.promises.stat(resolvedNew);
+      return { success: false, error: '目标名称已存在' };
+    } catch (e) { /* 目标不存在, 继续 */ }
+    await fs.promises.rename(resolvedOld, resolvedNew);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// 在系统资源管理器中显示文件/目录 (并选中)
+ipcMain.handle('shell:showItemInFolder', async (event, filePath) => {
+  if (!isValidFsPath(filePath)) return { success: false, error: '无效路径' };
+  try {
+    shell.showItemInFolder(filePath);
     return { success: true };
   } catch (error) {
     return { success: false, error: error.message };
@@ -502,6 +568,93 @@ ipcMain.handle('checks:gotoIssue', (event, issue) => {
 ipcMain.handle('window:isMaximized', (event) => {
   const win = BrowserWindow.fromWebContents(event.sender);
   return win ? win.isMaximized() : false;
+});
+
+// ---- 预览独立窗口: 把 MC 场景预览放到真正的独立 OS 窗口里 ----
+// 与 Checks 窗口同一套做法 (单独页面 + preload + 主进程推数据)。
+// 独立窗口里只有预览面板本身, 不再叠在编辑器之上, 适合多屏/边看边改。
+let previewWindow = null;
+let previewPayload = null;   // 最近一次要渲染的 ctx + 选项
+
+function openPreviewWindow(payload) {
+  if (payload) previewPayload = payload;
+  if (previewWindow && !previewWindow.isDestroyed()) {
+    if (previewWindow.isMinimized()) previewWindow.restore();
+    previewWindow.focus();
+    return previewWindow;
+  }
+  previewWindow = new BrowserWindow({
+    width: 880,
+    height: 700,
+    minWidth: 420,
+    minHeight: 320,
+    title: 'MC Preview — ChoTenEditor',
+    icon: path.join(__dirname, 'icon.png'),
+    backgroundColor: '#000000',
+    show: false,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true,
+      nodeIntegration: false,
+      nodeIntegrationInSubFrames: true,
+    },
+  });
+  try { previewWindow.setMenuBarVisibility(false); } catch (e) {}
+  const page = pathToFileURL(path.join(__dirname, 'ce-preview-window.html')).href;
+  previewWindow.webContents.on('did-fail-load', (e, code, desc, url, isMain) => {
+    console.error('[PREVIEWWIN] did-fail-load', code, desc, url, 'main=' + isMain);
+  });
+  previewWindow.loadURL(page).catch((e) => {
+    console.error('[PREVIEWWIN] load failed:', e && e.message);
+  });
+  // 页面加载完补推一次: 打开窗口时那次可能早于页面就绪
+  previewWindow.webContents.on('did-finish-load', () => {
+    if (previewPayload) sendToPreviewWindow('preview:update', previewPayload);
+  });
+  previewWindow.once('ready-to-show', () => {
+    if (previewWindow && !previewWindow.isDestroyed()) previewWindow.show();
+  });
+  previewWindow.on('closed', () => {
+    previewWindow = null;
+    // 通知主窗口: 独立预览已关闭 (面板好同步按钮状态)
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      try { mainWindow.webContents.send('preview:closed'); } catch (e) {}
+    }
+  });
+  return previewWindow;
+}
+
+function sendToPreviewWindow(channel, payload) {
+  if (previewWindow && !previewWindow.isDestroyed()) {
+    try { previewWindow.webContents.send(channel, payload); } catch (e) {}
+  }
+}
+
+ipcMain.handle('preview:openWindow', (event, payload) => {
+  openPreviewWindow(payload || null);
+  return { ok: true };
+});
+
+ipcMain.handle('preview:updateWindow', (event, payload) => {
+  previewPayload = payload || null;
+  sendToPreviewWindow('preview:update', previewPayload);
+  return { ok: true };
+});
+
+ipcMain.handle('preview:getPayload', () => previewPayload);
+
+ipcMain.handle('preview:closeWindow', () => {
+  if (previewWindow && !previewWindow.isDestroyed()) previewWindow.close();
+  return { ok: true };
+});
+
+ipcMain.handle('preview:isWindowOpen', () => !!(previewWindow && !previewWindow.isDestroyed()));
+
+// 独立预览窗口 → 主窗口的交互回传 (切换场景/条目等)
+ipcMain.on('preview:fromWindow', (event, msg) => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    try { mainWindow.webContents.send('preview:fromWindow', msg || {}); } catch (e) {}
+  }
 });
 
 // 仅允许 http/https/mailto 链接交给系统打开, 防 file:// 等协议被渲染进程滥用

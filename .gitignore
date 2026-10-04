@@ -14,3 +14,16 @@ debug_*.js
 
 # Local regression / probe tooling: kept in the working copy, never committed
 _ce_*.js
+_ce_*.out
+_ce_*.txt
+_ce_align_img/
+_ce_unihex_color_img/
+_rt.txt
+_rte.txt
+_rt_*.txt
+_ent_*.txt
+_check_ipc_dup.js
+_ce_*.html
+
+_fin_*.txt
+_fin_*.out

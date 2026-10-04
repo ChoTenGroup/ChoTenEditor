@@ -26,8 +26,12 @@
     // 两个标签命名空间分开开关
     resolveMiniMessage: true,
     resolveCeTags: true,
+    // 字体模式: 'auto' = 原版默认 (缺失才回退 unifont), 'unicode' = 强制 Unicode 字体
+    fontMode: 'auto',
     // 家具: 当前查看的变体下标
     variant: 0,
+    // 方块: 当前查看的内部状态下标 (blockStates() 的顺序, 0 = 默认状态)
+    blockState: 0,
     // 家具视图: yaw 旋转 (度, 45°步进), 缩放, 俯仰, 显示开关
     furnYaw: 0,
     furnZoom: 1,
@@ -47,6 +51,8 @@
     // 偏移 <shift:N>: 当前数值, 以及文本里「正在编辑的那个标签」的区间
     shiftValue: 0,
     shiftRange: null,
+    // 自动刷新模式: 'editor' (跟随编辑器, 默认) / 'disk' (轮询磁盘) / 'off' (不刷新)
+    refreshMode: 'editor',
   };
   var _busy = false;
   var _pending = false;
@@ -54,6 +60,7 @@
   var _furnDrag = null;        // 画布拖动旋转视角的进行中状态
   var _furnDragged = false;    // 本次指针操作是否发生了拖动 (用来抑制随后的 click 选箱)
   var _winSize = null;         // 记住用户调过的预览窗口大小 (拉大/最大化后重开也保持)
+  var _customTextDirty = false; // 用户手改过自定义文字? 改过则自动切换条目时不再覆盖
   var _projectData = { images: {}, globals: {}, emojis: {}, langs: {} };
 
   function t(key, fb, params) {
@@ -165,6 +172,13 @@
     return null;
   }
   function resolveEntryIcon(d) {
+    // 0) model/item_model 为对象时 (CE generation 写法) 优先取 path,
+    //    避免被 material (原版材质 id) 抢走图标 —— 方块物品在背包里显示的是自己的模型。
+    var mObj = unwrap(findKey(d, 'model')) || unwrap(findKey(d, 'item_model'));
+    if (isObj(mObj)) {
+      var mp = _iconFromValue(mObj);
+      if (mp) return mp;
+    }
     // 1) 条目自身的直观字段
     var direct = ['texture', 'item_model', 'material', 'icon', 'asset_id', 'file', 'image',
       'item', 'side_texture', 'model_path'];
@@ -253,17 +267,30 @@
   //   物品/方块/家具 → 只关心东西本身: 物品栏格子、悬浮提示、容器 GUI、聊天
   var GLYPH_SECTIONS = { images: 1, image: 1, emoji: 1, emojis: 1 };
   var FURNITURE_SECTIONS = { furniture: 1 };
+  var BLOCK_SECTIONS = { blocks: 1, block: 1 };
   // 物品带 furniture_item 行为时也按家具预览
   function hasFurnitureBehavior(c) {
     if (!c || !root.CEPreview || !root.CEPreview.furnitureItemRef) return false;
     try { return !!root.CEPreview.furnitureItemRef(c.data || {}); } catch (e) { return false; }
+  }
+  // 物品带 block_item 系行为时也按方块预览 (block 字段可引用也可内联)
+  function hasBlockItemBehavior(c) {
+    if (!c || !root.CEPreview || !root.CEPreview.blockItemRef) return false;
+    try { return !!root.CEPreview.blockItemRef(c.data || {}); } catch (e) { return false; }
+  }
+  function isBlockEntry(c) {
+    if (!c) return false;
+    var s = c.sectionBase || String(c.section || '').replace(/s$/, '');
+    return !!(BLOCK_SECTIONS[c.sectionBase] || BLOCK_SECTIONS[c.section] || BLOCK_SECTIONS[s]);
   }
   function contentKind(c) {
     if (!c) return 'icon';
     var s = c.sectionBase || String(c.section || '').replace(/s$/, '');
     if (GLYPH_SECTIONS[c.sectionBase] || GLYPH_SECTIONS[c.section] || GLYPH_SECTIONS[s]) return 'glyph';
     if (FURNITURE_SECTIONS[c.sectionBase] || FURNITURE_SECTIONS[c.section] || FURNITURE_SECTIONS[s]) return 'furniture';
+    if (isBlockEntry(c)) return 'block';
     if (hasFurnitureBehavior(c)) return 'furniture';
+    if (hasBlockItemBehavior(c)) return 'block';
     return 'icon';
   }
   function sceneDefs(kind) {
@@ -284,6 +311,16 @@
         { id: 'chat', label: t('preview.sceneChat', '聊天') }
       ];
     }
+    if (kind === 'block') {
+      return [
+        { id: 'block', label: t('preview.sceneBlock', '方块') },
+        { id: 'item-model', label: t('preview.sceneItemModel', '模型') },
+        { id: 'item', label: t('preview.sceneItem', '物品栏') },
+        { id: 'inventory', label: t('preview.sceneInventory', '背包 GUI') },
+        { id: 'lore', label: t('preview.sceneLore', '物品提示') },
+        { id: 'chat', label: t('preview.sceneChat', '聊天') }
+      ];
+    }
     return [
       { id: 'item', label: t('preview.sceneItem', '物品栏') },
       { id: 'inventory', label: t('preview.sceneInventory', '背包 GUI') },
@@ -296,7 +333,54 @@
   function defaultScene(kind) {
     if (kind === 'glyph') return 'gui';
     if (kind === 'furniture') return 'furniture';
+    if (kind === 'block') return 'block';
     return 'item';
+  }
+  // 方块条目的状态列表 (由 states.properties 的笛卡尔积推出来)
+  // 物品内联方块: 状态定义在 behavior.block.state(s) 里, 传解出来的方块定义
+  function blockStates() {
+    if (!root.CEPreview || !root.CEPreview.blockStateList) return null;
+    var src = resolvedBlock();
+    try { return root.CEPreview.blockStateList(src); } catch (e) { return null; }
+  }
+  // 当前条目的方块定义: 方块段条目直接用; 物品则解出它 block_item 行为引用的方块
+  // (引用 id → 去工程 blocks: 段找; 内联 → 直接用它自己)
+  function resolvedBlock() {
+    var d = (ctx && ctx.data) || {};
+    if (root.CEPreview && root.CEPreview.blockInlineOf) {
+      try {
+        var b = root.CEPreview.blockInlineOf(d);
+        if (b) return b;
+      } catch (e) { /* ignore */ }
+    }
+    return d;
+  }
+  // 把「当前选中的内部状态」注进数据副本 (渲染核心据此做 variant 匹配),
+  // 原对象不动 —— 预览不该改动编辑器里的配置
+  function blockDataWithState() {
+    var d = resolvedBlock();
+    if (!d || typeof d !== 'object') return d;
+    var list = blockStates();
+    var idx = state.blockState || 0;
+    // 浅拷贝保留引用语义, states 单独拷一层再塞 _ceVariant
+    var copy = {};
+    Object.keys(d).forEach(function (k) { copy[k] = d[k]; });
+    var st = copy.states;
+    if (st && typeof st === 'object' && !Array.isArray(st)) {
+      var stCopy = {};
+      Object.keys(st).forEach(function (k) { stCopy[k] = st[k]; });
+      stCopy._ceVariant = (list && list.states[idx]) ? list.states[idx] : {};
+      copy.states = stCopy;
+    }
+    return copy;
+  }
+  // Block entries and block_item entries must carry their resolved CE block
+  // definition into item/inventory/model scenes; the material icon alone is not enough.
+  function sceneItemRef(p) {
+    if (contentKind(ctx) === 'block') {
+      return { id: p.icon || ctx.entryKey || null, blockData: blockDataWithState() };
+    }
+    return p.icon || undefined;
   }
   // 当前条目的家具定义: 家具段条目直接用; 物品则解出它 furniture_item 行为引用的家具
   // (引用 id → 去工程 furniture: 段找; 内联 → 直接用它自己)
@@ -386,6 +470,8 @@
       '        <select class="pv-select" id="pv-variant"></select></label>' +
       '      <label class="pv-field" id="pv-modelctx-field" style="display:none;"><span>' + esc(t('preview.modelContext', 'display 上下文')) + '</span>' +
       '        <select class="pv-select" id="pv-modelctx"></select></label>' +
+      '      <label class="pv-field" id="pv-blockstate-field" style="display:none;"><span>' + esc(t('preview.blockState', '方块状态')) + '</span>' +
+      '        <select class="pv-select" id="pv-blockstate"></select></label>' +
       '    </div>' +
       '    <div class="pv-group" id="pv-furn-group" style="display:none;">' +
       '      <button type="button" class="pv-btn" data-furn-yaw="-45" title="' + esc(t('preview.furnYawLeft', '视角左转 45° (Q)')) + '">⟲</button>' +
@@ -430,10 +516,13 @@
       '      <label class="pv-check"><input type="checkbox" id="pv-globals" checked> ' + esc(t('preview.resolveGlobals', '解析全局变量')) + '</label>' +
       '      <label class="pv-check"><input type="checkbox" id="pv-images" checked> ' + esc(t('preview.resolveImages', '渲染字体图像')) + '</label>' +
       '      <label class="pv-check"><input type="checkbox" id="pv-shadow" checked> ' + esc(t('preview.shadow', '文字阴影')) + '</label>' +
+      '      <label class="pv-check"><input type="checkbox" id="pv-uni"' + (state.fontMode === 'unicode' ? ' checked' : '') + '> ' + esc(t('preview.forceUnicode', '强制 Unicode 字体 (unifont)')) + '</label>' +
       '      <label class="pv-check"><input type="checkbox" id="pv-dark" checked> ' + esc(t('preview.darkBg', '深色底')) + '</label>' +
       '    </div>' +
       '    <div class="pv-group pv-right">' +
       '      <button type="button" class="pv-btn" id="pv-refresh" title="' + esc(t('common.reload', '重新加载')) + '">⟳</button>' +
+      '      <button type="button" class="pv-btn" id="pv-detach" title="' + esc(t('preview.detachHint', '在独立窗口中打开')) + '">' +
+        esc(t('preview.detach', '独立窗口')) + '</button>' +
       '      <button type="button" class="pv-btn" id="pv-copy">' + esc(t('preview.copyImage', '复制图片')) + '</button>' +
       '      <button type="button" class="pv-btn" id="pv-source">' + esc(t('preview.showSource', '查看文本')) + '</button>' +
       '    </div>' +
@@ -722,8 +811,8 @@
     var textEl = els.text;
     if (useTextEl) useTextEl.addEventListener('change', function () { state.useCustomText = this.checked; render(); });
     if (textEl) {
-      textEl.addEventListener('input', function () { state.customText = this.value; });
-      textEl.addEventListener('change', function () { state.customText = this.value; render(); });
+      textEl.addEventListener('input', function () { state.customText = this.value; _customTextDirty = true; });
+      textEl.addEventListener('change', function () { state.customText = this.value; _customTextDirty = true; render(); });
       textEl.addEventListener('keydown', function (e) {
         // Alt+←/→ = ∓1, Alt+Shift+←/→ = ∓10 (和输入框里的偏移联动)
         if (e.altKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
@@ -735,12 +824,18 @@
         if (e.key === 'Enter') { state.customText = this.value; render(); }
       });
     }
-    ['tags:resolveMiniMessage', 'cetags:resolveCeTags', 'globals:resolveGlobals', 'images:resolveImages', 'shadow:shadow', 'dark:dark'].forEach(function (pair) {
+    ['tags:resolveMiniMessage', 'cetags:resolveCeTags', 'globals:resolveGlobals', 'images:resolveImages', 'shadow:shadow', 'dark:dark', 'uni:fontMode'].forEach(function (pair) {
       var parts = pair.split(':');
       var el = body.querySelector('#pv-' + parts[0]);
-      if (el) el.addEventListener('change', function () { state[parts[1]] = this.checked; render(); });
+      if (el) el.addEventListener('change', function () {
+        if (parts[1] === 'fontMode') state.fontMode = this.checked ? 'unicode' : 'auto';
+        else state[parts[1]] = this.checked;
+        render();
+      });
     });
     body.querySelector('#pv-refresh').addEventListener('click', function () { hardRefresh(); });
+    var detachBtn = body.querySelector('#pv-detach');
+    if (detachBtn) detachBtn.addEventListener('click', function () { detach(); });
     body.querySelector('#pv-copy').addEventListener('click', copyImage);
     body.querySelector('#pv-source').addEventListener('click', function () {
       var box = els.sourceBox;
@@ -777,12 +872,15 @@
     var guiLike = (state.scene === 'gui');
     if (rowsEl) rowsEl.disabled = !guiLike;
     if (rowsField) rowsField.style.opacity = guiLike ? '' : '0.45';
-    // 家具/模型场景: 显示视图控制组; 家具场景再加显示开关, 模型场景加 display 上下文
+    // 家具/模型/方块场景: 显示视图控制组; 家具场景再加显示开关, 模型场景加 display 上下文
     var isFurn = (state.scene === 'furniture');
     var isModel = (state.scene === 'item-model');
+    // 方块也是 3D 视图, 复用同一套 旋转/缩放/俯仰 控件
+    var isBlock = (state.scene === 'block');
+    var is3D = isFurn || isModel || isBlock;
     var furnGroup = win.body.querySelector('#pv-furn-group');
     var furnChecks = win.body.querySelector('#pv-furn-checks');
-    if (furnGroup) furnGroup.style.display = (isFurn || isModel) ? '' : 'none';
+    if (furnGroup) furnGroup.style.display = is3D ? '' : 'none';
     if (furnChecks) furnChecks.style.display = isFurn ? '' : 'none';
     var zoomVal = win.body.querySelector('#pv-furn-zoomval');
     if (zoomVal) zoomVal.textContent = Math.round((state.furnZoom || 1) * 100) + '%';
@@ -792,8 +890,8 @@
     if (pitchVal) pitchVal.textContent = Math.round(state.furnPitch != null ? state.furnPitch : 30) + '°';
     var editEl = win.body.querySelector('#pv-furn-edit');
     if (editEl) editEl.checked = state.furnEdit === true;
-    if (els.stage) els.stage.style.cursor = (isFurn || isModel) ? 'crosshair' : '';
-    if (els.canvas && !_furnDrag) els.canvas.style.cursor = (isFurn || isModel) ? 'grab' : '';
+    if (els.stage) els.stage.style.cursor = is3D ? 'crosshair' : '';
+    if (els.canvas && !_furnDrag) els.canvas.style.cursor = is3D ? 'grab' : '';
     // 开关状态回填 (state 可能被程序改动)
     [['pv-furn-hb', 'furnHitboxes'], ['pv-furn-fill', 'furnFill'], ['pv-furn-labels', 'furnLabels'],
      ['pv-furn-seats', 'furnSeats'], ['pv-furn-grid', 'furnGrid']].forEach(function (pair) {
@@ -817,6 +915,35 @@
         varField.style.display = '';
       } else {
         varField.style.display = 'none';
+      }
+    }
+    // 方块状态下拉 (多状态方块): 选项 = properties 的笛卡尔积, 按源码语义排序
+    var bsEl = win.body.querySelector('#pv-blockstate');
+    var bsField = win.body.querySelector('#pv-blockstate-field');
+    if (bsEl && bsField) {
+      var bsList = contentKind(ctx) === 'block' ? blockStates() : null;
+      if (bsList && bsList.states.length > 1) {
+        var propNames = bsList.props.map(function (p) { return p.name; });
+        var bsig = propNames.join(',') + '|' + bsList.states.length;
+        if (bsEl.getAttribute('data-sig') !== bsig) {
+          bsEl.setAttribute('data-sig', bsig);
+          bsEl.innerHTML = bsList.states.map(function (st, i) {
+            var label = propNames.map(function (n) { return n + '=' + st[n]; }).join(', ');
+            return '<option value="' + i + '">' + esc(label) + '</option>';
+          }).join('');
+        }
+        if (state.blockState >= bsList.states.length || state.blockState == null) state.blockState = 0;
+        bsEl.value = String(state.blockState);
+        bsField.style.display = '';
+        if (!bsEl.getAttribute('data-bound')) {
+          bsEl.setAttribute('data-bound', '1');
+          bsEl.addEventListener('change', function () {
+            state.blockState = parseInt(this.value, 10) || 0;
+            render();
+          });
+        }
+      } else {
+        bsField.style.display = 'none';
       }
     }
     // display 上下文下拉 (模型场景): 上下文列表来自渲染核心
@@ -891,6 +1018,7 @@
       resolveGlobals: state.resolveGlobals,
       resolveImages: state.resolveImages,
       lang: (root.I18N && root.I18N.lang) || 'zh_cn',
+      forceUnicode: state.fontMode === 'unicode',
     };
   }
 
@@ -1182,10 +1310,20 @@
           edit: state.furnEdit === true,
           editSel: state.furnEditSel || null,
         };
+      } else if (scene === 'block') {
+        // 方块: 把「当前选中的内部状态」注入数据副本, 让渲染核心按 variant 选对外观
+        payload = {
+          type: 'block', scale: state.scale, options: makeOpts(),
+          blockData: blockDataWithState(),
+          entryKey: ctx.entryKey || '',
+          yaw: state.furnYaw || 0, zoom: state.furnZoom || 1,
+          pitch: state.furnPitch != null ? state.furnPitch : 30,
+          showGrid: state.furnGrid !== false,
+        };
       } else if (scene === 'item-model') {
         payload = {
           type: 'item-model', scale: state.scale, options: makeOpts(),
-          modelRef: p.icon || ctx.entryKey || undefined,
+          modelRef: sceneItemRef(p) || ctx.entryKey || undefined,
           displayContext: state.modelCtx || 'gui',
           yaw: state.furnYaw || 0, zoom: state.furnZoom || 1,
           pitch: state.furnPitch != null ? state.furnPitch : 30,
@@ -1195,21 +1333,21 @@
         payload = {
           type: 'item', scale: state.scale, options: makeOpts(),
           name: useCustom ? cLines[0] : (p.name || ('<white>' + esc(ctx.entryKey || ''))),
-          lore: useCustom ? cLines.slice(1) : p.lore, item: p.icon || undefined,
+          lore: useCustom ? cLines.slice(1) : p.lore, item: sceneItemRef(p),
           count: countOf(p), rarity: rarityOf(ctx),
         };
       } else if (scene === 'inventory') {
         // 原版生存物品栏: 物品按 gui 上下文的 ItemTransform 渲染 (3D 模型 = 正交直视)
         payload = {
           type: 'inventory', scale: state.scale, options: makeOpts(),
-          item: p.icon || undefined, slot: state.invSlot || 0,
+          item: sceneItemRef(p), slot: state.invSlot || 0,
           count: countOf(p), hoverSlot: state.invSlot || 0,
         };
       } else {
         payload = {
           type: 'lore', scale: state.scale, options: makeOpts(),
           name: useCustom ? cLines[0] : (p.name || ('<white>' + esc(ctx.entryKey || ''))),
-          lore: useCustom ? cLines.slice(1) : p.lore, showItem: true, item: p.icon || undefined,
+          lore: useCustom ? cLines.slice(1) : p.lore, showItem: true, item: sceneItemRef(p),
           rarity: rarityOf(ctx),
         };
       }
@@ -1312,6 +1450,8 @@
       var pv2 = win.body.querySelector('#pv-furn-pitchval');
       if (pv2) pv2.textContent = Math.round(state.furnPitch != null ? state.furnPitch : 30) + '°';
       if (warnings.length) console.warn('[CEPreviewPanel] warnings:', warnings);
+      // 独立窗口开着的话, 把最新内容同步过去 (场景/状态/勾选项变化都跟上)
+      pushToDetached();
     } catch (e) {
       console.error('[CEPreviewPanel] render failed:', e);
       setStatus(t('preview.renderFailed', '渲染失败: {msg}', { msg: e && e.message || e }), 'error');
@@ -1330,6 +1470,7 @@
       gui: t('preview.sceneGui', kindSceneLabel(s)),
       image: t('preview.sceneImage', '图像总览'),
       furniture: t('preview.sceneFurniture', '家具'),
+      block: t('preview.sceneBlock', '方块'),
       'item-model': t('preview.sceneItemModel', '模型')
     };
     return map[s] || s;
@@ -1415,6 +1556,7 @@
     if (!_lastKey || _lastKey !== (ctx.entryKey || '')) {
       _lastKey = ctx.entryKey || '';
       state.customText = defaultCustomText(kind);
+      _customTextDirty = false;
       state.shiftValue = 0;
       state.shiftRange = null;
       state.furnPick = -1;
@@ -1426,12 +1568,18 @@
     else if (sceneDefs(kind).map(function (d) { return d.id; }).indexOf(state.scene) === -1) {
       state.scene = defaultScene(kind);
     }
+    // 设置里选了「独立窗口」→ 直接开独立系统窗口, 不在编辑器里开浮层
+    if (root.__cePreviewWindowMode === 'detached' && !(c && c.forceDocked)) {
+      detach();
+      return null;
+    }
     var title = t('preview.windowTitle', 'MC 场景预览') + (ctx.entryKey ? ' — ' + ctx.entryKey : '');
     if (win && !win._closed) {
       win.setTitle(title);
       win.body.innerHTML = panelHtml();
       bind();
       render();
+      if (state.refreshMode === 'disk') startDiskWatch();
       return win;
     }
     var content = document.createElement('div');
@@ -1451,6 +1599,7 @@
         win = null; els = {};
         _furnDrag = null; _furnDragged = false;
         _handleDrag = null;   // 手柄拖拽状态一并清掉, 防止 pointerId 复用时旧状态劫持新窗口
+        stopDiskWatch();
         document.removeEventListener('keydown', onFurnKey);
       },
     });
@@ -1463,11 +1612,230 @@
     bind();
     document.addEventListener('keydown', onFurnKey);
     render();
+    if (state.refreshMode === 'disk') startDiskWatch();
     return win;
   }
 
-  function close() { if (win && !win._closed) win.close(); }
-  function refresh() { if (win && !win._closed) render(); }
+  // 换条目但保持同一个窗口: 不重建 DOM (勾选态/滚动位置/尺寸都留着),
+  // 只换 ctx + 标题 + 场景标签后重画。自动切换预览走这里。
+  function follow(c) {
+    if (!win || win._closed || !c) return null;
+    var prevKey = _lastKey;
+    ctx = c;
+    var kind = contentKind(ctx);
+    if (prevKey !== (ctx.entryKey || '')) {
+      _lastKey = ctx.entryKey || '';
+      // 自定义文字跟随新条目, 但用户手改过就不再覆盖 (避免自动切换吃掉输入)
+      if (!_customTextDirty) state.customText = defaultCustomText(kind);
+      state.shiftValue = 0;
+      state.shiftRange = null;
+      state.furnPick = -1;
+      state.furnEditSel = null;
+      state.invSlot = 0;
+    }
+    if (c.scene && c.scene !== 'auto') state.scene = c.scene;
+    else if (sceneDefs(kind).map(function (d) { return d.id; }).indexOf(state.scene) === -1) {
+      state.scene = defaultScene(kind);
+    }
+    win.setTitle(t('preview.windowTitle', 'MC 场景预览') + (ctx.entryKey ? ' — ' + ctx.entryKey : ''));
+    // 场景集合可能变了 (物品 → 字体图像), 标签要重建; 勾选框与文字框回写 state
+    buildSceneTabs();
+    syncControls();
+    render();
+    return win;
+  }
 
-  root.CEPreviewPanel = { open: open, close: close, refresh: refresh, getState: function () { return state; } };
+  // follow() 后把 state 回写到已存在的 DOM 控件上 (与 open() 的全量重建等价)
+  function syncControls() {
+    if (!win || !win.body) return;
+    var body = win.body;
+    var setChecked = function (id, v) { var e = body.querySelector(id); if (e) e.checked = !!v; };
+    setChecked('#pv-tags', state.resolveMiniMessage);
+    setChecked('#pv-cetags', state.resolveCeTags);
+    setChecked('#pv-globals', state.resolveGlobals);
+    setChecked('#pv-images', state.resolveImages);
+    setChecked('#pv-shadow', state.shadow);
+    setChecked('#pv-uni', state.fontMode === 'unicode');
+    setChecked('#pv-dark', state.dark);
+    var txt = body.querySelector('#pv-text');
+    if (txt && !_customTextDirty) txt.value = state.customText || '';
+    var use = body.querySelector('#pv-usetext');
+    if (use) use.checked = state.useCustomText === true;
+  }
+
+  // ---------------- 独立窗口模式: 就地挂载 ----------------
+  // 与 open() 共用同一套面板/渲染逻辑, 区别只是「窗口」换成一个页面内的宿主元素。
+  // 这样独立窗口里没有嵌套的 WindowManager 窗口, 面板直接铺满整个 OS 窗口。
+  function mount(hostEl, c) {
+    if (!hostEl) return null;
+    ctx = c || {};
+    var kind = contentKind(ctx);
+    _lastKey = ctx.entryKey || '';
+    state.customText = defaultCustomText(kind);
+    _customTextDirty = false;
+    if (c && c.scene && c.scene !== 'auto') state.scene = c.scene;
+    else if (sceneDefs(kind).map(function (d) { return d.id; }).indexOf(state.scene) === -1) {
+      state.scene = defaultScene(kind);
+    }
+    hostEl.innerHTML = '';
+    var content = document.createElement('div');
+    content.className = 'pv-content';
+    content.innerHTML = panelHtml();
+    hostEl.appendChild(content);
+    // 伪装成一个 WindowManager 句柄: 面板内部大量代码用 win.body / win.setTitle / onResize
+    var fake = {
+      _closed: false,
+      el: hostEl,
+      body: content,
+      setTitle: function () { return fake; },
+      onResize: function () { return fake; },
+      close: function () { fake._closed = true; win = null; els = {}; },
+      isMaximized: function () { return false; },
+    };
+    win = fake;
+    bind();
+    render();
+    if (state.refreshMode === 'disk') startDiskWatch();
+    return fake;
+  }
+  function unmount() {
+    stopDiskWatch();
+    if (win && win._closed !== undefined) win._closed = true;
+    win = null; els = {};
+    _furnDrag = null; _furnDragged = false;
+    _handleDrag = null;
+  }
+
+  function close() { if (win && !win._closed) win.close(); }
+
+  // ---------------- 独立窗口 ----------------
+  // 把「当前正在看的东西」交给独立的 OS 窗口渲染。ctx 直接可结构化克隆 (纯数据),
+  // 所以能原样丢给主进程再转给那个窗口。
+  function payloadFor() {
+    if (!ctx) return null;
+    // mcRoot 让独立窗口自己也能加载贴图 (它是独立渲染上下文, 不共享主窗口的缓存)
+    var mcRoot = null;
+    try {
+      if (root.CEMCAssets && root.CEMCAssets.getState) {
+        var st = root.CEMCAssets.getState();
+        mcRoot = (st && (st.mcRoot || st.assetRoot)) || null;
+      }
+    } catch (e) { mcRoot = null; }
+    return {
+      file: ctx.file || null,
+      section: ctx.section || null,
+      sectionBase: ctx.sectionBase || null,
+      entryKey: ctx.entryKey || null,
+      data: ctx.data || null,
+      scene: state.scene || null,
+      mcRoot: mcRoot,
+    };
+  }
+  function detach() {
+    var api = root.electronAPI && root.electronAPI.preview;
+    if (!api) return false;
+    var p = payloadFor();
+    // 已经有独立窗口就先关掉再开, 保证内容和当前面板一致
+    Promise.resolve(api.isWindowOpen()).then(function (o) {
+      var open = !!(o && (o.open !== undefined ? o.open : o));
+      return open ? api.closeWindow() : null;
+    }).then(function () {
+      return api.openWindow(p);
+    }).catch(function () { /* ignore */ });
+    return true;
+  }
+  function isDetached() {
+    var api = root.electronAPI && root.electronAPI.preview;
+    if (!api) return false;
+    try { return !!api.isWindowOpen(); } catch (e) { return false; }
+  }
+  // 面板内容变化时同步给独立窗口 (场景切换/状态切换/勾选项都要跟过去)。
+  // 也可以由外部直接塞一个 ctx (自动切换预览在「只有独立窗口开着」时走这条路)。
+  function pushToDetached(forceCtx) {
+    // 独立窗口里的面板自己 render 时不要回推 (主进程会把旧 payload 再广播回来,
+    // 迟到的回声会把窗口里刚收到的新条目覆盖回旧的)
+    if (root.__cePreviewStandalone) return;
+    var api = root.electronAPI && root.electronAPI.preview;
+    if (!api) return;
+    var c = forceCtx || ctx;
+    if (!c) return;
+    var keep = ctx;
+    if (forceCtx) ctx = forceCtx;   // payloadFor() 读 ctx, 临时换上去
+    var p = payloadFor();
+    if (forceCtx) ctx = keep;
+    if (p) { try { api.updateWindow(p); } catch (e) { /* ignore */ } }
+  }
+  function refresh() { if (win && !win._closed) render(); }
+  function isOpen() { return !!(win && !win._closed); }
+
+  // ---------------- 从磁盘读取刷新 ----------------
+  // 三态: 'editor' = 跟随编辑器内存数据 (默认, 走 follow/refresh);
+  //       'disk'   = 定时轮询磁盘文件, 有变化就重新解析并刷新预览;
+  //       'off'    = 不自动刷新, 只能用 ⟳ 手动重载。
+  var _diskWatch = null;
+  function setRefreshMode(mode) {
+    state.refreshMode = (mode === 'disk' || mode === 'off') ? mode : 'editor';
+    if (state.refreshMode === 'disk') startDiskWatch(); else stopDiskWatch();
+    return state.refreshMode;
+  }
+  function stopDiskWatch() {
+    if (_diskWatch && _diskWatch.timer) clearInterval(_diskWatch.timer);
+    _diskWatch = null;
+  }
+  function startDiskWatch() {
+    stopDiskWatch();
+    if (!ctx || !ctx.file) return;
+    _diskWatch = { file: ctx.file, stamp: null, timer: null, busy: false };
+    var tick = async function () {
+      var w = _diskWatch;
+      if (!w || w.busy) return;
+      if (!win || win._closed) { stopDiskWatch(); return; }
+      if (!root.electronAPI || !root.electronAPI.readFile) return;
+      w.busy = true;
+      try {
+        var res = await root.electronAPI.readFile(w.file);
+        var text = res && res.success ? res.content : null;
+        if (typeof text !== 'string') return;
+        if (w.stamp === null) { w.stamp = text; return; }   // 首次只记基线
+        if (text === w.stamp) return;
+        w.stamp = text;
+        await reloadFromDisk(text);
+      } catch (e) { /* 文件暂时读不到: 下一轮再试 */ }
+      finally { if (w) w.busy = false; }
+    };
+    _diskWatch.timer = setInterval(tick, 1000);
+    tick();
+  }
+  // 用磁盘上的原文重新解析出当前条目, 再刷新预览
+  async function reloadFromDisk(text) {
+    var CI = root.CraftEngineInterpreter;
+    if (!CI || !CI.parse) return;
+    var parsed = null;
+    try { parsed = CI.parse(text); } catch (e) { return; }
+    if (!parsed || !parsed.sections) return;
+    var sec = null;
+    for (var i = 0; i < parsed.sections.length; i++) {
+      var s = parsed.sections[i];
+      if (ctx.sectionBase ? s.base === ctx.sectionBase : s.key === ctx.section) { sec = s; break; }
+    }
+    if (!sec) return;
+    var ent = null;
+    for (var j = 0; j < sec.entries.length; j++) {
+      if (sec.entries[j].key === ctx.entryKey) { ent = sec.entries[j]; break; }
+    }
+    if (!ent) return;   // 条目被外部删掉了, 保留旧画面
+    ctx.data = ent.data;
+    setStatus(t('preview.diskReloaded', '已从磁盘重新读取'), '');
+    render();
+  }
+
+  root.CEPreviewPanel = {
+    open: open, close: close, refresh: refresh, follow: follow,
+    isOpen: isOpen, setRefreshMode: setRefreshMode,
+    mount: mount, unmount: unmount,
+    detach: detach, isDetached: isDetached, pushToDetached: pushToDetached,
+    getState: function () { return state; },
+    // 诊断/测试: 条目图标解析 (model.path 优先于 material 的规则在这里)
+    resolveEntryIcon: resolveEntryIcon,
+  };
 })();

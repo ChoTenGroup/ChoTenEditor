@@ -70,21 +70,31 @@
 }
 .cw-max:hover { background: var(--color-bg-hover); color: var(--color-text-primary); }
 .cw-max.is-max { color: var(--color-primary); }
-/* 右下角拖动改大小 */
-.cw-resize {
+/* 八向拖拽手柄: 四边 + 四角 (上下左右都能拖大) */
+.cw-resize-edge {
   position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 16px;
-  height: 16px;
-  cursor: nwse-resize;
   z-index: 2;
+  /* 只吃指针不吃内容: 热区本身透明, 靠 cursor 提示方向 */
+  background: transparent;
+}
+/* 四条边: 8px 厚热区 */
+.cw-rz-n { top: 0; left: 10px; right: 10px; height: 6px; cursor: ns-resize; }
+.cw-rz-s { bottom: 0; left: 10px; right: 10px; height: 6px; cursor: ns-resize; }
+.cw-rz-w { left: 0; top: 10px; bottom: 10px; width: 6px; cursor: ew-resize; }
+.cw-rz-e { right: 0; top: 10px; bottom: 10px; width: 6px; cursor: ew-resize; }
+/* 四个角: 14px 见方热区, 压过边热区 */
+.cw-rz-nw { top: 0; left: 0; width: 14px; height: 14px; cursor: nwse-resize; z-index: 3; }
+.cw-rz-ne { top: 0; right: 0; width: 14px; height: 14px; cursor: nesw-resize; z-index: 3; }
+.cw-rz-sw { bottom: 0; left: 0; width: 14px; height: 14px; cursor: nesw-resize; z-index: 3; }
+.cw-rz-se { bottom: 0; right: 0; width: 16px; height: 16px; cursor: nwse-resize; z-index: 3; }
+/* 右下角保留原来的斜纹装饰 (老 .cw-resize 的外观), 让抓手看得见 */
+.cw-rz-deco {
   background:
     linear-gradient(135deg, transparent 0 45%, var(--color-border-light) 45% 55%, transparent 55% 100%),
     linear-gradient(135deg, transparent 0 68%, var(--color-border-light) 68% 78%, transparent 78% 100%);
   opacity: .7;
 }
-.cw-resize:hover { opacity: 1; }
+.cw-rz-deco:hover { opacity: 1; }
 .cw-window.is-resizing { opacity: .96; }
 .cw-window.is-resizing .cw-body { pointer-events: none; }
 .cw-body {

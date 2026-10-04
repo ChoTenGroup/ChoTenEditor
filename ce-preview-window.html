@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MC Preview - ChoTenEditor</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="settings-styles.css">
+  <link rel="stylesheet" href="window-manager.css">
+  <link rel="stylesheet" href="ce-tools.css">
+  <link rel="stylesheet" href="ce-preview-window.css">
+</head>
+<body data-theme="dark">
+  <header class="pvw-head">
+    <div class="pvw-head-main">
+      <span class="pvw-icon">👁</span>
+      <div class="pvw-titles">
+        <h1 id="pvw-title" data-i18n="preview.windowTitle">MC 场景预览</h1>
+        <p class="pvw-sub" id="pvw-sub"></p>
+      </div>
+    </div>
+    <div class="pvw-head-actions">
+      <button id="pvw-refresh" class="pvw-btn" data-i18n-title="common.reload">⟳</button>
+      <button id="pvw-close" class="pvw-btn" data-i18n-title="windowManager.close">✕</button>
+    </div>
+  </header>
+
+  <main class="pvw-body" id="pvw-body">
+    <div class="pvw-empty" id="pvw-empty" data-i18n="preview.windowEmpty">还没有可预览的内容 —— 在编辑器里点某个条目的预览按钮</div>
+    <div class="pv-wrap" id="pvw-wrap" style="display:none;"></div>
+  </main>
+
+  <script src="node_modules/js-yaml/dist/js-yaml.min.js"></script>
+  <script src="i18n.js"></script>
+  <script src="window-manager.js"></script>
+  <script src="ce-mcassets.js"></script>
+  <!-- 磁盘刷新模式要用它把磁盘原文重新解析成条目 -->
+  <script src="craftengine-interpreter.js"></script>
+  <script src="ce-unihex-data.js"></script>
+  <script src="ce-preview.js"></script>
+  <script src="ce-preview-panel.js"></script>
+  <script src="ce-preview-window.js"></script>
+</body>
+</html>

@@ -585,15 +585,22 @@ function deleteClientFile(clientId, client, msg) {
     return;
   }
 
-  // 直接删除
-  fs.unlink(filePath, (err) => {
+  // 直接删除 (移入系统回收站; shell 仅在 Electron 主进程可用, 独立 Node 环境回退为永久删除)
+  const finishDelete = (err) => {
     if (err) {
       safeSendTo(client, { type: 'file:delete:result', path: filePath, success: false, error: err.message });
       return;
     }
     safeSendTo(client, { type: 'file:delete:result', path: filePath, success: true });
     emit('file:delete:applied', { clientId, path: filePath });
-  });
+  };
+  try {
+    const { shell } = require('electron');
+    // trashItem 需要绝对路径: 用已通过沙箱校验的 resolvedPath
+    shell.trashItem(resolvedPath).then(() => finishDelete(null), finishDelete);
+  } catch (e) {
+    fs.unlink(resolvedPath, finishDelete);
+  }
 }
 
 function checkFilePermission(client, filePath) {
@@ -636,7 +643,7 @@ function applyApprovedDelete(clientId, filePath) {
     emit('server:error', { message: '批准删除路径无效' });
     return;
   }
-  fs.unlink(filePath, (err) => {
+  const finishApprovedDelete = (err) => {
     if (err) {
       emit('server:error', { message: `批准删除失败: ${err.message}` });
       return;
@@ -646,7 +653,16 @@ function applyApprovedDelete(clientId, filePath) {
       safeSendTo(client, { type: 'file:delete:result', path: filePath, success: true });
     }
     emit('file:delete:applied', { clientId, path: filePath });
-  });
+  };
+  // 移入回收站 (shell 仅在 Electron 主进程可用, 独立 Node 环境回退为永久删除)
+  // trashItem 需要绝对路径: 与删除沙箱一致地对 _serverBaseDir 解析
+  const absPath = path.resolve(_serverBaseDir, filePath);
+  try {
+    const { shell } = require('electron');
+    shell.trashItem(absPath).then(() => finishApprovedDelete(null), finishApprovedDelete);
+  } catch (e) {
+    fs.unlink(absPath, finishApprovedDelete);
+  }
 }
 
 // 管理员拒绝删除文件

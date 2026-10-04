@@ -2,7 +2,7 @@
 // 渲染进程主逻辑
 // ============================================
 
-let _electronAPI = null;
+let _electronAPI = window.electronAPI || null;
 let codeMirrorEditor = null; // CodeMirror 实例
 
 // DOM 元素
@@ -442,6 +442,13 @@ function setupEventListeners() {
       if (currentFile && (currentFile.endsWith('.yml') || currentFile.endsWith('.yaml'))) {
         await switchEditorMode(!isVisualMode);
       }
+    } else if (hit(_ceShortcuts.previewWindow)) {
+      // Ctrl+Shift+P: 打开/聚焦预览独立窗口
+      e.preventDefault();
+      playSound('click');
+      if (window.CEPreviewPanel && window.CEPreviewPanel.detach) {
+        window.CEPreviewPanel.detach();
+      }
     }
   });
 
@@ -538,6 +545,10 @@ function setupEventListeners() {
         row.classList.add('selected');
         document.getElementById('fm-delete').style.display = '';
         e.preventDefault();
+        var li = row.closest('li.tree-item');
+        var path = row.dataset.path;
+        var isDir = !!(li && li.classList.contains('directory'));
+        showTreeContextMenu(e, path, isDir);
       }
     });
     fileTreeEl.addEventListener('click', async function(e) {
@@ -851,6 +862,7 @@ function initMenuBar() {
     if (action !== 'recent') closeMenus();
     switch (action) {
       case 'new-file': playSound('click'); createNewFile(); break;
+      case 'new-folder': playSound('click'); createNewFolder(); break;
       case 'open-file': playSound('click'); openFileDialog(); break;
       case 'open-project': playSound('click'); openProject(); break;
       case 'save': playSound('save'); saveCurrentFile(); break;
@@ -891,6 +903,15 @@ async function _updateProjectTypeStatus(path) {
       typeMsg += I18N.t('status.projectTypesConversation');
     } else if (types.hasQuest) {
       typeMsg += I18N.t('status.projectTypesQuest');
+    }
+    // CraftEngine 工程级检测 (pack.yml namespace / config.yml 插件根特征)
+    if (typeof CraftEngineInterpreter !== 'undefined' && CraftEngineInterpreter.detectProjectTypes) {
+      try {
+        const ce = await CraftEngineInterpreter.detectProjectTypes(path);
+        if (ce && ce.isCraftEngine) {
+          typeMsg += I18N.t('status.ceProjectDetected');
+        }
+      } catch (e) {}
     }
     updateStatus(typeMsg);
   } else {
@@ -1481,6 +1502,17 @@ async function openFile(filePath, content) {
         }
       } else {
         updateStatus(I18N.t('status.file', { name: getFileName(filePath) }));
+        // CE 归属回退: 非 CE 配置路径的 yml (pack.yml/工程根 config.yml 等) 也尝试定位工程归属,
+        // 找到则追加展示; 未找到保持静默, 避免非 CE 工程下的 yml 噪音
+        if (/\.(ya?ml)$/i.test(filePath) && _fmMode !== 'remote' &&
+            typeof CraftEngineInterpreter !== 'undefined' && CraftEngineInterpreter.resolveProjectRoot) {
+          CraftEngineInterpreter.resolveProjectRoot(filePath).then(function (r) {
+            if (r && r.found && currentFile === filePath && !_closingTabs[filePath]) {
+              updateStatus(I18N.t('status.file', { name: getFileName(filePath) }) +
+                I18N.t('status.ceOwner', { root: r.pluginRoot || r.packRoot || '', pack: r.namespace || '' }));
+            }
+          });
+        }
       }
     } else {
       updateStatus(I18N.t('status.file', { name: getFileName(filePath) }));
@@ -1824,7 +1856,7 @@ function showTabContextMenu(e, filePath) {
   ];
 
   for (var i = 0; i < items.length; i++) {
-    var item = items[i];
+    const item = items[i];
     if (item.type === 'sep') {
       var sep = document.createElement('div');
       sep.style.cssText = 'height:1px;background:var(--color-border);margin:4px 8px;';
@@ -1854,6 +1886,231 @@ function showTabContextMenu(e, filePath) {
   setTimeout(function() { document.addEventListener('click', closeHandler); }, 0);
 }
 
+// 文件树剪贴板 (复制/粘贴用): { path, isDir, mode } — mode: 'copy'
+let _treeClipboard = null;
+
+// 文件树右键菜单: 新建文件/新建文件夹/复制/粘贴/删除/资源管理器显示
+// 目录行 → 在目录内创建/粘贴进目录; 文件行 → 在其父目录创建/粘贴
+function showTreeContextMenu(e, path, isDir) {
+  const old = document.getElementById('tab-context-menu');
+  if (old) old.remove();
+
+  const targetDir = isDir ? path : (path.replace(/[\\/][^\\/]*$/, '') || path);
+
+  const menu = document.createElement('div');
+  menu.id = 'tab-context-menu';
+  menu.style.cssText = 'position:fixed;z-index:200000;background:var(--color-bg-secondary);border:1px solid var(--color-border);border-radius:8px;padding:4px 0;min-width:170px;box-shadow:0 8px 24px rgba(0,0,0,0.6);';
+
+  const items = [
+    { label: I18N.t('menu.newFile'), icon: '📄', fn: function() { createNewFile(targetDir); } },
+    { label: I18N.t('menu.newFolder'), icon: '📁', fn: function() { createNewFolder(targetDir); } },
+    { type: 'sep' },
+    { label: I18N.t('menu.copy'), icon: '📋', fn: function() { _copyTreeItem(path, isDir); } },
+    { label: I18N.t('menu.paste'), icon: '📌',
+      disabled: !_treeClipboard,
+      fn: function() { _pasteTreeItem(_treeClipboard, targetDir); } },
+    { label: I18N.t('menu.rename'), icon: '✏️', disabled: _fmMode === 'remote', fn: function() { _renameTreeItem(path, isDir); } },
+    { type: 'sep' },
+    { label: I18N.t('sidebar.revealInExplorer'), icon: '📂', disabled: _fmMode === 'remote', fn: function() { _revealTreeItem(path); } },
+    { label: I18N.t('sidebar.delete'), icon: '🗑', danger: true, fn: function() { _deleteTreeItem(path); } },
+  ];
+
+  for (var i = 0; i < items.length; i++) {
+    const item = items[i];
+    if (item.type === 'sep') {
+      var sep = document.createElement('div');
+      sep.style.cssText = 'height:1px;background:var(--color-border);margin:4px 8px;';
+      menu.appendChild(sep);
+      continue;
+    }
+    var btn = document.createElement('button');
+    btn.style.cssText = 'display:flex;align-items:center;gap:8px;width:100%;padding:7px 14px;border:none;background:transparent;color:var(--color-text-primary);font-size:12px;cursor:pointer;text-align:left;';
+    btn.innerHTML = '<span style="width:20px;text-align:center;opacity:0.6;">' + item.icon + '</span>' + escapeHtml(item.label);
+    if (item.disabled) {
+      btn.style.opacity = '0.4';
+      btn.style.cursor = 'default';
+    } else {
+      btn.addEventListener('mouseenter', function() { this.style.background = 'var(--color-bg-hover)'; });
+      btn.addEventListener('mouseleave', function() { this.style.background = 'transparent'; });
+      btn.addEventListener('click', function() { menu.remove(); item.fn(); });
+    }
+    menu.appendChild(btn);
+  }
+
+  menu.style.left = Math.min(e.clientX, window.innerWidth - 180) + 'px';
+  menu.style.top = Math.min(e.clientY, window.innerHeight - 140) + 'px';
+
+  document.body.appendChild(menu);
+
+  function closeHandler(ev) {
+    if (!menu.contains(ev.target)) {
+      menu.remove();
+      document.removeEventListener('click', closeHandler);
+    }
+  }
+  setTimeout(function() { document.addEventListener('click', closeHandler); }, 0);
+}
+
+// 删除树节点: 走与 fm-delete 相同的确认/删除流程 (供右键菜单复用); 本地删除已移入系统回收站
+async function _deleteTreeItem(path) {
+  if (!path) return;
+  if (!(await UI.confirm({ message: I18N.t('confirm.deleteFile', { name: getFileName(path) }), danger: true }))) return;
+  playSound('click');
+  if (_fmMode === 'remote') {
+    if (window.electronAPI && window.electronAPI.remote) {
+      window.electronAPI.remote.requestFileDelete({ filePath: path });
+      setRemoteStatus('rm-client-status', I18N.t('rm.requestingDelete'));
+    }
+  } else {
+    try {
+      await _electronAPI.deleteFile(path);
+      refreshTree();
+    } catch (e) {
+      showErrorDialog(I18N.t('dialog.deleteFailed'), e.message);
+    }
+  }
+}
+
+// 复制树节点: 记入剪贴板 (文件 → 复制到其所属文件夹; 目录 → 整个目录)
+function _copyTreeItem(path, isDir) {
+  if (!path) return;
+  _treeClipboard = { path: path, isDir: !!isDir, mode: 'copy' };
+  updateStatus(I18N.t('status.copied', { name: getFileName(path) }));
+}
+
+// 生成目标目录内不冲突的名字: 'a.yml' 冲突 → 'a (2).yml' / 'a (3).yml'; 目录同理
+async function _uniqueDestPath(dirPath, fileName) {
+  const dot = fileName.lastIndexOf('.');
+  const stem = dot > 0 ? fileName.slice(0, dot) : fileName;
+  const ext = dot > 0 ? fileName.slice(dot) : '';
+  let candidate = dirPath + '/' + fileName;
+  for (let n = 2; n <= 100; n++) {
+    const st = await _electronAPI.stat(candidate);
+    if (!st || !st.success) return candidate; // 不存在 → 可用
+    candidate = dirPath + '/' + stem + ' (' + n + ')' + ext;
+  }
+  return candidate;
+}
+
+// 粘贴: 把剪贴板内容复制进 targetDir (文件名冲突自动加 ' (2)' 序号)
+async function _pasteTreeItem(clip, targetDir) {
+  if (!clip || !clip.path || !targetDir) return;
+  if (_fmMode === 'remote') {
+    await UI.alert({ message: I18N.t('alert.remotePasteUnsupported') });
+    return;
+  }
+  if (!_electronAPI || !_electronAPI.copyPath) return;
+  playSound('click');
+  try {
+    // 防呆: 目录粘贴进自身 (fs:copyPath 侧也有校验)
+    const dest = await _uniqueDestPath(targetDir, getFileName(clip.path));
+    const result = await _electronAPI.copyPath(clip.path, dest);
+    if (result.success) {
+      await refreshTree();
+      await _navToDirectory(targetDir);
+      updateStatus(I18N.t('status.pasted', { path: dest }));
+    } else {
+      showErrorDialog(I18N.t('dialog.pasteFailed'), result.error);
+    }
+  } catch (error) {
+    showErrorDialog(I18N.t('dialog.pasteFailed'), error.message || error);
+  }
+}
+
+// 重命名文件/目录 (仅本地模式): prompt 默认填旧名; 打开中的标签路径同步迁移
+async function _renameTreeItem(path, isDir) {
+  if (!path) return;
+  if (_fmMode === 'remote') {
+    await UI.alert({ message: I18N.t('alert.remoteRenameUnsupported') });
+    return;
+  }
+  if (!_electronAPI || !_electronAPI.renamePath) return;
+  const oldName = getFileName(path);
+  const newName = await UI.prompt({
+    title: I18N.t('menu.rename'),
+    message: I18N.t('prompt.renameName', { name: oldName }),
+    defaultValue: oldName,
+  });
+  if (!newName || newName === oldName) return;
+  // 拒绝路径分隔符与相对路径, 防止借重命名移动到目录外
+  if (/[\\/]|\.\./.test(newName)) {
+    showErrorDialog(I18N.t('dialog.renameFailed'), I18N.t('dialog.invalidFileName'));
+    return;
+  }
+  const parentDir = path.replace(/[\\/][^\\/]*$/, '');
+  const newPath = parentDir ? parentDir + '/' + newName : newName;
+  playSound('click');
+  try {
+    const result = await _electronAPI.renamePath(path, newPath);
+    if (!result.success) {
+      showErrorDialog(I18N.t('dialog.renameFailed'), result.error);
+      return;
+    }
+
+    // 迁移打开的标签路径 (仅当重命名单个文件, 或标签位于被重命名目录内)
+    const remap = (p) => {
+      if (p === path) return newPath;
+      if (isDir && (p.startsWith(path + '/') || p.startsWith(path + '\\'))) return newPath + p.slice(path.length);
+      return null;
+    };
+    const tabTargets = [];
+    for (let i = 0; i < openTabs.length; i++) {
+      const np = remap(openTabs[i]);
+      if (np === null) { tabTargets.push(openTabs[i]); continue; }
+      // 迁移内容缓存与脏标记
+      if (_fileContents[openTabs[i]] !== undefined) { _fileContents[np] = _fileContents[openTabs[i]]; delete _fileContents[openTabs[i]]; }
+      if (dirtyTabs[openTabs[i]]) { dirtyTabs[np] = true; delete dirtyTabs[openTabs[i]]; }
+      // 替换标签 DOM (复用 addTab 的防重复与事件绑定)
+      var oldTabEl = findTabByPath(openTabs[i]);
+      if (oldTabEl) oldTabEl.remove();
+      addTab(np);
+      tabTargets.push(np);
+    }
+    openTabs.length = 0;
+    for (let i = 0; i < tabTargets.length; i++) openTabs.push(tabTargets[i]);
+
+    if (currentFile !== null) {
+      const np = remap(currentFile);
+      if (np !== null) {
+        currentFile = np;
+        if (activeTab !== null && remap(activeTab) !== null) activeTab = np;
+        if (filePathEl) filePathEl.textContent = np;
+        if (!isDir) {
+          // 单文件: 重新读入改名后的内容, 保持编辑器与磁盘一致
+          try {
+            const r = await _electronAPI.readFile(newPath);
+            if (r && r.success && currentFile === np && codeMirrorEditor) {
+              _loadingFile = true;
+              codeMirrorEditor.setValue(r.content);
+              _loadingFile = false;
+              delete dirtyTabs[np];
+              updateTabDirtyIndicator(np);
+            }
+          } catch (e) {}
+        }
+      }
+    }
+
+    await refreshTree();
+    // 在树中定位重命名后的条目 (目录则展开其父级)
+    if (parentDir) {
+      try { await _navToDirectory(isDir ? newPath : parentDir); } catch (e) {}
+    }
+    updateStatus(I18N.t('status.renamed', { old: oldName, name: newName }));
+    saveAppState();
+  } catch (error) {
+    showErrorDialog(I18N.t('dialog.renameFailed'), error.message || error);
+  }
+}
+
+// 在系统资源管理器中显示 (仅本地模式)
+function _revealTreeItem(path) {
+  if (!path || _fmMode === 'remote') return;
+  if (!_electronAPI || !_electronAPI.showItemInFolder) return;
+  playSound('click');
+  _electronAPI.showItemInFolder(path);
+}
+
 async function closeAllTabs(exceptPath) {
   var paths = openTabs.filter(function(p) { return p !== exceptPath; });
   for (var i = 0; i < paths.length; i++) {
@@ -1881,14 +2138,55 @@ async function closeTabsDirection(filePath, direction) {
 // 文件操作
 // ============================================
 
-async function createNewFile() {
+// 远程写入并等待服务器确认 (file:write:result), 10s 超时; 返回是否成功
+function _remoteWriteConfirm(filePath, content) {
+  if (!(window.electronAPI && window.electronAPI.remote)) return Promise.resolve(false);
+  window.electronAPI.remote.requestFileWrite({ filePath: filePath, content: content });
+  setRemoteStatus('rm-client-status', I18N.t('rm.savingRemoteFile'));
+  return new Promise(function (resolve) {
+    const timer = setTimeout(function () {
+      const arr = _remoteSaveWaiters[filePath];
+      if (arr) {
+        _remoteSaveWaiters[filePath] = arr.filter(function (w) { return w.timer !== timer; });
+        if (!_remoteSaveWaiters[filePath].length) delete _remoteSaveWaiters[filePath];
+      }
+      resolve(false);
+    }, 10000);
+    if (!_remoteSaveWaiters[filePath]) _remoteSaveWaiters[filePath] = [];
+    _remoteSaveWaiters[filePath].push({ resolve, timer });
+  });
+}
+
+// 解析新建文件/文件夹的目标目录:
+// 右键/选中的目录行 > 右键/选中的文件行父目录 > 当前打开文件父目录 > 当前浏览目录 > 项目根
+function _resolveNewFileBaseDir(hintPath) {
+  if (hintPath) return hintPath;
+  const sel = fileTreeEl ? fileTreeEl.querySelector('.tree-row.selected') : null;
+  if (sel && sel.dataset.path) {
+    const li = sel.closest('li.tree-item');
+    if (li && li.classList.contains('directory')) return sel.dataset.path;
+    return sel.dataset.path.replace(/[\\/][^\\/]*$/, '') || sel.dataset.path;
+  }
+  if (currentFile) {
+    const dir = currentFile.replace(/[\\/][^\\/]*$/, '');
+    if (dir && dir !== currentFile) return dir;
+  }
+  return currentDirectoryPath || currentProjectPath;
+}
+
+async function createNewFile(targetDir) {
 
   if (!currentProjectPath) {
     await UI.alert({ message: I18N.t('alert.openProjectFirst') });
     return;
   }
 
-  const fileName = await UI.prompt({ message: I18N.t('prompt.newFileName') });
+  const basePath = _resolveNewFileBaseDir(targetDir);
+  const fileName = await UI.prompt({
+    title: I18N.t('menu.newFile'),
+    message: I18N.t('prompt.newFileInDir', { dir: basePath }),
+    placeholder: 'config.yml',
+  });
   if (!fileName) return;
   // 拒绝路径分隔符与相对路径, 防止在项目目录外创建文件
   if (/[\\/]|\.\./.test(fileName)) {
@@ -1896,10 +2194,21 @@ async function createNewFile() {
     return;
   }
 
-  const basePath = currentDirectoryPath || currentProjectPath;
   const filePath = `${basePath}/${fileName}`;
 
   try {
+    if (_fmMode === 'remote') {
+      // 远程: 走 file:write 协议并等待服务器确认 (无 mkdir, 远程仅支持新建文件)
+      if (!(window.electronAPI && window.electronAPI.remote)) return;
+      const ok = await _remoteWriteConfirm(filePath, '');
+      if (ok) {
+        refreshTree();
+        updateStatus(I18N.t('status.fileCreated', { path: filePath }));
+      } else {
+        showErrorDialog(I18N.t('dialog.createFileFailed'), I18N.t('rm.saveTimeout'));
+      }
+      return;
+    }
     const result = await _electronAPI.writeFile(filePath, '');
     if (result.success) {
       await refreshTree();
@@ -1910,6 +2219,41 @@ async function createNewFile() {
     }
   } catch (error) {
     showErrorDialog(I18N.t('dialog.createFileFailed'), error.message || error);
+  }
+}
+
+// 新建文件夹 (远程模式暂不支持: 远程协议无 mkdir)
+async function createNewFolder(targetDir) {
+  if (!currentProjectPath) {
+    await UI.alert({ message: I18N.t('alert.openProjectFirst') });
+    return;
+  }
+  if (_fmMode === 'remote') {
+    await UI.alert({ message: I18N.t('alert.remoteMkdirUnsupported') });
+    return;
+  }
+  const basePath = _resolveNewFileBaseDir(targetDir);
+  const folderName = await UI.prompt({
+    title: I18N.t('menu.newFolder'),
+    message: I18N.t('prompt.newFolderInDir', { dir: basePath }),
+    placeholder: 'folder',
+  });
+  if (!folderName) return;
+  if (/[\\/]|\.\./.test(folderName)) {
+    showErrorDialog(I18N.t('dialog.createFolderFailed'), I18N.t('dialog.invalidFileName'));
+    return;
+  }
+  const dirPath = `${basePath}/${folderName}`;
+  try {
+    const result = await _electronAPI.mkdir(dirPath);
+    if (result.success) {
+      await refreshTree();
+      updateStatus(I18N.t('status.folderCreated', { path: dirPath }));
+    } else {
+      showErrorDialog(I18N.t('dialog.createFolderFailed'), result.error);
+    }
+  } catch (error) {
+    showErrorDialog(I18N.t('dialog.createFolderFailed'), error.message || error);
   }
 }
 
@@ -2590,7 +2934,7 @@ try {
 
 // 重新应用存储的主题/颜色/背景（窗口重新聚焦或设置弹窗关闭时调用）
 // 快捷键配置 (由 applyStoredConfig 刷新; 无配置时用默认值)
-let _ceShortcuts = { save: 'Ctrl+S', newFile: 'Ctrl+N', openProject: 'Ctrl+O', toggleMode: 'F2' };
+let _ceShortcuts = { save: 'Ctrl+S', newFile: 'Ctrl+N', openProject: 'Ctrl+O', toggleMode: 'F2', previewWindow: 'Ctrl+Shift+P' };
 // 匹配按键事件与 "Ctrl+S" 格式组合键 (配置中未含的修饰键若被按下则不匹配, 避免误触发)
 function matchShortcut(e, combo) {
   if (!combo) return false;
@@ -2656,6 +3000,8 @@ function applyStoredConfig() {
     // CraftEngine 资源索引 / 预览 / 配置检查开关
     document.body.classList.toggle('ce-no-preview', config.cePreview === false);
     document.body.classList.toggle('ce-no-diagnostics', config.ceDiagnostics === false);
+    // 预览行为: 自动切换 + 刷新模式 (设置页改完立即生效)
+    applyPreviewBehavior(config);
     try {
       if (window.CEMCAssets) {
         const wantRoot = (typeof config.mcAssetsPath === 'string' && config.mcAssetsPath.trim()) ? config.mcAssetsPath.trim() : null;
@@ -3604,8 +3950,28 @@ function initChecksBridge() {
   if (api.onGoto) api.onGoto(function (issue) { gotoDiagnosticIssue(issue || {}); });
 }
 
+// 预览行为开关下发: 自动切换预览 (切条目时预览窗口跟随) + 刷新模式
+// (editor = 编辑器时刻刷新 / disk = 从磁盘读取刷新 / off = 不刷新)
+function applyPreviewBehavior(config) {
+  const cfg = config || _ceCfg();
+  try { window.__ceAutoSwitchPreview = cfg.autoSwitchPreview !== false; } catch (e) {}
+  try {
+    const mode = (cfg.previewRefresh === 'disk' || cfg.previewRefresh === 'off') ? cfg.previewRefresh : 'editor';
+    if (window.CEPreviewPanel && window.CEPreviewPanel.setRefreshMode) {
+      window.CEPreviewPanel.setRefreshMode(mode);
+    }
+  } catch (e) {}
+  // 预览窗口模式: docked (编辑器内浮动) / detached (独立系统窗口)
+  try {
+    window.__cePreviewWindowMode = (cfg.previewWindowMode === 'detached') ? 'detached' : 'docked';
+  } catch (e) {}
+}
+
 function initCETools() {
   const cfg = _ceCfg();
+
+  // 0) 预览行为开关 → 全局标志 (craftengine-interpreter / ce-preview-panel 读取)
+  applyPreviewBehavior(cfg);
 
   // 0) 诊断引擎设置注入 (隐藏付费版提示等)
   if (window.CEDiagnostics && window.CEDiagnostics.setOptions) {

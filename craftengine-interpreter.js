@@ -201,6 +201,69 @@
     return p;
   }
 
+  // ============ 工程级检测（打开项目目录时） ============
+  // 仿 ChemdahInterpreter.detectProjectTypes: 在项目根一层内识别 CE 特征
+  // 返回 { isCraftEngine, namespace: string|null }
+  // 特征 (任一即命中):
+  //   a) 子目录 resources/ 内任意 pack.yml (读头 4KB 校验 namespace: 字段) → 取该 namespace
+  //   b) 根下 config.yml 含 config-version: 且同目录存在 mappings.yml|commands.yml|translations → 插件根特征
+  var _projectTypesCache = { path: null, result: null };
+  async function detectProjectTypes(projectPath) {
+    var result = { isCraftEngine: false, namespace: null };
+    if (!projectPath || typeof projectPath !== 'string') return result;
+    if (!ROOT.electronAPI || !ROOT.electronAPI.readdir) return result;
+    if (_projectTypesCache.path === projectPath && _projectTypesCache.result) return _projectTypesCache.result;
+
+    var normPath = String(projectPath).replace(/\\/g, '/').replace(/\/+$/, '');
+    var readHead = async function (p) {
+      try {
+        var r = await ROOT.electronAPI.readFile(p);
+        if (r && r.success && typeof r.content === 'string') {
+          return r.content.slice(0, 4096);
+        }
+      } catch (e) {}
+      return '';
+    };
+
+    try {
+      var entries = await ROOT.electronAPI.readdir(normPath);
+      if (entries && entries.success && Array.isArray(entries.files)) {
+        var names = {};
+        for (var i = 0; i < entries.files.length; i++) names[entries.files[i].name] = entries.files[i];
+        // b) 插件根特征 (config.yml + config-version: + 兄弟特征)
+        if (names['config.yml'] && !names['config.yml'].isDirectory) {
+          var head = await readHead(normPath + '/config.yml');
+          if (/^[ \t]*config-version\s*:/m.test(head) &&
+              (names['mappings.yml'] || names['commands.yml'] || (names['translations'] && names['translations'].isDirectory))) {
+            result.isCraftEngine = true;
+          }
+        }
+        // a) resources/<pack>/pack.yml 带 namespace
+        if (!result.isCraftEngine && names['resources'] && names['resources'].isDirectory) {
+          try {
+            var resEntries = await ROOT.electronAPI.readdir(normPath + '/resources');
+            if (resEntries && resEntries.success && Array.isArray(resEntries.files)) {
+              for (var j = 0; j < resEntries.files.length; j++) {
+                var packDir = resEntries.files[j];
+                if (!packDir.isDirectory) continue;
+                var packHead = await readHead(normPath + '/resources/' + packDir.name + '/pack.yml');
+                var m = packHead.match(/^namespace:\s*(\S+)/m);
+                if (m) {
+                  result.isCraftEngine = true;
+                  result.namespace = m[1];
+                  break;
+                }
+              }
+            }
+          } catch (e) {}
+        }
+      }
+    } catch (e) {}
+
+    _projectTypesCache = { path: projectPath, result: result };
+    return result;
+  }
+
   // ============ !!type 值包装 (configuration.mdx Expanded Value Structure) ============
   // 11 种 Java 类型 tag 注册到自定义 schema: 解析时构造包装对象 {__ceTag, v},
   // 渲染汇聚点 (_sfScalarText/_sfYvCtrl/...) 解包显示, 序列化汇聚点恢复 !!前缀
@@ -4491,6 +4554,8 @@
     }
     _sfLastParsed = containerEl._ceParsed;
     _ceDiagApply(containerEl);
+    // 条目/分区切完后让开着的预览窗口跟着换内容 (自动切换预览)
+    _ceNotifyPreviewFollow(containerEl);
   }
 
   // ============ 配置诊断 (IDEA 风格 ERROR/WARN/WEAK_WARN/INFO) ============
@@ -4633,25 +4698,51 @@
   }
   // 取当前条目并交给预览面板; scene 为 'auto' 时按 section 自动选择场景
   function _cePreviewCurrentEntry(containerEl, scene) {
-    var parsed = containerEl._ceParsed;
-    var ui = containerEl._ceUi;
-    if (!parsed || !ui) return;
-    var section = parsed.sections[ui.section];
-    var entry = section && section.entries[ui.entry];
-    if (!section || !entry) return;
     var P = ROOT.CEPreviewPanel;
     if (!P) {
       if (typeof ROOT.updateStatus === 'function') ROOT.updateStatus(_tf('preview.unavailable', '预览模块未加载'));
       return;
     }
-    P.open({
+    var c = _ceCurrentEntryCtx(containerEl);
+    if (!c) return;
+    c.scene = scene || 'auto';
+    P.open(c);
+  }
+  // 「自动切换预览」: 条目/分区切换后, 若预览窗口开着就让它跟着换内容。
+  // 开关来自设置 (defaultConfig.autoSwitchPreview, 由 renderer 写到 ROOT.__ceAutoSwitchPreview,
+  // 缺省视为开启)。关闭时不动, 由用户点 👁 手动切。
+  // 编辑器内浮层和独立系统窗口都算「预览开着」: 浮层走 follow, 独立窗口走 pushToDetached。
+  function _ceNotifyPreviewFollow(containerEl) {
+    if (ROOT.__ceAutoSwitchPreview === false) return;
+    var P = ROOT.CEPreviewPanel;
+    if (!P) return;
+    var cur = _ceCurrentEntryCtx(containerEl);
+    if (!cur) return;
+    if (P.isOpen && P.isOpen()) {
+      if (P.follow) { try { P.follow(cur); } catch (e) { /* 预览跟随失败不影响编辑 */ } }
+      return;
+    }
+    // 浮层没开但独立窗口开着 → 同步给独立窗口 (open() 在 detached 模式下也会走到 detach)
+    if (P.isDetached && P.isDetached()) {
+      if (P.pushToDetached) { try { P.pushToDetached(cur); } catch (e) { /* ignore */ } }
+    }
+  }
+  // 组装当前选中条目的预览上下文 (供 follow 复用), 与 _cePreviewCurrentEntry 的数据源一致
+  function _ceCurrentEntryCtx(containerEl) {
+    var parsed = containerEl._ceParsed;
+    var ui = containerEl._ceUi;
+    if (!parsed || !ui) return null;
+    var section = parsed.sections[ui.section];
+    var entry = section && section.entries[ui.entry];
+    if (!section || !entry) return null;
+    return {
       file: containerEl._ceFilePath,
       section: section.key,
       sectionBase: section.base,
       entryKey: entry.key,
       data: entry.data,
-      scene: scene || 'auto',
-    });
+      scene: 'auto',
+    };
   }
   function _applyValue(entry, path, value, parsed, section) {
     if (path === '__key__') return; // 由 ce-rename 处理
@@ -5346,6 +5437,7 @@
     SECTION_KEYS: SECTION_KEYS,
     detectFileType: detectFileType,
     resolveProjectRoot: resolveProjectRoot,
+    detectProjectTypes: detectProjectTypes,
     parse: parse,
     render: render,
     generateYAML: generateYAML,

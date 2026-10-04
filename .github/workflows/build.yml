@@ -1,0 +1,130 @@
+name: Build
+
+# 手动触发 (workflow_dispatch) 或推送 v* / 纯版本号 tag 时构建三平台产物。
+# 打 tag 时 (refs/tags/...) 会自动把产物传到对应的 Release。
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: '要附加产物的 Release tag (留空则只上传到 Actions artifacts)'
+        type: string
+        required: false
+        default: ''
+  push:
+    tags:
+      - 'v*'
+      - '[0-9]+.[0-9]+.[0-9]+'
+
+permissions:
+  contents: write
+
+# 同一 tag / 分支只保留最新一次构建, 避免重复上传同名附件
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build ${{ matrix.label }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # 任一平台失败时其余平台继续跑完, 便于一次看清全部问题
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            label: Windows x64
+            args: --win --x64
+          - os: ubuntu-latest
+            label: Linux x64
+            args: --linux --x64
+          # 架构 (x64 + arm64) 由 package.json 的 build.mac.target[].arch 决定
+          - os: macos-latest
+            label: macOS x64 + arm64
+            args: --mac
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # electron-builder 在 Linux 上打 AppImage 需要 fuse; 打 deb 需要 fakeroot/dpkg
+      - name: Install Linux packaging tools
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends fakeroot dpkg rpm
+
+      # 校验 7 种语言字典完整 (键覆盖 / 占位符 / tips 条数)
+      - name: Validate locales
+        run: node scripts/validate-locales.js
+
+      - name: Build
+        run: npx electron-builder ${{ matrix.args }} --publish never
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # macOS 未做签名/公证: 跳过签名环节, 避免 CI 因缺少证书而失败。
+          # 产物在别人机器上首次打开需右键「打开」或 xattr -dr 解除隔离。
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      # Windows: portable 单文件 exe
+      - name: Collect (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          mv release/*.exe artifacts/ 2>/dev/null || true
+
+      # Linux: AppImage + deb
+      - name: Collect (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          find release -maxdepth 1 -type f \( -name '*.AppImage' -o -name '*.deb' \) -exec mv {} artifacts/ \;
+          chmod +x artifacts/*.AppImage 2>/dev/null || true
+
+      # macOS: dmg + zip (x64 / arm64)
+      - name: Collect (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          find release -maxdepth 1 -type f \( -name '*.dmg' -o -name '*.zip' \) -exec mv {} artifacts/ \;
+
+      - name: List artifacts
+        shell: bash
+        run: ls -lh artifacts
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ChotenEditor-${{ matrix.os }}
+          path: artifacts/*
+          if-no-files-found: error
+
+      # tag 推送时自动发布到 Release; 手动触发时按 release_tag 输入决定
+      - name: Resolve release tag
+        id: rel
+        shell: bash
+        run: |
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            echo "tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          elif [ -n "${{ inputs.release_tag }}" ]; then
+            echo "tag=${{ inputs.release_tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload to release
+        if: steps.rel.outputs.tag != ''
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.rel.outputs.tag }}
+          files: artifacts/*
+          fail_on_unmatched_files: false

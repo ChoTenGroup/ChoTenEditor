@@ -31,6 +31,12 @@ try {
     // 文件操作
     copyFile: (src, dest) => ipcRenderer.invoke('fs:copyFile', src, dest),
     deleteFile: (filePath) => ipcRenderer.invoke('fs:deleteFile', filePath),
+    // 复制文件/目录到目标 (目录递归; 树右键"复制/粘贴"用)
+    copyPath: (src, dest) => ipcRenderer.invoke('fs:copyPath', src, dest),
+    // 重命名/移动文件或目录 (树右键"重命名"用)
+    renamePath: (oldPath, newPath) => ipcRenderer.invoke('fs:rename', oldPath, newPath),
+    // 在系统资源管理器中显示
+    showItemInFolder: (filePath) => ipcRenderer.invoke('shell:showItemInFolder', filePath),
 
     // CraftEngine 工程根回溯
     ce: {
@@ -45,6 +51,33 @@ try {
       readBinary: (filePath) => ipcRenderer.invoke('mc:readBinary', filePath),
       readText: (filePath) => ipcRenderer.invoke('mc:readText', filePath),
       detectRoots: () => ipcRenderer.invoke('mc:detectRoots'),
+    },
+
+    // MC 场景预览独立窗口
+    preview: {
+      openWindow: (payload) => ipcRenderer.invoke('preview:openWindow', payload),
+      updateWindow: (payload) => ipcRenderer.invoke('preview:updateWindow', payload),
+      getPayload: () => ipcRenderer.invoke('preview:getPayload'),
+      closeWindow: () => ipcRenderer.invoke('preview:closeWindow'),
+      isWindowOpen: () => ipcRenderer.invoke('preview:isWindowOpen'),
+      // 独立预览窗口 → 主窗口的交互回传 (单订阅)
+      onFromWindow: (callback) => {
+        if (api.preview.__fromListener) ipcRenderer.removeListener('preview:fromWindow', api.preview.__fromListener);
+        api.preview.__fromListener = (event, msg) => callback(msg);
+        ipcRenderer.on('preview:fromWindow', api.preview.__fromListener);
+      },
+      // 独立预览窗口被用户关掉 (主窗口侧监听)
+      onClosed: (callback) => {
+        if (api.preview.__closedListener) ipcRenderer.removeListener('preview:closed', api.preview.__closedListener);
+        api.preview.__closedListener = () => callback();
+        ipcRenderer.on('preview:closed', api.preview.__closedListener);
+      },
+      // 主进程推送内容到本窗口 (单订阅; applyPayload 内部做 follow)
+      onUpdate: (callback) => {
+        if (api.preview.__updateListener) ipcRenderer.removeListener('preview:update', api.preview.__updateListener);
+        api.preview.__updateListener = (event, payload) => callback(payload);
+        ipcRenderer.on('preview:update', api.preview.__updateListener);
+      },
     },
 
     // 系统字体列表

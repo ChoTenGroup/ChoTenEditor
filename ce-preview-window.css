@@ -1,0 +1,114 @@
+/* ============================================
+   独立预览窗口 (ce-preview-window.html)
+   面板本体复用 .pv-* 样式 (styles.css), 这里只做窗口外壳布局
+   ============================================ */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--color-bg-primary, #1e1e1e);
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+.pvw-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px 10px 14px;
+  background: var(--color-bg-tertiary, #2a2a2a);
+  border-bottom: 1px solid var(--color-border, #3a3a3a);
+  flex-shrink: 0;
+  -webkit-app-region: drag;
+}
+.pvw-head-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.pvw-icon { font-size: 18px; flex-shrink: 0; }
+.pvw-titles { min-width: 0; }
+.pvw-titles h1 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-primary, #e8e8e8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pvw-sub {
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: var(--color-text-tertiary, #999);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pvw-head-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+  -webkit-app-region: no-drag;
+}
+.pvw-btn {
+  border: 1px solid var(--color-border, #3a3a3a);
+  background: var(--color-bg-secondary, #252525);
+  color: var(--color-text-secondary, #ccc);
+  font-size: 13px;
+  cursor: pointer;
+  min-width: 30px;
+  height: 28px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  transition: all var(--transition-fast, .15s);
+}
+.pvw-btn:hover {
+  background: var(--color-bg-hover, #333);
+  color: var(--color-text-primary, #fff);
+}
+
+.pvw-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+.pvw-empty {
+  margin: auto;
+  padding: 24px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-text-tertiary, #999);
+}
+/* 面板铺满窗口: 去掉内部窗口的圆角/边框约束 */
+#pvw-wrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+#pvw-wrap .pv-content {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+}
+#pvw-wrap .pv-wrap {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+#pvw-wrap .pv-stage {
+  flex: 1;
+  min-height: 0;
+}

@@ -47,6 +47,9 @@ let prewarmFilesMax;
 let prewarmKether;
 let ceElementPickerEl;
 let cePreviewEl;
+let ceSwitchPreviewEl;
+let cePreviewRefreshEl;
+let cePreviewModeEl;
 let ceDiagnosticsEl;
 let mcAssetsPathEl;
 let hidePremiumHintsEl;
@@ -174,6 +177,9 @@ const defaultConfig = {
   // ---- CraftEngine 工具 ----
   ceElementPicker: true,       // 预载扫描 CE 元素 (补全按钮)
   cePreview: true,             // MC 场景预览
+  autoSwitchPreview: true,     // 自动切换预览 (切条目时预览窗口跟着换)
+  previewRefresh: 'editor',    // 预览刷新: editor (编辑器时刻刷新) / disk (从磁盘读取) / off (不刷新)
+  previewWindowMode: 'docked', // 预览窗口模式: docked (编辑器内浮动) / detached (独立系统窗口)
   ceDiagnostics: true,         // 配置错误检查 (ERROR/WARN/WEAK_WARN/INFO)
   mcAssetsPath: '',            // 原版 Minecraft assets 目录
   hidePremiumHints: false,     // 隐藏付费版提示
@@ -439,6 +445,9 @@ function initializeDOMElements() {
   // CraftEngine 工具
   ceElementPickerEl = document.getElementById('ce-element-picker');
   cePreviewEl = document.getElementById('ce-preview');
+  ceSwitchPreviewEl = document.getElementById('ce-switch-preview');
+  cePreviewRefreshEl = document.getElementById('ce-preview-refresh');
+  cePreviewModeEl = document.getElementById('ce-preview-mode');
   ceDiagnosticsEl = document.getElementById('ce-diagnostics');
   mcAssetsPathEl = document.getElementById('mc-assets-path');
   hidePremiumHintsEl = document.getElementById('hide-premium-hints');
@@ -1224,6 +1233,9 @@ async function saveSettings() {
     itemKeyStyle: itemKeyStyle ? itemKeyStyle.value : defaultConfig.itemKeyStyle,
     ceElementPicker: ceElementPickerEl ? ceElementPickerEl.checked : defaultConfig.ceElementPicker,
     cePreview: cePreviewEl ? cePreviewEl.checked : defaultConfig.cePreview,
+    autoSwitchPreview: ceSwitchPreviewEl ? ceSwitchPreviewEl.checked : defaultConfig.autoSwitchPreview,
+    previewRefresh: cePreviewRefreshEl ? cePreviewRefreshEl.value : defaultConfig.previewRefresh,
+    previewWindowMode: cePreviewModeEl ? cePreviewModeEl.value : defaultConfig.previewWindowMode,
     ceDiagnostics: ceDiagnosticsEl ? ceDiagnosticsEl.checked : defaultConfig.ceDiagnostics,
     mcAssetsPath: mcAssetsPathEl ? mcAssetsPathEl.value.trim() : defaultConfig.mcAssetsPath,
     hidePremiumHints: hidePremiumHintsEl ? hidePremiumHintsEl.checked : defaultConfig.hidePremiumHints,
@@ -1531,6 +1543,14 @@ function loadSettings() {
   // CraftEngine 工具设置
   if (ceElementPickerEl) ceElementPickerEl.checked = config.ceElementPicker !== false;
   if (cePreviewEl) cePreviewEl.checked = config.cePreview !== false;
+  if (ceSwitchPreviewEl) ceSwitchPreviewEl.checked = config.autoSwitchPreview !== false;
+  if (cePreviewRefreshEl) {
+    var pr = config.previewRefresh;
+    cePreviewRefreshEl.value = (pr === 'disk' || pr === 'off') ? pr : 'editor';
+  }
+  if (cePreviewModeEl) {
+    cePreviewModeEl.value = (config.previewWindowMode === 'detached') ? 'detached' : 'docked';
+  }
   if (ceDiagnosticsEl) ceDiagnosticsEl.checked = config.ceDiagnostics !== false;
   if (mcAssetsPathEl) mcAssetsPathEl.value = config.mcAssetsPath || '';
   if (hidePremiumHintsEl) hidePremiumHintsEl.checked = config.hidePremiumHints === true;

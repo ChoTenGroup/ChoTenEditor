@@ -1,6 +1,6 @@
 {
   "name": "choteneditor",
-  "version": "1.2.6",
+  "version": "1.2.9",
   "description": "ChoTenChan's plugin editor",
   "license": "MIT",
   "author": "AkaCandyKAngel",
@@ -24,19 +24,61 @@
       "!node_modules/electron-builder",
       "!node_modules/rcedit",
       "!.claude",
+      "!.github",
       "!_ce_tmp",
       "!_ce_shots",
       "!_ce_*.js",
       "!test.log",
       "!_verify*.js",
+      "!_t_*.js",
+      "!_msg*.txt",
+      "!_rel*.md",
       "!debug_*.js",
       "!**/._*"
     ],
     "icon": "icon.ico",
     "win": {
+      "icon": "icon.ico",
       "target": [
         "portable"
       ]
+    },
+    "linux": {
+      "icon": "icon.png",
+      "category": "Development",
+      "maintainer": "AkaCandyKAngel <AkaCandyKAngel@users.noreply.github.com>",
+      "synopsis": "Minecraft plugin configuration editor",
+      "description": "An editor for CraftEngine / Kether / Chemdah plugin configuration.",
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "mac": {
+      "icon": "icon.png",
+      "category": "public.app-category.developer-tools",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ]
+    },
+    "appImage": {
+      "artifactName": "${productName}.${version}.${ext}"
+    },
+    "dmg": {
+      "artifactName": "${productName}.${version}.${arch}.${ext}"
     }
   },
   "devDependencies": {

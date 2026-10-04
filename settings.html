@@ -639,6 +639,36 @@
                         </div>
                         <div class="setting-group">
                             <label class="checkbox-row">
+                                <input type="checkbox" id="ce-switch-preview" checked>
+                                <span data-i18n="settings.autoSwitchPreview">自动切换预览</span>
+                            </label>
+                            <div class="setting-hint" data-i18n="settings.autoSwitchPreviewHint">预览窗口开着时，在左侧切换到其它物品 / 方块 / 家具 / 字体图像条目会自动换成该条目的预览，无需再点 👁</div>
+                        </div>
+                        <div class="setting-group">
+                            <label for="ce-preview-refresh" data-i18n="settings.previewRefresh">预览刷新</label>
+                            <div class="select-wrapper">
+                                <select id="ce-preview-refresh">
+                                    <option value="editor" selected data-i18n="settings.previewRefreshEditor">编辑器时刻刷新</option>
+                                    <option value="disk" data-i18n="settings.previewRefreshDisk">从磁盘读取刷新</option>
+                                    <option value="off" data-i18n="settings.previewRefreshOff">不刷新</option>
+                                </select>
+                                <span class="select-icon">▼</span>
+                            </div>
+                            <div class="setting-hint" data-i18n="settings.previewRefreshHint">编辑器时刻刷新：预览跟随当前编辑内容即时更新。从磁盘读取刷新：每秒读取磁盘上的文件，被外部改动时自动重载预览。不刷新：只在点预览窗口的 ⟳ 时更新。</div>
+                        </div>
+                        <div class="setting-group">
+                            <label for="ce-preview-mode" data-i18n="settings.previewWindowMode">预览窗口模式</label>
+                            <div class="select-wrapper">
+                                <select id="ce-preview-mode">
+                                    <option value="docked" selected data-i18n="settings.previewModeDocked">编辑器内浮动窗口</option>
+                                    <option value="detached" data-i18n="settings.previewModeDetached">独立窗口</option>
+                                </select>
+                                <span class="select-icon">▼</span>
+                            </div>
+                            <div class="setting-hint" data-i18n="settings.previewWindowModeHint">编辑器内浮动窗口：预览显示在编辑器里的浮动窗口，可拖拽四边与四角改大小。独立窗口：点预览时打开一个真正的系统窗口，可拖到第二块屏幕、单独最小化，适合边看边改。</div>
+                        </div>
+                        <div class="setting-group">
+                            <label class="checkbox-row">
                                 <input type="checkbox" id="ce-diagnostics" checked>
                                 <span data-i18n="settings.ceDiagnostics">启用配置错误检查</span>
                             </label>

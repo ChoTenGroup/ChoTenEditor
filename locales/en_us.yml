@@ -111,6 +111,9 @@ sidebar:
   navForward: "Forward"
   navPrev: "Previous File"
   navNext: "Next File"
+  newFolder: "📁 New Folder"
+  delete: "Delete"
+  revealInExplorer: "Show in Explorer"
 
 menu:
   file: "File"
@@ -119,6 +122,7 @@ menu:
   settings: "Settings"
   help: "Help"
   newFile: "📄 New File"
+  newFolder: "📁 New Folder"
   openFile: "📂 Open File…"
   openProject: "📁 Open Project…"
   recent: "🕘 Recent"
@@ -130,6 +134,7 @@ menu:
   cut: "Cut"
   copy: "Copy"
   paste: "Paste"
+  rename: "✏️ Rename"
   selectAll: "Select All"
   noDebug: "No debug features available"
   checks: "Checks"
@@ -176,6 +181,11 @@ status:
   typeOverrideCleared: "Type override cleared"
   typeOverrideSet: "Interpreter type set to: {type} (Scope: {scope})"
   ceOwner: " · CE project: {root} · Pack: {pack}"
+  folderCreated: "Folder created: {path}"
+  ceProjectDetected: " [CraftEngine]"
+  copied: "Copied: {name} — use Paste in a folder's context menu"
+  pasted: "Pasted: {path}"
+  renamed: "Renamed: {old} → {name}"
 
 typeScope:
   file: "File"
@@ -256,6 +266,9 @@ dialog:
   readFailed: "Read Failed"
   error: "Error"
   createFileFailed: "Failed to Create File"
+  createFolderFailed: "Failed to Create Folder"
+  pasteFailed: "Paste Failed"
+  renameFailed: "Rename Failed"
   invalidFileName: "File name cannot contain path separators or relative paths"
   saveFileFailed: "Failed to Save File"
 
@@ -291,10 +304,17 @@ confirm:
 
 prompt:
   newFileName: "Enter a file name (e.g. config.yml):"
+  newFileInDir: "Create in: {dir}\nEnter a file name (e.g. config.yml):"
+  newFolderName: "Enter a folder name:"
+  newFolderInDir: "Create in: {dir}\nEnter a folder name:"
+  renameName: "Rename \"{name}\" to:"
 
 alert:
   openProjectFirst: "Please open a project first"
   noFileOpen: "No file is open"
+  remoteMkdirUnsupported: "Creating folders is not supported in remote mode yet. You can create a new file instead."
+  remotePasteUnsupported: "Copy/paste is not supported in remote mode yet."
+  remoteRenameUnsupported: "Rename is not supported in remote mode yet."
 
 tab:
   unsavedTitle: "{name} (unsaved)"
@@ -358,6 +378,17 @@ perm:
 settings:
   cePreview: "Enable MC scene preview"
   cePreviewHint: "Shows a preview button at the top of item / block / furniture / font-image entry forms, rendering font images and text tags inside simulated in-game scenes (chat, item lore, 9x1~9x6 GUI)"
+  autoSwitchPreview: "Auto-switch preview"
+  autoSwitchPreviewHint: "While the preview window is open, selecting another item / block / furniture / font-image entry on the left switches the preview to that entry automatically — no need to click the preview button again"
+  previewRefresh: "Preview refresh"
+  previewRefreshEditor: "Refresh with editor"
+  previewRefreshDisk: "Refresh from disk"
+  previewRefreshOff: "Do not refresh"
+  previewRefreshHint: "Refresh with editor: the preview follows your edits live. Refresh from disk: reads the file from disk every second and reloads the preview when it is changed externally. Do not refresh: updates only when you click the reload button in the preview window."
+  previewWindowMode: "Preview window mode"
+  previewModeDocked: "Floating window in editor"
+  previewModeDetached: "Separate window"
+  previewWindowModeHint: "Floating window in editor: the preview appears as a floating window inside the editor; drag any edge or corner to resize. Separate window: clicking preview opens a real system window that you can move to a second monitor and minimize on its own."
   ceDiagnostics: "Enable config inspections"
   ceDiagnosticsHint: "Checks CraftEngine configs like an IDE and reports unknown keys, type errors, illegal enums and out-of-range references as ERROR / WARN / WEAK_WARN / INFO"
   mcAssetsPath: "Minecraft assets directory"
@@ -1049,7 +1080,7 @@ craftengine:
   syncToSource: "Sync to Source"
   autoSync: "Auto Sync"
   ownerBadge: "Project: {root} · Pack: {pack}"
-  ownerNone: "No CE project ownership found"
+  ownerNone: "No CE project ownership found — CE files are only recognized under resources/<namespace>/configuration(s)/ of a CraftEngine project"
   pickerBtn: "Quick fill"
   pickerSearch: "Search..."
   pickerEmpty: "No entries yet. Click ⟳ to rescan"
@@ -2159,3 +2190,20 @@ preview:
   invSlotArmor: "Armor"
   invSlotResult: "Result"
 
+  sceneBlock: "Block"
+  blockState: "Block state"
+  blockNoModel: "This block has no state/model configured (renders empty)"
+  blockBlueprint: "blueprint requires plugin conversion; not previewable"
+  blockCarrier: "Carrier"
+  blockTextures: "Textures"
+  blockAppearance: "Appearance"
+  blockTransparent: "transparent: true (own model is cleared)"
+  blockEntityExternal: "entity_renderer is drawn by the plugin; not previewable"
+  blockEntityText: "Text entity"
+  blockEntityBlock: "Block entity"
+  blockEntityItem: "Item entity"
+  blockEntityUnknown: "Could not resolve the referenced content"
+  detach: "Detach"
+  detachHint: "Open in a separate window"
+  forceUnicode: "Enable the Unicode font (unifont) for all glyphs"
+  windowEmpty: "Nothing to preview yet — click a preview button on an entry in the editor"

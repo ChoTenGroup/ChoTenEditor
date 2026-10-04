@@ -65,6 +65,27 @@
     return h;
   }
 
+  // 八向拖拽手柄: 四条边 (n/s/e/w) + 四个角 (ne/nw/se/sw)。
+  // se 沿用原来的 .cw-resize (带可见斜纹装饰, 也是旧测试/样式约定的锚点), 其余是纯热区。
+  var RESIZE_DIRS = ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'];
+  function resizeHandlesHtml(opts) {
+    if (opts.resizable === false) return '';
+    var resizeTip = esc(opts.resizeTitle || defaultTitles().resize);
+    var out = '';
+    for (var i = 0; i < RESIZE_DIRS.length; i++) {
+      var d = RESIZE_DIRS[i];
+      // 只有右下角带可见斜纹, 其它方向是纯热区 (cursor 提示方向即可)
+      // se 的 class 里把 cw-resize 放最前: 老代码/样式/测试按 `class="cw-resize"` 精确匹配它
+      var cls = d === 'se'
+        ? 'cw-resize cw-rz-deco cw-resize-edge cw-rz-se'
+        : 'cw-resize-edge cw-rz-' + d;
+      out += '<div class="' + cls + '" data-rz="' + d + '"'
+        + (d === 'se' ? ' data-tip="' + resizeTip + '" title="' + resizeTip + '"' : '')
+        + '></div>';
+    }
+    return out;
+  }
+
   function open(opts) {
     opts = opts || {};
     var el = document.createElement('div');
@@ -87,12 +108,12 @@
         '<button type="button" class="cw-close" data-tip="' + esc(opts.closeTitle || defTitle.close) + '" title="' + esc(opts.closeTitle || defTitle.close) + '">✕</button>' +
       '</div>' +
       '<div class="cw-body"></div>' +
-      (opts.resizable === false ? '' : '<div class="cw-resize" data-tip="' + esc(opts.resizeTitle || defTitle.resize) + '" title="' + esc(opts.resizeTitle || defTitle.resize) + '"></div>');
+      resizeHandlesHtml(opts);
     var titleEl = el.querySelector('.cw-title');
     var bodyEl = el.querySelector('.cw-body');
     var closeBtn = el.querySelector('.cw-close');
     var maxBtn = el.querySelector('.cw-max');
-    var resizeEl = el.querySelector('.cw-resize');
+    var resizeEls = el.querySelectorAll('.cw-resize-edge');
     titleEl.textContent = opts.title || '';
 
     // 内容: HTMLElement 或 HTML 字符串
@@ -182,11 +203,11 @@
       toggleMax(win);
     });
 
-    // 右下角拖动改大小 (拖动过程节流, 松手时再补一次)
-    if (resizeEl) {
-      resizeEl.addEventListener('mousedown', function (e) {
+    // 八向拖动改大小 (拖动过程节流, 松手时再补一次)
+    for (var re = 0; re < resizeEls.length; re++) {
+      resizeEls[re].addEventListener('mousedown', function (e) {
         if (e.button !== 0) return;
-        startResize(win, e);
+        startResize(win, e, this.getAttribute('data-rz') || 'se');
       });
     }
 
@@ -215,20 +236,52 @@
     else win._resizeRAF = requestAnimationFrame(fire);
   }
 
-  function startResize(win, e) {
+  // dir: 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw'
+  // 拖 n/w 方向时窗口的 left/top 要跟着动, 且不能把宽高压到 min 以下 ——
+  // 用「先算新矩形, 再按 min 夹住, 最后反推 left/top」的写法避免抖动。
+  function startResize(win, e, dir) {
     var el = win.el;
+    dir = dir || 'se';
     var startX = e.clientX, startY = e.clientY;
     var origW = el.offsetWidth, origH = el.offsetHeight;
+    var origL = el.offsetLeft, origT = el.offsetTop;
+    var west = dir.indexOf('w') >= 0, east = dir.indexOf('e') >= 0;
+    var north = dir.indexOf('n') >= 0, south = dir.indexOf('s') >= 0;
     el.classList.add('is-resizing');
     // 一旦手动改大小就退出「最大化」状态
     win._setRestoreRect(null);
     var maxBtn = el.querySelector('.cw-max');
     if (maxBtn) { maxBtn.textContent = '⛶'; maxBtn.classList.remove('is-max'); }
+    var topLimit = chromeTop();   // 上边缘不能被拖到应用标题栏/菜单栏下面
     function onMove(ev) {
-      var w = Math.max(win._minW, Math.min(origW + (ev.clientX - startX), window.innerWidth - el.offsetLeft - 4));
-      var h = Math.max(win._minH, Math.min(origH + (ev.clientY - startY), window.innerHeight - el.offsetTop - 4));
-      el.style.width = w + 'px';
-      el.style.height = h + 'px';
+      var dx = ev.clientX - startX, dy = ev.clientY - startY;
+      var w = origW, h = origH, l = origL, t = origT;
+      if (east) w = origW + dx;
+      if (west) { w = origW - dx; }
+      if (south) h = origH + dy;
+      if (north) { h = origH - dy; }
+      // 夹住尺寸 (不小于最小尺寸)
+      w = Math.max(win._minW, w);
+      h = Math.max(win._minH, h);
+      // 西/北方向: 反向推 left/top, 保证被拖的那条边跟着指针走
+      if (west) l = origL + (origW - w);
+      if (north) t = origT + (origH - h);
+      // 上边缘不能被拖到应用标题栏/菜单栏下面 (先夹 top, 再把高度缩回来)
+      if (t < topLimit) {
+        if (north) h = Math.max(win._minH, h - (topLimit - t));
+        t = topLimit;
+      }
+      // 视口约束: 右/下不越界; 东/南边把尺寸夹回可用空间
+      if (!west) w = Math.min(w, Math.max(win._minW, window.innerWidth - 4 - l));
+      if (!north) h = Math.min(h, Math.max(win._minH, window.innerHeight - 4 - t));
+      w = Math.max(win._minW, Math.min(w, window.innerWidth - 8));
+      h = Math.max(win._minH, Math.min(h, window.innerHeight - 8));
+      if (l > window.innerWidth - 40) l = window.innerWidth - 40;
+      if (t > window.innerHeight - 28) t = window.innerHeight - 28;
+      el.style.width = Math.round(w) + 'px';
+      el.style.height = Math.round(h) + 'px';
+      el.style.left = Math.round(l) + 'px';
+      el.style.top = Math.round(t) + 'px';
       win._notifyResize(false);
     }
     function onUp() {
