@@ -800,6 +800,7 @@ var LANG_LABELS = {
   en_us: { native: 'English', en: 'English', zh: '英语 (English)' },
   de_de: { native: 'Deutsch', en: 'German', zh: '德语 (Deutsch)' },
   es_es: { native: 'Español', en: 'Spanish', zh: '西班牙语 (Español)' },
+  fr_fr: { native: 'Français', en: 'French', zh: '法语 (Français)' },
   ko_kr: { native: '한국어', en: 'Korean', zh: '韩语 (한국어)' },
   ru_ru: { native: 'Русский', en: 'Russian', zh: '俄语 (Русский)' },
 };
@@ -850,7 +851,7 @@ function syncLangModal() {
 
 // 弹窗选项旗帜 HTML
 function langFlagsHtml(code) {
-  var FLAG_FILES = { zh_cn: ['PRC'], zh_tw: ['HKN'], en_us: ['ENG', 'USA'], de_de: ['GER'], es_es: ['SPR'], ko_kr: ['KOR'], ru_ru: ['SOV'] };
+  var FLAG_FILES = { zh_cn: ['PRC'], zh_tw: ['HKN'], en_us: ['ENG', 'USA'], de_de: ['GER'], es_es: ['SPR'], fr_fr: ['FRA'], ko_kr: ['KOR'], ru_ru: ['SOV'] };
   var files = FLAG_FILES[code] || [];
   return files.map(function(f) {
     return '<img src="images/flag/' + f + '.png" alt="">';

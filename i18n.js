@@ -1,12 +1,12 @@
 /* ChoTenEditor 本地化核心模块
  * 依赖: js-yaml (全局 jsyaml)。在 index.html / settings.html 中紧随 js-yaml 加载。
  * 字典: locales/<lang>.yml (zh_cn 为源语言)。语言持久化: localStorage.editorConfig.language
- * 支持语言: zh_cn / zh_tw / en_us / de_de / es_es / ko_kr / ru_ru
+ * 支持语言: zh_cn / zh_tw / en_us / de_de / es_es / fr_fr / ko_kr / ru_ru
  * 默认语言: en_us (未选择过语言时)
  * 回退链: 新语言缺失词条 → en_us → zh_cn (源语言); zh_tw 同样 → en_us → zh_cn
  */
 (function () {
-  var SUPPORTED = ['zh_cn', 'zh_tw', 'en_us', 'de_de', 'es_es', 'ko_kr', 'ru_ru'];
+  var SUPPORTED = ['zh_cn', 'zh_tw', 'en_us', 'de_de', 'es_es', 'fr_fr', 'ko_kr', 'ru_ru'];
   // 查值回退链 (不含 zh_cn; zh_cn 作为最终兜底在 init 时总是加载)
   var FALLBACK = {
     zh_cn: [],
@@ -14,13 +14,14 @@
     en_us: [],
     de_de: ['en_us'],
     es_es: ['en_us'],
+    fr_fr: ['en_us'],
     ko_kr: ['en_us'],
     ru_ru: ['en_us'],
   };
   // <html lang> 属性映射
   var HTML_LANG = {
     zh_cn: 'zh-CN', zh_tw: 'zh-TW',
-    en_us: 'en', de_de: 'de', es_es: 'es', ko_kr: 'ko', ru_ru: 'ru',
+    en_us: 'en', de_de: 'de', es_es: 'es', fr_fr: 'fr', ko_kr: 'ko', ru_ru: 'ru',
   };
 
   var DEFAULT_LANG = 'en_us'; // 默认语言 (未选择过语言时)
@@ -150,7 +151,7 @@
   // 而不是刚保存但尚未生效的语言（否则设置面板会和编辑器界面语言不一致）。
   function getForcedLang() {
     try {
-      var m = /[?&]lang=(zh_cn|zh_tw|en_us|de_de|es_es|ko_kr|ru_ru)(?:&|$)/.exec(window.location.search || '');
+      var m = /[?&]lang=(zh_cn|zh_tw|en_us|de_de|es_es|fr_fr|ko_kr|ru_ru)(?:&|$)/.exec(window.location.search || '');
       return m ? m[1] : null;
     } catch (e) {
       return null;

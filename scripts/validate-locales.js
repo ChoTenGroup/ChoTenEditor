@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* locale 校验脚本: node scripts/validate-locales.js [--strict] [lang ...]
- * 默认校验全部语言 (zh_cn, zh_tw, en_us, de_de, es_es, ko_kr, ru_ru)。
+ * 默认校验全部语言 (zh_cn, zh_tw, en_us, de_de, es_es, fr_fr, ko_kr, ru_ru)。
  * --strict: 用于新增语言文件 —— 强制要求完整键覆盖 (en_us ∪ zh_cn 并集) 与 18 条 tips;
  *           不加 --strict 时 (存量文件) 缺键/缺 tip 只警告 (存量文件本来就互补回退)。
  * 检查项:
@@ -21,7 +21,7 @@ const SOURCE = 'zh_cn';    // 源语言
 const argv = process.argv.slice(2);
 const STRICT = argv.includes('--strict');
 const langs = argv.filter(a => !a.startsWith('--'));
-const ALL = ['zh_cn', 'zh_tw', 'en_us', 'de_de', 'es_es', 'ko_kr', 'ru_ru'];
+const ALL = ['zh_cn', 'zh_tw', 'en_us', 'de_de', 'es_es', 'fr_fr', 'ko_kr', 'ru_ru'];
 const targets = langs.length ? langs : ALL;
 
 function flatten(o, prefix) {

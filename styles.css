@@ -3252,6 +3252,13 @@ body {
   margin: 6px;
   flex-shrink: 0;
 }
+/* "添加分段"按钮: 分段列表下方, 水平居中 */
+.ce-sections .ce-add-btn {
+  display: block;
+  margin: 6px auto 4px;
+  width: calc(100% - 12px);
+  flex-shrink: 0;
+}
 .ce-entry-item {
   flex-shrink: 0;
   padding: 4px 10px;

@@ -230,28 +230,45 @@
       if (entries && entries.success && Array.isArray(entries.files)) {
         var names = {};
         for (var i = 0; i < entries.files.length; i++) names[entries.files[i].name] = entries.files[i];
-        // b) 插件根特征 (config.yml + config-version: + 兄弟特征)
+        // b) 插件根特征 (config.yml + 版本键 + 兄弟特征); 版本键: 旧版 config-version:, 新版 ___version___:
         if (names['config.yml'] && !names['config.yml'].isDirectory) {
           var head = await readHead(normPath + '/config.yml');
-          if (/^[ \t]*config-version\s*:/m.test(head) &&
+          if (/^[\t ]*(config-version|___version___)\s*:/m.test(head) &&
               (names['mappings.yml'] || names['commands.yml'] || (names['translations'] && names['translations'].isDirectory))) {
             result.isCraftEngine = true;
           }
         }
-        // a) resources/<pack>/pack.yml 带 namespace
-        if (!result.isCraftEngine && names['resources'] && names['resources'].isDirectory) {
+        // a) resources/<pack>/... : pack.yml 可选 (缺失时按目录结构判定)。
+        //    即使 b) 已命中 (插件根), 也继续扫 namespace —— b) 只证插件在, 不给命名空间。
+        if (names['resources'] && names['resources'].isDirectory) {
           try {
             var resEntries = await ROOT.electronAPI.readdir(normPath + '/resources');
             if (resEntries && resEntries.success && Array.isArray(resEntries.files)) {
               for (var j = 0; j < resEntries.files.length; j++) {
                 var packDir = resEntries.files[j];
                 if (!packDir.isDirectory) continue;
-                var packHead = await readHead(normPath + '/resources/' + packDir.name + '/pack.yml');
+                var packBase = normPath + '/resources/' + packDir.name;
+                // a1) pack.yml 带 namespace: (最权威)
+                var packHead = await readHead(packBase + '/pack.yml');
                 var m = packHead.match(/^namespace:\s*(\S+)/m);
                 if (m) {
                   result.isCraftEngine = true;
                   result.namespace = m[1];
                   break;
+                }
+                // a2) 无 pack.yml: 看包内是否有 configuration(s)/ 或 resourcepack/ 特征目录
+                var packEntries = await ROOT.electronAPI.readdir(packBase);
+                if (packEntries && packEntries.success && Array.isArray(packEntries.files)) {
+                  var pkNames = {};
+                  for (var k = 0; k < packEntries.files.length; k++) pkNames[packEntries.files[k].name] = packEntries.files[k];
+                  var hasStruct = (pkNames['configuration'] && pkNames['configuration'].isDirectory) ||
+                    (pkNames['configurations'] && pkNames['configurations'].isDirectory) ||
+                    (pkNames['resourcepack'] && pkNames['resourcepack'].isDirectory);
+                  if (hasStruct) {
+                    result.isCraftEngine = true;
+                    if (!result.namespace) result.namespace = packDir.name;
+                    break;
+                  }
                 }
               }
             }
@@ -4476,6 +4493,11 @@
     if (parsed.sections.length === 0) {
       secHtml += '<div class="ce-empty">' + _escHtml(_t('craftengine.noSections')) + '</div>';
     }
+    // "添加分段"始终可用 (有空态提示 / 有分段时放列表末尾; config.yml 除外, 其顶层键由文件自身定义)
+    if (!parsed._isConfig) {
+      secHtml += '<button class="cv-btn cv-btn-secondary ce-add-btn" data-action="ce-add-section">' +
+        _escHtml(_t('craftengine.addSection')) + '</button>';
+    }
 
     // 左2: 条目列表
     var entryHtml = '';
@@ -4810,6 +4832,9 @@
       } else if (action === 'ce-sync') {
         _sound('click');
         syncToSource(parsed);
+      } else if (action === 'ce-add-section') {
+        _sound('click');
+        _showAddSectionModal(containerEl);
       } else if (action === 'ce-add-entry') {
         _sound('click');
         _showAddEntryModal(containerEl);
@@ -5236,6 +5261,81 @@
       _ceRenderFn();
     });
     document.getElementById('ce-add-cancel').addEventListener('click', function () { modal.remove(); });
+    modal.addEventListener('click', function (e) { if (e.target === this) modal.remove(); });
+  }
+
+  // ---- 新建分段弹窗 (空文件/无分段时的起步入口; 空态按钮 data-action="ce-add-section") ----
+  function _showAddSectionModal(containerEl) {
+    var parsed = containerEl._ceParsed;
+    var ui = containerEl._ceUi;
+    if (!parsed || parsed._isConfig) return; // config.yml 顶层键由文件自身定义, 不在此新增
+    var old = document.getElementById('ce-addsec-modal');
+    if (old) old.remove();
+
+    // 下拉: SECTION_KEYS 中尚未出现的顶层分段 (已存在的无从新建)
+    var existing = {};
+    for (var i = 0; i < parsed.sections.length; i++) {
+      existing[parsed.sections[i].key] = true;
+    }
+    for (var rk in parsed._fileLevelRaw) existing[rk] = true;
+    var candidates = SECTION_KEYS.filter(function (k) { return !existing[k]; });
+
+    var modal = document.createElement('div');
+    modal.id = 'ce-addsec-modal';
+    modal.className = 'cv-modal';
+    var opts = candidates.map(function (k, idx) {
+      return '<option value="' + _escHtml(k) + '"' + (idx === 0 ? ' selected' : '') + '>' + _escHtml(k) + '</option>';
+    }).join('');
+    modal.innerHTML =
+      '<div class="cv-modal-content ce-modal-content">' +
+      '<h3>' + _escHtml(_t('craftengine.addSectionTitle')) + '</h3>' +
+      '<div class="cv-modal-field"><label>' + _escHtml(_t('craftengine.sectionPreset')) + '</label>' +
+      '<select id="ce-addsec-preset" class="cv-select cv-select-lg">' +
+      (opts || '<option value="">' + _escHtml(_t('craftengine.sectionPresetNone')) + '</option>') +
+      '</select>' +
+      '<div class="ce-field-hint">' + _escHtml(_t('craftengine.sectionPresetHint')) + '</div></div>' +
+      '<div class="cv-modal-field"><label>' + _escHtml(_t('craftengine.sectionCustom')) + '</label>' +
+      '<input id="ce-addsec-custom" class="cv-input" placeholder="items" spellcheck="false">' +
+      '<div class="ce-field-hint">' + _escHtml(_t('craftengine.sectionCustomHint')) + '</div></div>' +
+      '<div class="cv-modal-field" id="ce-addsec-err" style="display:none;color:var(--color-error);font-size:12px;"></div>' +
+      '<div class="cv-modal-actions">' +
+      '<button class="cv-btn cv-btn-secondary" id="ce-addsec-cancel">' + _escHtml(_t('common.close')) + '</button>' +
+      '<button class="cv-btn cv-btn-primary" id="ce-addsec-confirm">' + _escHtml(_t('craftengine.confirmAdd')) + '</button>' +
+      '</div></div>';
+    document.body.appendChild(modal);
+
+    var errEl = document.getElementById('ce-addsec-err');
+    function showErr(msg) { errEl.textContent = msg; errEl.style.display = ''; }
+    document.getElementById('ce-addsec-confirm').addEventListener('click', function () {
+      var custom = document.getElementById('ce-addsec-custom').value.trim();
+      var preset = document.getElementById('ce-addsec-preset').value;
+      var key = custom || preset;
+      if (!key) { showErr(_t('craftengine.sectionEmpty')); return; }
+      // 校验: 顶层分段键形如 items / items#1 (SECTION_BASE_RE), 且不与现有键重复
+      var m = key.match(SECTION_BASE_RE);
+      if (!m || SECTION_KEYS.indexOf(m[1]) === -1) { showErr(_t('craftengine.sectionInvalid')); return; }
+      for (var i = 0; i < parsed.sections.length; i++) {
+        if (parsed.sections[i].key === key) { showErr(_t('craftengine.sectionExists', { key: key })); return; }
+      }
+      if (parsed._fileLevelRaw[key] !== undefined) { showErr(_t('craftengine.sectionExists', { key: key })); return; }
+      // 与 parse() 同构的 section 结构: 同步写入 sections + _topOrder, generateYAML 才会带上
+      var sec = {
+        key: key,
+        base: m[1],
+        segment: m[2] || '',
+        entries: [],
+        entryOrder: [],
+        _comments: { beforeEntry: {}, inlineEntry: {} },
+      };
+      parsed.sections.push(sec);
+      parsed._topOrder.push({ kind: 'section', key: key });
+      _sfMarkDirty(parsed);
+      ui.section = parsed.sections.length - 1;
+      ui.entry = 0;
+      modal.remove();
+      _ceRenderFn();
+    });
+    document.getElementById('ce-addsec-cancel').addEventListener('click', function () { modal.remove(); });
     modal.addEventListener('click', function (e) { if (e.target === this) modal.remove(); });
   }
 
